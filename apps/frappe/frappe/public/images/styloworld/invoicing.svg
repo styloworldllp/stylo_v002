@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 30 30" width="512" height="512">
+  <rect width="30" height="30" rx="7" fill="#00A86B"/>
+  <rect x="5" y="3" width="16" height="21" rx="2.5" stroke="#fff" stroke-width="1.8" fill="#fff" opacity=".18"/>
+    <path d="M17.5 3 L17.5 8.5 L21 8.5" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+    <line x1="8.5" y1="13" x2="18.5" y2="13" stroke="#fff" stroke-width="1.6" stroke-linecap="round"/>
+    <line x1="8.5" y1="16.5" x2="16" y2="16.5" stroke="#fff" stroke-width="1.6" stroke-linecap="round" opacity=".65"/>
+    <text x="17" y="23" font-size="7" fill="#fff" font-weight="700" text-anchor="middle" font-family="system-ui">₹</text>
+    <line x1="8.5" y1="20" x2="12" y2="20" stroke="#fff" stroke-width="1.4" stroke-linecap="round" opacity=".5"/>
+</svg>

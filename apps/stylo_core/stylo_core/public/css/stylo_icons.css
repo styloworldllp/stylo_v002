@@ -1,0 +1,107 @@
+/* === Stylo BMS Dark-Mode Icon Switching ===
+   Swaps subtle (light) SVG icons → dark SVG icons when data-theme="dark".
+   Icons live at /assets/frappe/icons/desktop_icons/subtle/*.svg  (light)
+                /assets/frappe/icons/desktop_icons/stylo-dark/*.svg (dark)
+*/
+
+/* Single-word icons */
+[data-theme="dark"] img.app-icon[src="/assets/frappe/icons/desktop_icons/subtle/accounting.svg"] { content: url("/assets/frappe/icons/desktop_icons/stylo-dark/accounting.svg"); }
+[data-theme="dark"] img.app-icon[src="/assets/frappe/icons/desktop_icons/subtle/assets.svg"] { content: url("/assets/frappe/icons/desktop_icons/stylo-dark/assets.svg"); }
+[data-theme="dark"] img.app-icon[src="/assets/frappe/icons/desktop_icons/subtle/automation.svg"] { content: url("/assets/frappe/icons/desktop_icons/stylo-dark/automation.svg"); }
+[data-theme="dark"] img.app-icon[src="/assets/frappe/icons/desktop_icons/subtle/banking.svg"] { content: url("/assets/frappe/icons/desktop_icons/stylo-dark/banking.svg"); }
+[data-theme="dark"] img.app-icon[src="/assets/frappe/icons/desktop_icons/subtle/budget.svg"] { content: url("/assets/frappe/icons/desktop_icons/stylo-dark/budget.svg"); }
+[data-theme="dark"] img.app-icon[src="/assets/frappe/icons/desktop_icons/subtle/build.svg"] { content: url("/assets/frappe/icons/desktop_icons/stylo-dark/build.svg"); }
+[data-theme="dark"] img.app-icon[src="/assets/frappe/icons/desktop_icons/subtle/buying.svg"] { content: url("/assets/frappe/icons/desktop_icons/stylo-dark/buying.svg"); }
+[data-theme="dark"] img.app-icon[src="/assets/frappe/icons/desktop_icons/subtle/crm.svg"] { content: url("/assets/frappe/icons/desktop_icons/stylo-dark/crm.svg"); }
+[data-theme="dark"] img.app-icon[src="/assets/frappe/icons/desktop_icons/subtle/dashboard.svg"] { content: url("/assets/frappe/icons/desktop_icons/stylo-dark/dashboard.svg"); }
+[data-theme="dark"] img.app-icon[src="/assets/frappe/icons/desktop_icons/subtle/data.svg"] { content: url("/assets/frappe/icons/desktop_icons/stylo-dark/data.svg"); }
+[data-theme="dark"] img.app-icon[src="/assets/frappe/icons/desktop_icons/subtle/desktop.svg"] { content: url("/assets/frappe/icons/desktop_icons/stylo-dark/desktop.svg"); }
+[data-theme="dark"] img.app-icon[src="/assets/frappe/icons/desktop_icons/subtle/documents.svg"] { content: url("/assets/frappe/icons/desktop_icons/stylo-dark/documents.svg"); }
+[data-theme="dark"] img.app-icon[src="/assets/frappe/icons/desktop_icons/subtle/email.svg"] { content: url("/assets/frappe/icons/desktop_icons/stylo-dark/email.svg"); }
+[data-theme="dark"] img.app-icon[src="/assets/frappe/icons/desktop_icons/subtle/hrms.svg"] { content: url("/assets/frappe/icons/desktop_icons/stylo-dark/hrms.svg"); }
+[data-theme="dark"] img.app-icon[src="/assets/frappe/icons/desktop_icons/subtle/integrations.svg"] { content: url("/assets/frappe/icons/desktop_icons/stylo-dark/integrations.svg"); }
+[data-theme="dark"] img.app-icon[src="/assets/frappe/icons/desktop_icons/subtle/inventory.svg"] { content: url("/assets/frappe/icons/desktop_icons/stylo-dark/inventory.svg"); }
+[data-theme="dark"] img.app-icon[src="/assets/frappe/icons/desktop_icons/subtle/invoicing.svg"] { content: url("/assets/frappe/icons/desktop_icons/stylo-dark/invoicing.svg"); }
+[data-theme="dark"] img.app-icon[src="/assets/frappe/icons/desktop_icons/subtle/leads.svg"] { content: url("/assets/frappe/icons/desktop_icons/stylo-dark/leads.svg"); }
+[data-theme="dark"] img.app-icon[src="/assets/frappe/icons/desktop_icons/subtle/maintenance.svg"] { content: url("/assets/frappe/icons/desktop_icons/stylo-dark/maintenance.svg"); }
+[data-theme="dark"] img.app-icon[src="/assets/frappe/icons/desktop_icons/subtle/manufacturing.svg"] { content: url("/assets/frappe/icons/desktop_icons/stylo-dark/manufacturing.svg"); }
+[data-theme="dark"] img.app-icon[src="/assets/frappe/icons/desktop_icons/subtle/organization.svg"] { content: url("/assets/frappe/icons/desktop_icons/stylo-dark/organization.svg"); }
+[data-theme="dark"] img.app-icon[src="/assets/frappe/icons/desktop_icons/subtle/payments.svg"] { content: url("/assets/frappe/icons/desktop_icons/stylo-dark/payments.svg"); }
+[data-theme="dark"] img.app-icon[src="/assets/frappe/icons/desktop_icons/subtle/payroll.svg"] { content: url("/assets/frappe/icons/desktop_icons/stylo-dark/payroll.svg"); }
+[data-theme="dark"] img.app-icon[src="/assets/frappe/icons/desktop_icons/subtle/printing.svg"] { content: url("/assets/frappe/icons/desktop_icons/stylo-dark/printing.svg"); }
+[data-theme="dark"] img.app-icon[src="/assets/frappe/icons/desktop_icons/subtle/projects.svg"] { content: url("/assets/frappe/icons/desktop_icons/stylo-dark/projects.svg"); }
+[data-theme="dark"] img.app-icon[src="/assets/frappe/icons/desktop_icons/subtle/purchase.svg"] { content: url("/assets/frappe/icons/desktop_icons/stylo-dark/purchase.svg"); }
+[data-theme="dark"] img.app-icon[src="/assets/frappe/icons/desktop_icons/subtle/quality.svg"] { content: url("/assets/frappe/icons/desktop_icons/stylo-dark/quality.svg"); }
+[data-theme="dark"] img.app-icon[src="/assets/frappe/icons/desktop_icons/subtle/reports.svg"] { content: url("/assets/frappe/icons/desktop_icons/stylo-dark/reports.svg"); }
+[data-theme="dark"] img.app-icon[src="/assets/frappe/icons/desktop_icons/subtle/sales.svg"] { content: url("/assets/frappe/icons/desktop_icons/stylo-dark/sales.svg"); }
+[data-theme="dark"] img.app-icon[src="/assets/frappe/icons/desktop_icons/subtle/selling.svg"] { content: url("/assets/frappe/icons/desktop_icons/stylo-dark/selling.svg"); }
+[data-theme="dark"] img.app-icon[src="/assets/frappe/icons/desktop_icons/subtle/settings.svg"] { content: url("/assets/frappe/icons/desktop_icons/stylo-dark/settings.svg"); }
+[data-theme="dark"] img.app-icon[src="/assets/frappe/icons/desktop_icons/subtle/setup.svg"] { content: url("/assets/frappe/icons/desktop_icons/stylo-dark/setup.svg"); }
+[data-theme="dark"] img.app-icon[src="/assets/frappe/icons/desktop_icons/subtle/stock.svg"] { content: url("/assets/frappe/icons/desktop_icons/stylo-dark/stock.svg"); }
+[data-theme="dark"] img.app-icon[src="/assets/frappe/icons/desktop_icons/subtle/subcontracting.svg"] { content: url("/assets/frappe/icons/desktop_icons/stylo-dark/subcontracting.svg"); }
+[data-theme="dark"] img.app-icon[src="/assets/frappe/icons/desktop_icons/subtle/subscription.svg"] { content: url("/assets/frappe/icons/desktop_icons/stylo-dark/subscription.svg"); }
+[data-theme="dark"] img.app-icon[src="/assets/frappe/icons/desktop_icons/subtle/support.svg"] { content: url("/assets/frappe/icons/desktop_icons/stylo-dark/support.svg"); }
+[data-theme="dark"] img.app-icon[src="/assets/frappe/icons/desktop_icons/subtle/system.svg"] { content: url("/assets/frappe/icons/desktop_icons/stylo-dark/system.svg"); }
+[data-theme="dark"] img.app-icon[src="/assets/frappe/icons/desktop_icons/subtle/taxes.svg"] { content: url("/assets/frappe/icons/desktop_icons/stylo-dark/taxes.svg"); }
+[data-theme="dark"] img.app-icon[src="/assets/frappe/icons/desktop_icons/subtle/users.svg"] { content: url("/assets/frappe/icons/desktop_icons/stylo-dark/users.svg"); }
+[data-theme="dark"] img.app-icon[src="/assets/frappe/icons/desktop_icons/subtle/website.svg"] { content: url("/assets/frappe/icons/desktop_icons/stylo-dark/website.svg"); }
+[data-theme="dark"] img.app-icon[src="/assets/frappe/icons/desktop_icons/subtle/workspaces.svg"] { content: url("/assets/frappe/icons/desktop_icons/stylo-dark/workspaces.svg"); }
+
+/* Multi-word icons (scrubbed to underscores by frappe.scrub()) */
+[data-theme="dark"] img.app-icon[src="/assets/frappe/icons/desktop_icons/subtle/accounts_setup.svg"] { content: url("/assets/frappe/icons/desktop_icons/stylo-dark/accounts-setup.svg"); }
+[data-theme="dark"] img.app-icon[src="/assets/frappe/icons/desktop_icons/subtle/ai_assistant.svg"] { content: url("/assets/frappe/icons/desktop_icons/stylo-dark/ai-assistant.svg"); }
+[data-theme="dark"] img.app-icon[src="/assets/frappe/icons/desktop_icons/subtle/asset_movement.svg"] { content: url("/assets/frappe/icons/desktop_icons/stylo-dark/asset-movement.svg"); }
+[data-theme="dark"] img.app-icon[src="/assets/frappe/icons/desktop_icons/subtle/erp_core.svg"] { content: url("/assets/frappe/icons/desktop_icons/stylo-dark/erp-core.svg"); }
+[data-theme="dark"] img.app-icon[src="/assets/frappe/icons/desktop_icons/subtle/erp_settings.svg"] { content: url("/assets/frappe/icons/desktop_icons/stylo-dark/erp-settings.svg"); }
+[data-theme="dark"] img.app-icon[src="/assets/frappe/icons/desktop_icons/subtle/financial_reports.svg"] { content: url("/assets/frappe/icons/desktop_icons/stylo-dark/financial-reports.svg"); }
+[data-theme="dark"] img.app-icon[src="/assets/frappe/icons/desktop_icons/subtle/share_management.svg"] { content: url("/assets/frappe/icons/desktop_icons/stylo-dark/share-management.svg"); }
+[data-theme="dark"] img.app-icon[src="/assets/frappe/icons/desktop_icons/subtle/website_v2.svg"] { content: url("/assets/frappe/icons/desktop_icons/stylo-dark/website-v2.svg"); }
+
+/* Sidebar header icons — same swap for .sidebar-app-icon */
+[data-theme="dark"] img.sidebar-app-icon[src="/assets/frappe/icons/desktop_icons/subtle/accounting.svg"] { content: url("/assets/frappe/icons/desktop_icons/stylo-dark/accounting.svg"); }
+[data-theme="dark"] img.sidebar-app-icon[src="/assets/frappe/icons/desktop_icons/subtle/assets.svg"] { content: url("/assets/frappe/icons/desktop_icons/stylo-dark/assets.svg"); }
+[data-theme="dark"] img.sidebar-app-icon[src="/assets/frappe/icons/desktop_icons/subtle/automation.svg"] { content: url("/assets/frappe/icons/desktop_icons/stylo-dark/automation.svg"); }
+[data-theme="dark"] img.sidebar-app-icon[src="/assets/frappe/icons/desktop_icons/subtle/banking.svg"] { content: url("/assets/frappe/icons/desktop_icons/stylo-dark/banking.svg"); }
+[data-theme="dark"] img.sidebar-app-icon[src="/assets/frappe/icons/desktop_icons/subtle/budget.svg"] { content: url("/assets/frappe/icons/desktop_icons/stylo-dark/budget.svg"); }
+[data-theme="dark"] img.sidebar-app-icon[src="/assets/frappe/icons/desktop_icons/subtle/build.svg"] { content: url("/assets/frappe/icons/desktop_icons/stylo-dark/build.svg"); }
+[data-theme="dark"] img.sidebar-app-icon[src="/assets/frappe/icons/desktop_icons/subtle/buying.svg"] { content: url("/assets/frappe/icons/desktop_icons/stylo-dark/buying.svg"); }
+[data-theme="dark"] img.sidebar-app-icon[src="/assets/frappe/icons/desktop_icons/subtle/crm.svg"] { content: url("/assets/frappe/icons/desktop_icons/stylo-dark/crm.svg"); }
+[data-theme="dark"] img.sidebar-app-icon[src="/assets/frappe/icons/desktop_icons/subtle/dashboard.svg"] { content: url("/assets/frappe/icons/desktop_icons/stylo-dark/dashboard.svg"); }
+[data-theme="dark"] img.sidebar-app-icon[src="/assets/frappe/icons/desktop_icons/subtle/data.svg"] { content: url("/assets/frappe/icons/desktop_icons/stylo-dark/data.svg"); }
+[data-theme="dark"] img.sidebar-app-icon[src="/assets/frappe/icons/desktop_icons/subtle/email.svg"] { content: url("/assets/frappe/icons/desktop_icons/stylo-dark/email.svg"); }
+[data-theme="dark"] img.sidebar-app-icon[src="/assets/frappe/icons/desktop_icons/subtle/hrms.svg"] { content: url("/assets/frappe/icons/desktop_icons/stylo-dark/hrms.svg"); }
+[data-theme="dark"] img.sidebar-app-icon[src="/assets/frappe/icons/desktop_icons/subtle/integrations.svg"] { content: url("/assets/frappe/icons/desktop_icons/stylo-dark/integrations.svg"); }
+[data-theme="dark"] img.sidebar-app-icon[src="/assets/frappe/icons/desktop_icons/subtle/inventory.svg"] { content: url("/assets/frappe/icons/desktop_icons/stylo-dark/inventory.svg"); }
+[data-theme="dark"] img.sidebar-app-icon[src="/assets/frappe/icons/desktop_icons/subtle/invoicing.svg"] { content: url("/assets/frappe/icons/desktop_icons/stylo-dark/invoicing.svg"); }
+[data-theme="dark"] img.sidebar-app-icon[src="/assets/frappe/icons/desktop_icons/subtle/leads.svg"] { content: url("/assets/frappe/icons/desktop_icons/stylo-dark/leads.svg"); }
+[data-theme="dark"] img.sidebar-app-icon[src="/assets/frappe/icons/desktop_icons/subtle/maintenance.svg"] { content: url("/assets/frappe/icons/desktop_icons/stylo-dark/maintenance.svg"); }
+[data-theme="dark"] img.sidebar-app-icon[src="/assets/frappe/icons/desktop_icons/subtle/manufacturing.svg"] { content: url("/assets/frappe/icons/desktop_icons/stylo-dark/manufacturing.svg"); }
+[data-theme="dark"] img.sidebar-app-icon[src="/assets/frappe/icons/desktop_icons/subtle/organization.svg"] { content: url("/assets/frappe/icons/desktop_icons/stylo-dark/organization.svg"); }
+[data-theme="dark"] img.sidebar-app-icon[src="/assets/frappe/icons/desktop_icons/subtle/payments.svg"] { content: url("/assets/frappe/icons/desktop_icons/stylo-dark/payments.svg"); }
+[data-theme="dark"] img.sidebar-app-icon[src="/assets/frappe/icons/desktop_icons/subtle/payroll.svg"] { content: url("/assets/frappe/icons/desktop_icons/stylo-dark/payroll.svg"); }
+[data-theme="dark"] img.sidebar-app-icon[src="/assets/frappe/icons/desktop_icons/subtle/printing.svg"] { content: url("/assets/frappe/icons/desktop_icons/stylo-dark/printing.svg"); }
+[data-theme="dark"] img.sidebar-app-icon[src="/assets/frappe/icons/desktop_icons/subtle/projects.svg"] { content: url("/assets/frappe/icons/desktop_icons/stylo-dark/projects.svg"); }
+[data-theme="dark"] img.sidebar-app-icon[src="/assets/frappe/icons/desktop_icons/subtle/purchase.svg"] { content: url("/assets/frappe/icons/desktop_icons/stylo-dark/purchase.svg"); }
+[data-theme="dark"] img.sidebar-app-icon[src="/assets/frappe/icons/desktop_icons/subtle/quality.svg"] { content: url("/assets/frappe/icons/desktop_icons/stylo-dark/quality.svg"); }
+[data-theme="dark"] img.sidebar-app-icon[src="/assets/frappe/icons/desktop_icons/subtle/reports.svg"] { content: url("/assets/frappe/icons/desktop_icons/stylo-dark/reports.svg"); }
+[data-theme="dark"] img.sidebar-app-icon[src="/assets/frappe/icons/desktop_icons/subtle/sales.svg"] { content: url("/assets/frappe/icons/desktop_icons/stylo-dark/sales.svg"); }
+[data-theme="dark"] img.sidebar-app-icon[src="/assets/frappe/icons/desktop_icons/subtle/selling.svg"] { content: url("/assets/frappe/icons/desktop_icons/stylo-dark/selling.svg"); }
+[data-theme="dark"] img.sidebar-app-icon[src="/assets/frappe/icons/desktop_icons/subtle/settings.svg"] { content: url("/assets/frappe/icons/desktop_icons/stylo-dark/settings.svg"); }
+[data-theme="dark"] img.sidebar-app-icon[src="/assets/frappe/icons/desktop_icons/subtle/setup.svg"] { content: url("/assets/frappe/icons/desktop_icons/stylo-dark/setup.svg"); }
+[data-theme="dark"] img.sidebar-app-icon[src="/assets/frappe/icons/desktop_icons/subtle/stock.svg"] { content: url("/assets/frappe/icons/desktop_icons/stylo-dark/stock.svg"); }
+[data-theme="dark"] img.sidebar-app-icon[src="/assets/frappe/icons/desktop_icons/subtle/subcontracting.svg"] { content: url("/assets/frappe/icons/desktop_icons/stylo-dark/subcontracting.svg"); }
+[data-theme="dark"] img.sidebar-app-icon[src="/assets/frappe/icons/desktop_icons/subtle/subscription.svg"] { content: url("/assets/frappe/icons/desktop_icons/stylo-dark/subscription.svg"); }
+[data-theme="dark"] img.sidebar-app-icon[src="/assets/frappe/icons/desktop_icons/subtle/support.svg"] { content: url("/assets/frappe/icons/desktop_icons/stylo-dark/support.svg"); }
+[data-theme="dark"] img.sidebar-app-icon[src="/assets/frappe/icons/desktop_icons/subtle/system.svg"] { content: url("/assets/frappe/icons/desktop_icons/stylo-dark/system.svg"); }
+[data-theme="dark"] img.sidebar-app-icon[src="/assets/frappe/icons/desktop_icons/subtle/taxes.svg"] { content: url("/assets/frappe/icons/desktop_icons/stylo-dark/taxes.svg"); }
+[data-theme="dark"] img.sidebar-app-icon[src="/assets/frappe/icons/desktop_icons/subtle/users.svg"] { content: url("/assets/frappe/icons/desktop_icons/stylo-dark/users.svg"); }
+[data-theme="dark"] img.sidebar-app-icon[src="/assets/frappe/icons/desktop_icons/subtle/website.svg"] { content: url("/assets/frappe/icons/desktop_icons/stylo-dark/website.svg"); }
+[data-theme="dark"] img.sidebar-app-icon[src="/assets/frappe/icons/desktop_icons/subtle/workspaces.svg"] { content: url("/assets/frappe/icons/desktop_icons/stylo-dark/workspaces.svg"); }
+[data-theme="dark"] img.sidebar-app-icon[src="/assets/frappe/icons/desktop_icons/subtle/accounts_setup.svg"] { content: url("/assets/frappe/icons/desktop_icons/stylo-dark/accounts-setup.svg"); }
+[data-theme="dark"] img.sidebar-app-icon[src="/assets/frappe/icons/desktop_icons/subtle/ai_assistant.svg"] { content: url("/assets/frappe/icons/desktop_icons/stylo-dark/ai-assistant.svg"); }
+[data-theme="dark"] img.sidebar-app-icon[src="/assets/frappe/icons/desktop_icons/subtle/asset_movement.svg"] { content: url("/assets/frappe/icons/desktop_icons/stylo-dark/asset-movement.svg"); }
+[data-theme="dark"] img.sidebar-app-icon[src="/assets/frappe/icons/desktop_icons/subtle/erp_core.svg"] { content: url("/assets/frappe/icons/desktop_icons/stylo-dark/erp-core.svg"); }
+[data-theme="dark"] img.sidebar-app-icon[src="/assets/frappe/icons/desktop_icons/subtle/erp_settings.svg"] { content: url("/assets/frappe/icons/desktop_icons/stylo-dark/erp-settings.svg"); }
+[data-theme="dark"] img.sidebar-app-icon[src="/assets/frappe/icons/desktop_icons/subtle/financial_reports.svg"] { content: url("/assets/frappe/icons/desktop_icons/stylo-dark/financial-reports.svg"); }
+[data-theme="dark"] img.sidebar-app-icon[src="/assets/frappe/icons/desktop_icons/subtle/share_management.svg"] { content: url("/assets/frappe/icons/desktop_icons/stylo-dark/share-management.svg"); }
+[data-theme="dark"] img.sidebar-app-icon[src="/assets/frappe/icons/desktop_icons/subtle/website_v2.svg"] { content: url("/assets/frappe/icons/desktop_icons/stylo-dark/website-v2.svg"); }

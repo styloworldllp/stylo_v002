@@ -1,0 +1,82 @@
+version: "3.9"
+
+# ── Production — uses external managed MariaDB and Redis ─────────────────────
+# Usage: docker-compose -f docker-compose.prod.yml up -d
+# All DB/Redis values come from environment variables (set in Coolify or .env).
+
+x-stylo-env: &stylo-env
+  SITE_NAME: ${SITE_NAME}
+  DB_HOST: ${DB_HOST}
+  DB_PORT: ${DB_PORT:-3306}
+  DB_NAME: ${DB_NAME}
+  DB_PASSWORD: ${DB_PASSWORD}
+  DB_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
+  REDIS_CACHE_URL: ${REDIS_CACHE_URL}
+  REDIS_QUEUE_URL: ${REDIS_QUEUE_URL}
+  REDIS_SOCKETIO_URL: ${REDIS_SOCKETIO_URL}
+  GUNICORN_WORKERS: ${GUNICORN_WORKERS:-4}
+  GUNICORN_THREADS: ${GUNICORN_THREADS:-4}
+
+x-stylo-common: &stylo-common
+  image: ${STYLO_IMAGE:-ghcr.io/your-org/stylo-bench:latest}
+  environment:
+    <<: *stylo-env
+  volumes:
+    - sites-files:/home/frappe/frappe-bench/sites/${SITE_NAME}/public/files
+    - sites-private:/home/frappe/frappe-bench/sites/${SITE_NAME}/private
+  restart: always
+  logging:
+    driver: "json-file"
+    options:
+      max-size: "50m"
+      max-file: "5"
+
+services:
+  web:
+    <<: *stylo-common
+    command: web
+    environment:
+      <<: *stylo-env
+      RUN_MIGRATE: "true"
+    ports:
+      - "8000:8000"
+
+  socketio:
+    <<: *stylo-common
+    command: socketio
+    environment:
+      <<: *stylo-env
+      RUN_MIGRATE: "false"
+    ports:
+      - "9000:9000"
+
+  worker-short:
+    <<: *stylo-common
+    command: worker-short
+    environment:
+      <<: *stylo-env
+      RUN_MIGRATE: "false"
+
+  worker-long:
+    <<: *stylo-common
+    command: worker-long
+    environment:
+      <<: *stylo-env
+      RUN_MIGRATE: "false"
+
+  # ── Deploy scheduler to ONE server only via Coolify ────────────────────────
+  # In Coolify: create this as a separate service, deploy to a single node.
+  scheduler:
+    <<: *stylo-common
+    command: scheduler
+    environment:
+      <<: *stylo-env
+      RUN_MIGRATE: "false"
+
+volumes:
+  sites-files:
+    driver: local
+    # For multi-server: use an NFS or S3-backed volume driver
+    # driver: rclone  (with rclone configured for S3)
+  sites-private:
+    driver: local

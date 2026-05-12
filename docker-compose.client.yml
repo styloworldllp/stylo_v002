@@ -1,0 +1,65 @@
+version: "3.9"
+
+# ── Styloworld — Client Deployment ───────────────────────────────────────────
+# This file is provided by Styloworld to customers.
+# It contains NO source code — it only pulls the pre-built image.
+#
+# Setup:
+#   1. Copy .env.client.template to .env and fill in your values
+#   2. docker login ghcr.io -u YOUR_GITHUB_USERNAME -p YOUR_REGISTRY_TOKEN
+#   3. docker-compose -f docker-compose.client.yml pull
+#   4. docker-compose -f docker-compose.client.yml up -d
+#
+# Update (when Styloworld releases a new version):
+#   docker-compose -f docker-compose.client.yml pull
+#   docker-compose -f docker-compose.client.yml up -d
+
+x-common: &common
+  image: ghcr.io/styloworld/stylo-bench:latest
+  env_file: .env
+  volumes:
+    - files:/home/frappe/frappe-bench/sites/${SITE_NAME}/public/files
+    - private:/home/frappe/frappe-bench/sites/${SITE_NAME}/private
+  restart: always
+  logging:
+    driver: "json-file"
+    options:
+      max-size: "20m"
+      max-file: "5"
+
+services:
+  web:
+    <<: *common
+    command: web
+    ports:
+      - "8000:8000"
+
+  socketio:
+    <<: *common
+    command: socketio
+    environment:
+      RUN_MIGRATE: "false"
+    ports:
+      - "9000:9000"
+
+  worker-short:
+    <<: *common
+    command: worker-short
+    environment:
+      RUN_MIGRATE: "false"
+
+  worker-long:
+    <<: *common
+    command: worker-long
+    environment:
+      RUN_MIGRATE: "false"
+
+  scheduler:
+    <<: *common
+    command: scheduler
+    environment:
+      RUN_MIGRATE: "false"
+
+volumes:
+  files:
+  private:

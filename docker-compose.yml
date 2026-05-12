@@ -1,0 +1,108 @@
+version: "3.9"
+
+# ── Local development — all services in one compose file ─────────────────────
+# Copy .env.example to .env and fill in your values before running.
+
+x-stylo-env: &stylo-env
+  SITE_NAME: ${SITE_NAME:-stylo.localhost}
+  DB_HOST: mariadb
+  DB_PORT: 3306
+  DB_NAME: ${DB_NAME:-_stylo}
+  DB_PASSWORD: ${DB_PASSWORD:-changeme}
+  DB_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:-changeme}
+  REDIS_CACHE_URL: redis://redis:6379/0
+  REDIS_QUEUE_URL: redis://redis:6379/1
+  REDIS_SOCKETIO_URL: redis://redis:6379/2
+  RUN_MIGRATE: "true"
+
+x-stylo-common: &stylo-common
+  image: stylo-bench:local
+  build:
+    context: .
+    dockerfile: Dockerfile
+  environment:
+    <<: *stylo-env
+  volumes:
+    # Persist uploaded files across restarts
+    - sites-files:/home/frappe/frappe-bench/sites/${SITE_NAME:-stylo.localhost}/public/files
+    - sites-private:/home/frappe/frappe-bench/sites/${SITE_NAME:-stylo.localhost}/private
+  depends_on:
+    mariadb:
+      condition: service_healthy
+    redis:
+      condition: service_started
+  restart: unless-stopped
+
+services:
+  # ── Web (gunicorn) ─────────────────────────────────────────────────────────
+  web:
+    <<: *stylo-common
+    command: web
+    ports:
+      - "8000:8000"
+
+  # ── SocketIO ───────────────────────────────────────────────────────────────
+  socketio:
+    <<: *stylo-common
+    command: socketio
+    environment:
+      <<: *stylo-env
+      RUN_MIGRATE: "false"
+    ports:
+      - "9000:9000"
+
+  # ── Workers ───────────────────────────────────────────────────────────────
+  worker-short:
+    <<: *stylo-common
+    command: worker-short
+    environment:
+      <<: *stylo-env
+      RUN_MIGRATE: "false"
+
+  worker-long:
+    <<: *stylo-common
+    command: worker-long
+    environment:
+      <<: *stylo-env
+      RUN_MIGRATE: "false"
+
+  # ── Scheduler (ONLY ONE instance allowed globally) ────────────────────────
+  scheduler:
+    <<: *stylo-common
+    command: scheduler
+    environment:
+      <<: *stylo-env
+      RUN_MIGRATE: "false"
+
+  # ── MariaDB ───────────────────────────────────────────────────────────────
+  mariadb:
+    image: mariadb:10.6
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:-changeme}
+      MYSQL_DATABASE: ${DB_NAME:-_stylo}
+      MYSQL_USER: ${DB_USER:-stylo}
+      MYSQL_PASSWORD: ${DB_PASSWORD:-changeme}
+    volumes:
+      - mariadb-data:/var/lib/mysql
+    ports:
+      - "3306:3306"
+    healthcheck:
+      test: ["CMD", "mariadb-admin", "ping", "-h", "localhost",
+             "-u", "root", "-pchangeme"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+
+  # ── Redis ─────────────────────────────────────────────────────────────────
+  redis:
+    image: redis:7-alpine
+    volumes:
+      - redis-data:/data
+    restart: unless-stopped
+
+volumes:
+  mariadb-data:
+  redis-data:
+  sites-files:
+  sites-private:

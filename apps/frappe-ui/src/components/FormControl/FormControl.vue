@@ -1,0 +1,137 @@
+<template>
+  <div
+    v-if="type != 'checkbox'"
+    :class="['space-y-1.5', attrs.class]"
+    :style="attrs.style"
+  >
+    <FormLabel
+      v-if="label"
+      :label="label"
+      :size="size"
+      :id="id"
+      :required="required"
+    />
+    <Select
+      v-if="type === 'select'"
+      :id="id"
+      v-bind="{ ...controlAttrs, size, variant }"
+    >
+      <template #prefix v-if="$slots.prefix">
+        <slot name="prefix" />
+      </template>
+    </Select>
+    <Combobox
+      v-else-if="type === 'combobox'"
+      :id="id"
+      v-bind="{ ...controlAttrs, size, variant }"
+    >
+      <template #prefix v-if="$slots.prefix">
+        <slot name="prefix" />
+      </template>
+    </Combobox>
+    <Autocomplete
+      v-else-if="type === 'autocomplete'"
+      v-bind="{ ...controlAttrs }"
+    >
+      <template #prefix v-if="$slots.prefix">
+        <slot name="prefix" />
+      </template>
+      <template #item-prefix="itemPrefixProps" v-if="$slots['item-prefix']">
+        <slot name="item-prefix" v-bind="itemPrefixProps" />
+      </template>
+    </Autocomplete>
+    <Textarea
+      v-else-if="type === 'textarea'"
+      :id="id"
+      v-bind="{ ...controlAttrs, size, variant }"
+    />
+    <TextInput
+      v-else
+      :id="id"
+      v-bind="{ ...controlAttrs, type, size, variant, required }"
+    >
+      <template #prefix v-if="$slots.prefix">
+        <slot name="prefix" />
+      </template>
+      <template #suffix v-if="$slots.suffix">
+        <slot name="suffix" />
+      </template>
+    </TextInput>
+    <slot name="description">
+      <p v-if="description" :class="descriptionClasses">{{ description }}</p>
+    </slot>
+  </div>
+  <Checkbox
+    v-else
+    :id="id"
+    v-bind="{ ...controlAttrs, label, size, class: attrs.class }"
+  />
+</template>
+<script setup lang="ts">
+import { useAttrs, computed, provide, watchEffect } from 'vue'
+import { useId } from '../../utils/useId'
+import { TextInput } from '../TextInput'
+import { Select } from '../Select'
+import { Textarea } from '../Textarea'
+import { Checkbox } from '../Checkbox'
+import { Autocomplete } from '../Autocomplete'
+import { autocompleteDeprecationSuppressed } from '../Autocomplete/deprecationKey'
+import { Combobox } from '../Combobox'
+import FormLabel from '../FormLabel.vue'
+import { warnDeprecated } from '../../utils/warnDeprecated'
+import type { FormControlProps } from './types'
+
+defineOptions({
+  inheritAttrs: false,
+})
+
+const id = useId()
+const props = withDefaults(defineProps<FormControlProps>(), {
+  type: 'text',
+  size: 'sm',
+  variant: 'subtle',
+})
+
+provide(autocompleteDeprecationSuppressed, true)
+
+watchEffect(() => {
+  if (props.type === 'autocomplete') {
+    warnDeprecated('FormControl type="autocomplete"', 'Combobox')
+  }
+})
+
+const attrs = useAttrs()
+const controlAttrs = computed(() => {
+  // pass everything except class and style
+  let _attrs: typeof attrs = {}
+  for (let key in attrs) {
+    if (key !== 'class' && key !== 'style') {
+      _attrs[key] = attrs[key]
+    }
+  }
+  return _attrs
+})
+
+const descriptionClasses = computed(() => {
+  return [
+    {
+      sm: 'text-p-xs',
+      md: 'text-p-base',
+    }[props.size],
+    'text-ink-gray-5',
+  ]
+})
+
+defineSlots<{
+  /** Custom content rendered before the input (prefix icon/content) */
+  prefix?: () => any
+  /** Custom content rendered after the input (suffix icon/content) */
+  suffix?: () => any
+  /** Custom description slot (replaces description prop) */
+  description?: () => any
+  /** Custom slot for autocomplete items prefix (if using Autocomplete type) */
+  'item-prefix'?: (props: { item: any }) => any
+  /** Default slot override for full input rendering */
+  default?: () => any
+}>()
+</script>

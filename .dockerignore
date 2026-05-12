@@ -1,0 +1,53 @@
+# ── Never copy these into the Docker build context ───────────────────────────
+
+# Site credentials and runtime data
+sites/*/site_config.json
+sites/*/private/
+sites/*/public/files/
+sites/currentsite.txt
+sites/assets/
+
+# Node modules (will be installed fresh in Dockerfile)
+node_modules/
+*/node_modules/
+*/frontend/node_modules/
+*/desk/node_modules/
+*/roster/node_modules/
+
+# Python artifacts
+env/
+__pycache__/
+*.py[cod]
+*.pyo
+*.egg-info/
+
+# Logs and runtime
+logs/
+*.log
+config/pids/
+
+# macOS
+.DS_Store
+*.mov
+*.mp4
+
+# Large binary / design files
+styloworld-icons*/
+stylobms-icons/
+Stylo\ Logo/
+desktop_wallpapers/
+
+# Archived old code
+archived/
+
+# Git metadata (keep app source, not git history)
+**/.git/
+
+# IDE
+.vscode/
+.idea/
+
+# Docker files themselves
+Dockerfile
+docker-compose*.yml
+.dockerignore

@@ -1,0 +1,12 @@
+.DS_Store
+*.pyc
+*.egg-info
+*.swp
+__pycache__
+tags
+node_modules
+gameplan/docs/current
+gameplan/public/frontend
+gameplan/www/teams.html
+gameplan/www/g.html
+build

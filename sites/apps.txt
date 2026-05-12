@@ -1,0 +1,11 @@
+frappe
+payments
+gameplan
+lms
+crm
+india_compliance
+hrms
+telephony
+erpnext
+helpdesk
+stylo_core

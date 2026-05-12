@@ -1,0 +1,1199 @@
+/* ============================================================
+   Stylo Theme — Brand: #0FBF7F (Stylo Teal-Green)
+   ============================================================ */
+
+/* ── Inter font — apply globally ──────────────────────────── */
+@import url("/assets/frappe/css/fonts/inter/inter.css");
+
+*, *::before, *::after,
+body, html,
+input, textarea, select, button {
+  font-family: "InterVariable", "Inter", -apple-system, BlinkMacSystemFont, sans-serif !important;
+}
+
+/* Brand logos — cap size so PNGs/SVGs don't blow up */
+.app-logo {
+  height: 48px !important;
+  width: auto !important;
+  max-height: 48px !important;
+}
+
+/* Navbar logo — show correct version per theme */
+.brand-logo-light,
+.brand-logo-dark {
+  height: 36px !important;
+  width: auto !important;
+  max-height: 36px !important;
+}
+/* Default: show light, hide dark */
+.brand-logo-light { display: block; }
+.brand-logo-dark  { display: none; }
+/* Dark theme: flip */
+[data-theme="dark"] .brand-logo-light { display: none !important; }
+[data-theme="dark"] .brand-logo-dark  { display: block !important; }
+
+/* === Brand Color Variables === */
+:root,
+[data-theme="light"] {
+  --stylo-primary:       #0FBF7F;
+  --stylo-primary-hover: #0DA870;
+  --stylo-primary-light: #E6FBF4;
+  --stylo-primary-muted: rgba(15, 191, 127, 0.10);
+
+  --btn-primary:         #0FBF7F;
+  --progress-bar-bg:     #0FBF7F;
+  --brand-color:         #0FBF7F;
+
+  --checkbox-gradient: linear-gradient(180deg, #0FBF7F -124.51%, #0FBF7F 100%);
+  --checkbox-color:    #0FBF7F;
+  --date-active-bg:    #0FBF7F;
+
+  --focus-default:      0 0 0 2px rgba(15, 191, 127, 0.30);
+  --highlight-shadow:   1px 1px 10px rgba(15, 191, 127, 0.10), 0px 0px 4px rgba(15, 191, 127, 0.35);
+
+  --border-radius:    8px;
+  --border-radius-sm: 6px;
+  --border-radius-lg: 14px;
+}
+
+[data-theme="dark"] {
+  --btn-primary:         #0FBF7F;
+  --stylo-primary:       #0FBF7F;
+  --stylo-primary-hover: #0DA870;
+}
+
+/* ============================================================
+   Primary Buttons → Stylo Teal
+   ============================================================ */
+.btn-primary {
+  background-color: #0FBF7F !important;
+  border-color:     #0FBF7F !important;
+  color: #ffffff !important;
+}
+.btn-primary:hover,
+.btn-primary:focus {
+  background-color: #0DA870 !important;
+  border-color:     #0DA870 !important;
+  color: #ffffff !important;
+}
+.btn-primary:active {
+  background-color: #0B8F60 !important;
+  border-color:     #0B8F60 !important;
+  color: #ffffff !important;
+}
+.btn-primary .icon { --icon-stroke: #ffffff; }
+
+/* ============================================================
+   Sidebar — Dark + Stylo brand (no width/toggle changes)
+   ============================================================ */
+.layout-main { flex: 1 1 0%; min-width: 0; }
+
+/* Sidebar — active item highlight: lightest teal instead of white */
+.body-sidebar .active-sidebar .item-anchor {
+  background-color: rgba(15, 191, 127, 0.12) !important;
+}
+.body-sidebar .active-sidebar .sidebar-item-label,
+.body-sidebar .active-sidebar .item-anchor {
+  color: #0FBF7F !important;
+}
+.body-sidebar .active-sidebar .sidebar-item-icon svg,
+.body-sidebar .active-sidebar .sidebar-item-icon use,
+.body-sidebar .active-sidebar .icon svg,
+.body-sidebar .active-sidebar .icon use {
+  stroke: #0FBF7F !important;
+}
+
+/* ============================================================
+   Navbar — no dark treatment on logo
+   ============================================================ */
+.navbar {
+  border-bottom: 1px solid var(--border-color) !important;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.06) !important;
+}
+
+/* Logo in the sidebar / navbar-home: keep it natural, no black filter */
+.navbar-home {
+  background: transparent !important;
+  padding: 6px !important;
+  border-radius: 6px !important;
+  margin: 0 !important;
+}
+.navbar-home img {
+  filter: none !important;
+}
+
+/* App icon in sidebar top — keep natural color */
+.body-sidebar .navbar-home img,
+.body-sidebar .navbar-home svg {
+  filter: none !important;
+}
+
+
+/* ============================================================
+   Progress bar — brand green
+   ============================================================ */
+.progress-bar {
+  background-color: #0FBF7F !important;
+}
+
+/* ============================================================
+   Scrollbar
+   ============================================================ */
+:root {
+  --scrollbar-thumb-color: #BBF7D0;
+  --scrollbar-track-color: #F0FDF4;
+}
+[data-theme="dark"] {
+  --scrollbar-thumb-color: #0B8F60;
+  --scrollbar-track-color: #0F172A;
+}
+
+/* ============================================================
+   List row hover — green left accent
+   ============================================================ */
+.list-row-container:hover .list-row {
+  border-left: 2px solid #0FBF7F !important;
+}
+
+/* ============================================================
+   Cards — more rounded
+   ============================================================ */
+.card,
+.frappe-card,
+.widget.shortcut-widget-box,
+.widget.links-widget-box,
+.desk-widget {
+  border-radius: 12px !important;
+}
+
+
+/* ============================================================
+   Desktop Home — icon tiles (subtle variant uses gray, switch to green)
+   ============================================================ */
+
+/* Letter-fallback tiles only (no image icon) — teal tint */
+.desktop-wrapper .icon-container:has(.desktop-alphabet) {
+  background-color: rgba(15, 191, 127, 0.12) !important;
+  border-radius: 10px !important;
+}
+.desktop-wrapper .icon-container .desktop-alphabet {
+  color: #0FBF7F !important;
+}
+
+/* Sidebar collapse/expand — let Frappe handle it natively */
+
+/* ============================================================
+   Typography — tighter heading tracking only
+   ============================================================ */
+.page-title,
+.widget-group-title,
+h1, h2, h3 {
+  letter-spacing: -0.01em;
+}
+
+/* ============================================================
+   Workspace — Premium Desktop Theme
+   Brand: #00a876 green · bg: #f4f9f6 · cards: white
+   ============================================================ */
+
+/* Page background — soft mint wash */
+[data-theme="light"] [data-page-route="Workspaces"] {
+  background-color: #f4f9f6 !important;
+}
+[data-theme="light"] [data-page-route="Workspaces"] .layout-main-section {
+  background-color: transparent !important;
+  box-shadow: none !important;
+}
+[data-theme="light"] [data-page-route="Workspaces"] .layout-main-section-wrapper {
+  background-color: transparent !important;
+}
+
+/* Page title row */
+[data-theme="light"] [data-page-route="Workspaces"] .page-title {
+  font-size: 1.35rem !important;
+  font-weight: 700 !important;
+  color: #1d1d1f !important;
+  letter-spacing: -0.02em;
+}
+
+/* ---- Widget group heading ---- */
+[data-theme="light"] [data-page-route="Workspaces"] .widget-group-title {
+  font-size: 0.78rem !important;
+  font-weight: 600 !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.07em !important;
+  color: #6e6e73 !important;
+  margin-bottom: 10px !important;
+  padding-bottom: 6px !important;
+  border-bottom: 1.5px solid #e8e8ed !important;
+}
+
+/* ---- Base widget card — white, elevated ---- */
+[data-theme="light"] [data-page-route="Workspaces"] .widget {
+  background: #ffffff !important;
+  border: 1px solid rgba(0, 168, 118, 0.10) !important;
+  border-radius: 14px !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04), 0 1px 2px rgba(0, 0, 0, 0.03) !important;
+  transition: box-shadow 0.22s ease, border-color 0.22s ease, transform 0.18s ease !important;
+}
+
+/* ---- Shortcut tiles — app launcher cards ---- */
+[data-theme="light"] [data-page-route="Workspaces"] .widget.shortcut-widget-box {
+  cursor: pointer;
+  border: 1px solid rgba(0, 168, 118, 0.12) !important;
+}
+[data-theme="light"] [data-page-route="Workspaces"] .widget.shortcut-widget-box:hover {
+  border-color: #00a876 !important;
+  box-shadow: 0 4px 20px rgba(0, 168, 118, 0.14), 0 1px 4px rgba(0, 0, 0, 0.06) !important;
+  transform: translateY(-2px) !important;
+}
+[data-theme="light"] [data-page-route="Workspaces"] .widget.shortcut-widget-box:hover .widget-title {
+  color: #00a876 !important;
+}
+[data-theme="light"] [data-page-route="Workspaces"] .widget.shortcut-widget-box:hover .icon-container {
+  background-color: rgba(0, 168, 118, 0.14) !important;
+}
+
+/* ---- Links card ---- */
+[data-theme="light"] [data-page-route="Workspaces"] .widget.links-widget-box {
+  border: 1px solid rgba(0, 168, 118, 0.10) !important;
+}
+[data-theme="light"] [data-page-route="Workspaces"] .widget.links-widget-box:hover {
+  box-shadow: 0 4px 18px rgba(0, 168, 118, 0.10), 0 1px 4px rgba(0, 0, 0, 0.05) !important;
+  border-color: rgba(0, 168, 118, 0.25) !important;
+}
+[data-theme="light"] [data-page-route="Workspaces"] .widget.links-widget-box .widget-title {
+  color: #1d1d1f !important;
+  font-weight: 600 !important;
+}
+[data-theme="light"] [data-page-route="Workspaces"] .widget.links-widget-box .link-item:hover .link-content {
+  color: #00a876 !important;
+}
+[data-theme="light"] [data-page-route="Workspaces"] .widget.links-widget-box .link-item:hover {
+  background-color: rgba(0, 168, 118, 0.06) !important;
+  border-radius: 8px !important;
+}
+
+/* ---- Number / KPI cards ---- */
+[data-theme="light"] [data-page-route="Workspaces"] .widget.number-widget-box {
+  border-left: 3px solid #00a876 !important;
+  border-top: 1px solid rgba(0, 168, 118, 0.10) !important;
+  border-right: 1px solid rgba(0, 168, 118, 0.10) !important;
+  border-bottom: 1px solid rgba(0, 168, 118, 0.10) !important;
+  border-radius: 14px !important;
+  background: linear-gradient(135deg, #ffffff 60%, rgba(0, 168, 118, 0.04) 100%) !important;
+}
+[data-theme="light"] [data-page-route="Workspaces"] .widget.number-widget-box:hover {
+  box-shadow: 0 4px 20px rgba(0, 168, 118, 0.14) !important;
+  transform: translateY(-2px) !important;
+}
+[data-theme="light"] [data-page-route="Workspaces"] .widget.number-widget-box .number {
+  color: #1d1d1f !important;
+  font-weight: 700 !important;
+}
+[data-theme="light"] [data-page-route="Workspaces"] .widget.number-widget-box .widget-title {
+  color: #6e6e73 !important;
+  font-weight: 500 !important;
+  font-size: 0.78rem !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.04em !important;
+}
+
+/* ---- Chart/dashboard widgets ---- */
+[data-theme="light"] [data-page-route="Workspaces"] .widget.dashboard-widget-box {
+  border: 1px solid rgba(0, 168, 118, 0.10) !important;
+}
+[data-theme="light"] [data-page-route="Workspaces"] .widget.dashboard-widget-box:hover {
+  box-shadow: 0 6px 24px rgba(0, 168, 118, 0.12) !important;
+}
+
+/* ---- Page head / breadcrumb bar ---- */
+[data-theme="light"] [data-page-route="Workspaces"] .page-head {
+  background: linear-gradient(90deg, #f4f9f6 0%, rgba(244, 249, 246, 0.96) 100%) !important;
+  border-bottom: 1px solid #e8e8ed !important;
+  backdrop-filter: blur(8px) !important;
+}
+
+/* ---- Quick list widget ---- */
+[data-theme="light"] [data-page-route="Workspaces"] .widget.quick-list-widget-box {
+  border: 1px solid rgba(0, 168, 118, 0.10) !important;
+}
+[data-theme="light"] [data-page-route="Workspaces"] .widget.quick-list-widget-box .quick-list-item:hover {
+  background-color: rgba(0, 168, 118, 0.07) !important;
+}
+[data-theme="light"] [data-page-route="Workspaces"] .widget.quick-list-widget-box .widget-footer .see-all {
+  background-color: rgba(0, 168, 118, 0.07) !important;
+  color: #00a876 !important;
+  font-weight: 500 !important;
+}
+[data-theme="light"] [data-page-route="Workspaces"] .widget.quick-list-widget-box .widget-footer .see-all:hover {
+  background-color: rgba(0, 168, 118, 0.14) !important;
+}
+
+/* ---- Workspace welcome / hero strip ---- */
+[data-theme="light"] [data-page-route="Workspaces"] .workspace-banner,
+[data-theme="light"] [data-page-route="Workspaces"] .onboarding-widget-box {
+  background: linear-gradient(120deg, #f0fdf9 0%, #f4f9f6 100%) !important;
+  border: 1px solid rgba(0, 168, 118, 0.15) !important;
+  border-radius: 14px !important;
+}
+
+/* ---- Indicator pills — green tint ---- */
+[data-theme="light"] [data-page-route="Workspaces"] .indicator-pill.green,
+[data-theme="light"] [data-page-route="Workspaces"] .indicator-pill-round.green {
+  background: rgba(0, 168, 118, 0.12) !important;
+  color: #00a876 !important;
+}
+
+/* ---- Smooth entrance animation ---- */
+@keyframes stylo-fade-up {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+[data-theme="light"] [data-page-route="Workspaces"] .widget-group {
+  animation: stylo-fade-up 0.4s ease both;
+}
+[data-theme="light"] [data-page-route="Workspaces"] .widget-group:nth-child(2) { animation-delay: 0.06s; }
+[data-theme="light"] [data-page-route="Workspaces"] .widget-group:nth-child(3) { animation-delay: 0.12s; }
+[data-theme="light"] [data-page-route="Workspaces"] .widget-group:nth-child(4) { animation-delay: 0.18s; }
+[data-theme="light"] [data-page-route="Workspaces"] .widget-group:nth-child(5) { animation-delay: 0.24s; }
+
+/* ---- Navbar — light theme frosted glass ---- */
+[data-theme="light"] .navbar {
+  background: rgba(255, 255, 255, 0.92) !important;
+  backdrop-filter: blur(12px) !important;
+  -webkit-backdrop-filter: blur(12px) !important;
+  border-bottom: 1px solid #e8e8ed !important;
+  box-shadow: 0 1px 0 rgba(0, 168, 118, 0.08) !important;
+}
+
+/* Navbar search input */
+.navbar .search-bar input,
+.navbar .search-bar .form-control {
+  border-color: #e8e8ed !important;
+  border-radius: 20px !important;
+  background-color: #f4f9f6 !important;
+  font-size: 0.875rem !important;
+}
+.navbar .search-bar input:focus,
+.navbar .search-bar .form-control:focus {
+  border-color: #00a876 !important;
+  background-color: #fff !important;
+  box-shadow: 0 0 0 3px rgba(0, 168, 118, 0.10) !important;
+}
+
+/* Navbar icons — slightly muted */
+.navbar .nav-link .icon use,
+.navbar .nav-link svg {
+  stroke: #6e6e73 !important;
+  transition: stroke 0.15s !important;
+}
+.navbar .nav-link:hover .icon use,
+.navbar .nav-link:hover svg {
+  stroke: #00a876 !important;
+}
+
+/* ---- Scrollbar — brand green ---- */
+[data-theme="light"] [data-page-route="Workspaces"] ::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+[data-theme="light"] [data-page-route="Workspaces"] ::-webkit-scrollbar-track {
+  background: transparent;
+}
+[data-theme="light"] [data-page-route="Workspaces"] ::-webkit-scrollbar-thumb {
+  background: rgba(0, 168, 118, 0.25);
+  border-radius: 3px;
+}
+[data-theme="light"] [data-page-route="Workspaces"] ::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 168, 118, 0.45);
+}
+
+/* ============================================================
+   Desktop Home — icon launcher page
+   ============================================================ */
+
+/* Background — light theme only */
+[data-theme="light"] .desktop-wrapper {
+  background: #f4f9f6 !important;
+}
+.desktop-wrapper { min-height: 100vh; }
+
+/* Navbar — light theme frosted glass */
+[data-theme="light"] .desktop-wrapper .navbar-container {
+  background: rgba(255, 255, 255, 0.90) !important;
+  backdrop-filter: blur(14px) !important;
+  -webkit-backdrop-filter: blur(14px) !important;
+  border-bottom: 1px solid #e8e8ed !important;
+  box-shadow: 0 1px 0 rgba(0, 168, 118, 0.08) !important;
+}
+
+/* Search bar pill — light theme only */
+[data-theme="light"] .desktop-wrapper .desktop-navbar-modal-search {
+  background-color: #f0f7f4 !important;
+  border: 1px solid #e0ede8 !important;
+  border-radius: 20px !important;
+}
+[data-theme="light"] .desktop-wrapper .desktop-navbar-modal-search:hover {
+  background-color: #fff !important;
+  border-color: rgba(15, 191, 127, 0.35) !important;
+  outline: none !important;
+}
+
+/* Reduce the huge 60px top gap to something tighter */
+.desktop-wrapper .icons-container {
+  margin-top: 16px !important;
+}
+
+/* Vertical centering only on top-level desk, not inside folders/sub-groups */
+.desktop-wrapper > .desktop-container {
+  min-height: calc(100vh - 52px);
+  align-items: center !important;
+  justify-content: center !important;
+}
+/* Sub-group/folder icon grids align to top-left */
+.desktop-wrapper .desktop-container .desktop-container,
+.folder-contents .desktop-container,
+.in-folder .icons-container {
+  align-items: flex-start !important;
+  justify-content: flex-start !important;
+  min-height: unset !important;
+}
+
+/* Icon tile — white card with green tint on hover */
+.desktop-wrapper .desktop-icon {
+  border-color: transparent !important;
+  border-radius: 22px !important;
+  transition: background 0.18s ease, box-shadow 0.18s ease, transform 0.15s ease !important;
+}
+.desktop-wrapper .desktop-icon:hover {
+  background: rgba(0, 168, 118, 0.07) !important;
+  box-shadow: 0 4px 18px rgba(0, 168, 118, 0.12) !important;
+  transform: translateY(-3px) scale(1.03) !important;
+}
+
+/* PNG icons — fill container completely, icon shape provides its own rounded square */
+.desktop-wrapper .icon-container:not(.folder-icon):has(img.app-icon) {
+  padding: 0 !important;
+  overflow: hidden;
+  border-radius: 16px !important;
+  background-color: transparent !important;
+}
+.desktop-wrapper .icon-container:not(.folder-icon) img.app-icon {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover;
+  border-radius: 0;
+  display: block;
+}
+
+/* Folder icon — align child icons to top-left, not centered */
+.desktop-wrapper .icon-container.folder-icon {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: flex-start !important;
+  justify-content: flex-start !important;
+}
+.desktop-wrapper .icon-container.folder-icon .icons-container {
+  width: 100% !important;
+  height: auto !important;
+  display: block !important;
+  overflow: hidden !important;
+}
+.desktop-wrapper .icon-container.folder-icon .icons {
+  grid-template-rows: repeat(auto-fill, var(--folder-thumbnail-icon-height)) !important;
+  align-content: start !important;
+  align-items: start !important;
+  justify-items: start !important;
+  margin-top: 0 !important;
+}
+
+/* ── Desktop wallpaper ─────────────────────────────────────────────────────── */
+[data-theme="light"] .desktop-wrapper {
+  background-image: url("/assets/frappe/images/styloworld/wallpapers/nature_day.png") !important;
+  background-size: cover !important;
+  background-position: center center !important;
+  background-repeat: no-repeat !important;
+}
+[data-theme="dark"] .desktop-wrapper {
+  background-image: url("/assets/frappe/images/styloworld/wallpapers/nature_night.png") !important;
+  background-size: cover !important;
+  background-position: center center !important;
+  background-repeat: no-repeat !important;
+}
+
+/* ── Wallpaper overlay — frosted glass panel behind icons ──────────────────── */
+/* Semi-transparent scrim over the full desktop area */
+[data-theme="light"] .desktop-wrapper::before,
+[data-theme="dark"] .desktop-wrapper::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+}
+[data-theme="light"] .desktop-wrapper::before {
+  background: rgba(255, 255, 255, 0.22);
+}
+[data-theme="dark"] .desktop-wrapper::before {
+  background: rgba(0, 0, 0, 0.30);
+}
+
+/* Frosted glass card behind the icons grid */
+[data-theme="light"] .desktop-wrapper .icons-container:not(.folder-icon .icons-container) {
+  background: rgba(255, 255, 255, 0.45) !important;
+  backdrop-filter: blur(18px) saturate(1.4) !important;
+  -webkit-backdrop-filter: blur(18px) saturate(1.4) !important;
+  border-radius: 24px !important;
+  border: 1px solid rgba(255, 255, 255, 0.6) !important;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.10) !important;
+}
+[data-theme="dark"] .desktop-wrapper .icons-container:not(.folder-icon .icons-container) {
+  background: rgba(15, 15, 20, 0.45) !important;
+  backdrop-filter: blur(18px) saturate(1.2) !important;
+  -webkit-backdrop-filter: blur(18px) saturate(1.2) !important;
+  border-radius: 24px !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.30) !important;
+}
+
+/* ── Edit mode — full-screen frosted glass overlay covering the entire desktop ── */
+
+/* Extend the desktop-wrapper to fill the full viewport in edit mode */
+.desktop-wrapper[data-mode="Edit"] {
+  position: relative;
+}
+
+/* Full-screen frosted glass overlay via pseudo-element behind the icons */
+.desktop-wrapper[data-mode="Edit"]::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background: rgba(255, 255, 255, 0.18);
+  backdrop-filter: blur(24px) saturate(1.4);
+  -webkit-backdrop-filter: blur(24px) saturate(1.4);
+  z-index: 0;
+  pointer-events: none;
+}
+[data-theme="dark"] .desktop-wrapper[data-mode="Edit"]::before {
+  background: rgba(15, 15, 30, 0.55);
+}
+
+/* Lift the desktop-container above the overlay so icons are interactive */
+.desktop-wrapper[data-mode="Edit"] .desktop-container {
+  position: relative;
+  z-index: 1;
+  overflow-y: auto;
+  max-height: calc(100vh - 60px);
+  padding-bottom: 100px;
+}
+
+/* Strip the individual icons-container frosted card in edit mode — the full overlay replaces it */
+.desktop-wrapper[data-mode="Edit"] .icons-container:not(.folder-icon .icons-container) {
+  background: rgba(255, 255, 255, 0.10) !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  border: 1px solid rgba(255, 255, 255, 0.20) !important;
+  box-shadow: none !important;
+}
+[data-theme="dark"] .desktop-wrapper[data-mode="Edit"] .icons-container:not(.folder-icon .icons-container) {
+  background: rgba(255, 255, 255, 0.05) !important;
+  border: 1px solid rgba(255, 255, 255, 0.10) !important;
+}
+
+/* Removed Icons label inside the pane */
+.desktop-wrapper[data-mode="Edit"] .icons-container > span {
+  display: block;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  padding: 12px 16px 4px;
+}
+
+/* Save / Discard bar — fixed at bottom, above OS taskbar, full width */
+.desktop-wrapper[data-mode="Edit"] .edit-mode-buttons {
+  position: fixed !important;
+  bottom: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  z-index: 10 !important;
+  display: flex !important;
+  justify-content: flex-end !important;
+  align-items: center !important;
+  gap: 12px !important;
+  padding: 14px 28px !important;
+  padding-bottom: max(14px, env(safe-area-inset-bottom, 14px)) !important;
+  background: rgba(255, 255, 255, 0.70) !important;
+  backdrop-filter: blur(16px) !important;
+  -webkit-backdrop-filter: blur(16px) !important;
+  border-top: 1px solid rgba(255, 255, 255, 0.40) !important;
+  box-shadow: 0 -4px 24px rgba(0, 0, 0, 0.10) !important;
+}
+[data-theme="dark"] .desktop-wrapper[data-mode="Edit"] .edit-mode-buttons {
+  background: rgba(20, 20, 35, 0.80) !important;
+  border-top: 1px solid rgba(255, 255, 255, 0.12) !important;
+  box-shadow: 0 -4px 24px rgba(0, 0, 0, 0.30) !important;
+}
+.desktop-wrapper[data-mode="Edit"] .edit-mode-buttons .btn {
+  min-width: 90px !important;
+}
+
+/* Icon title color — clean, no shadows */
+[data-theme="light"] .desktop-wrapper .icon-title {
+  color: #1a1a1a !important;
+  text-shadow: none !important;
+}
+[data-theme="dark"] .desktop-wrapper .icon-title {
+  color: #f0f0f0 !important;
+  text-shadow: none !important;
+}
+
+/* Theme toggle — sun (light) / moon (dark) icon button */
+.stylo-theme-toggle {
+  cursor: pointer;
+  opacity: 0.75;
+  transition: opacity 0.15s;
+  padding: 4px;
+  line-height: 0;
+}
+.stylo-theme-toggle:hover { opacity: 1; }
+.stylo-theme-toggle .theme-icon-sun,
+.stylo-theme-toggle .theme-icon-moon { display: none !important; }
+[data-theme="light"] .stylo-theme-toggle .theme-icon-sun  { display: inline-block !important; }
+[data-theme="dark"]  .stylo-theme-toggle .theme-icon-moon { display: inline-block !important; }
+.navbar-right .stylo-theme-toggle { margin: 0 4px; }
+.desktop-wrapper .stylo-theme-toggle { margin: 0 4px; }
+
+/* Keep navbar opaque over wallpaper */
+[data-theme="light"] .desktop-wrapper .desktop-navbar {
+  background: rgba(255, 255, 255, 0.82) !important;
+  backdrop-filter: blur(12px) !important;
+  -webkit-backdrop-filter: blur(12px) !important;
+  border-bottom: 1px solid rgba(0,0,0,0.06) !important;
+}
+[data-theme="dark"] .desktop-wrapper .desktop-navbar {
+  background: rgba(18, 18, 22, 0.80) !important;
+  backdrop-filter: blur(12px) !important;
+  -webkit-backdrop-filter: blur(12px) !important;
+  border-bottom: 1px solid rgba(255,255,255,0.06) !important;
+}
+
+
+/* Sidebar header icon — proper size and fit */
+.sidebar-header .sidebar-item-icon {
+  background-color: transparent !important;
+  padding: 0 !important;
+  overflow: hidden;
+  border-radius: 10px !important;
+  flex-shrink: 0;
+  width: 32px;
+  height: 32px;
+}
+.sidebar-header .sidebar-item-icon img.sidebar-app-icon {
+  width: 32px !important;
+  height: 32px !important;
+  object-fit: contain;
+  display: block;
+}
+
+/* Sidebar dropdown module icons (Build, Data, Email etc.) */
+.dropdown-menu-item .menu-item-icon img.logo {
+  width: 24px !important;
+  height: 24px !important;
+  border-radius: 6px !important;
+  object-fit: cover;
+  display: block;
+}
+
+/* Icon titles — bolder, tighter */
+.desktop-wrapper .icon-title {
+  font-size: 12px !important;
+  font-weight: 600 !important;
+  letter-spacing: -0.01em;
+}
+[data-theme="light"] .desktop-wrapper .icon-title { color: #1d1d1f !important; }
+[data-theme="light"] .desktop-wrapper .icon-subtitle { color: #8a8a8e !important; }
+
+/* Grid gap — a bit more breathing room */
+.desktop-wrapper .icons {
+  gap: 6px !important;
+}
+
+/* Staggered fade-up entrance for icon rows */
+@keyframes desk-icon-in {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.desktop-wrapper .desktop-icon {
+  animation: desk-icon-in 0.35s ease both;
+}
+/* Stagger each icon by position — nth-child 1-18 */
+.desktop-wrapper .desktop-icon:nth-child(1)  { animation-delay: 0.03s; }
+.desktop-wrapper .desktop-icon:nth-child(2)  { animation-delay: 0.06s; }
+.desktop-wrapper .desktop-icon:nth-child(3)  { animation-delay: 0.09s; }
+.desktop-wrapper .desktop-icon:nth-child(4)  { animation-delay: 0.12s; }
+.desktop-wrapper .desktop-icon:nth-child(5)  { animation-delay: 0.15s; }
+.desktop-wrapper .desktop-icon:nth-child(6)  { animation-delay: 0.18s; }
+.desktop-wrapper .desktop-icon:nth-child(7)  { animation-delay: 0.21s; }
+.desktop-wrapper .desktop-icon:nth-child(8)  { animation-delay: 0.24s; }
+.desktop-wrapper .desktop-icon:nth-child(9)  { animation-delay: 0.27s; }
+.desktop-wrapper .desktop-icon:nth-child(10) { animation-delay: 0.30s; }
+.desktop-wrapper .desktop-icon:nth-child(11) { animation-delay: 0.33s; }
+.desktop-wrapper .desktop-icon:nth-child(12) { animation-delay: 0.36s; }
+.desktop-wrapper .desktop-icon:nth-child(13) { animation-delay: 0.39s; }
+.desktop-wrapper .desktop-icon:nth-child(14) { animation-delay: 0.42s; }
+.desktop-wrapper .desktop-icon:nth-child(15) { animation-delay: 0.45s; }
+.desktop-wrapper .desktop-icon:nth-child(16) { animation-delay: 0.48s; }
+.desktop-wrapper .desktop-icon:nth-child(17) { animation-delay: 0.51s; }
+.desktop-wrapper .desktop-icon:nth-child(18) { animation-delay: 0.54s; }
+/* Stylo BMS Icon System — auto light/dark switching */
+
+/* By default (light theme): show stylo-light icons */
+.desk-icon-grid .desk-icon .desk-icon-logo,
+.module-icon img {
+  content: attr(src);
+}
+
+/* Dark mode overrides */
+[data-theme-mode="dark"] img[src="/assets/frappe/icons/desktop_icons/stylo-light/accounting.svg"] { content: url("/assets/frappe/icons/desktop_icons/stylo-dark/accounting.svg"); }
+[data-theme-mode="dark"] img[src="/assets/frappe/icons/desktop_icons/stylo-light/accounts-setup.svg"] { content: url("/assets/frappe/icons/desktop_icons/stylo-dark/accounts-setup.svg"); }
+[data-theme-mode="dark"] img[src="/assets/frappe/icons/desktop_icons/stylo-light/ai-assistant.svg"] { content: url("/assets/frappe/icons/desktop_icons/stylo-dark/ai-assistant.svg"); }
+[data-theme-mode="dark"] img[src="/assets/frappe/icons/desktop_icons/stylo-light/asset-movement.svg"] { content: url("/assets/frappe/icons/desktop_icons/stylo-dark/asset-movement.svg"); }
+[data-theme-mode="dark"] img[src="/assets/frappe/icons/desktop_icons/stylo-light/assets.svg"] { content: url("/assets/frappe/icons/desktop_icons/stylo-dark/assets.svg"); }
+[data-theme-mode="dark"] img[src="/assets/frappe/icons/desktop_icons/stylo-light/automation.svg"] { content: url("/assets/frappe/icons/desktop_icons/stylo-dark/automation.svg"); }
+[data-theme-mode="dark"] img[src="/assets/frappe/icons/desktop_icons/stylo-light/banking.svg"] { content: url("/assets/frappe/icons/desktop_icons/stylo-dark/banking.svg"); }
+[data-theme-mode="dark"] img[src="/assets/frappe/icons/desktop_icons/stylo-light/budget.svg"] { content: url("/assets/frappe/icons/desktop_icons/stylo-dark/budget.svg"); }
+[data-theme-mode="dark"] img[src="/assets/frappe/icons/desktop_icons/stylo-light/build.svg"] { content: url("/assets/frappe/icons/desktop_icons/stylo-dark/build.svg"); }
+[data-theme-mode="dark"] img[src="/assets/frappe/icons/desktop_icons/stylo-light/buying.svg"] { content: url("/assets/frappe/icons/desktop_icons/stylo-dark/buying.svg"); }
+[data-theme-mode="dark"] img[src="/assets/frappe/icons/desktop_icons/stylo-light/crm.svg"] { content: url("/assets/frappe/icons/desktop_icons/stylo-dark/crm.svg"); }
+[data-theme-mode="dark"] img[src="/assets/frappe/icons/desktop_icons/stylo-light/dashboard.svg"] { content: url("/assets/frappe/icons/desktop_icons/stylo-dark/dashboard.svg"); }
+[data-theme-mode="dark"] img[src="/assets/frappe/icons/desktop_icons/stylo-light/data.svg"] { content: url("/assets/frappe/icons/desktop_icons/stylo-dark/data.svg"); }
+[data-theme-mode="dark"] img[src="/assets/frappe/icons/desktop_icons/stylo-light/desktop.svg"] { content: url("/assets/frappe/icons/desktop_icons/stylo-dark/desktop.svg"); }
+[data-theme-mode="dark"] img[src="/assets/frappe/icons/desktop_icons/stylo-light/documents.svg"] { content: url("/assets/frappe/icons/desktop_icons/stylo-dark/documents.svg"); }
+[data-theme-mode="dark"] img[src="/assets/frappe/icons/desktop_icons/stylo-light/email.svg"] { content: url("/assets/frappe/icons/desktop_icons/stylo-dark/email.svg"); }
+[data-theme-mode="dark"] img[src="/assets/frappe/icons/desktop_icons/stylo-light/erp-core.svg"] { content: url("/assets/frappe/icons/desktop_icons/stylo-dark/erp-core.svg"); }
+[data-theme-mode="dark"] img[src="/assets/frappe/icons/desktop_icons/stylo-light/erp-settings.svg"] { content: url("/assets/frappe/icons/desktop_icons/stylo-dark/erp-settings.svg"); }
+[data-theme-mode="dark"] img[src="/assets/frappe/icons/desktop_icons/stylo-light/financial-reports.svg"] { content: url("/assets/frappe/icons/desktop_icons/stylo-dark/financial-reports.svg"); }
+[data-theme-mode="dark"] img[src="/assets/frappe/icons/desktop_icons/stylo-light/hrms.svg"] { content: url("/assets/frappe/icons/desktop_icons/stylo-dark/hrms.svg"); }
+[data-theme-mode="dark"] img[src="/assets/frappe/icons/desktop_icons/stylo-light/integrations.svg"] { content: url("/assets/frappe/icons/desktop_icons/stylo-dark/integrations.svg"); }
+[data-theme-mode="dark"] img[src="/assets/frappe/icons/desktop_icons/stylo-light/inventory.svg"] { content: url("/assets/frappe/icons/desktop_icons/stylo-dark/inventory.svg"); }
+[data-theme-mode="dark"] img[src="/assets/frappe/icons/desktop_icons/stylo-light/invoicing.svg"] { content: url("/assets/frappe/icons/desktop_icons/stylo-dark/invoicing.svg"); }
+[data-theme-mode="dark"] img[src="/assets/frappe/icons/desktop_icons/stylo-light/leads.svg"] { content: url("/assets/frappe/icons/desktop_icons/stylo-dark/leads.svg"); }
+[data-theme-mode="dark"] img[src="/assets/frappe/icons/desktop_icons/stylo-light/maintenance.svg"] { content: url("/assets/frappe/icons/desktop_icons/stylo-dark/maintenance.svg"); }
+[data-theme-mode="dark"] img[src="/assets/frappe/icons/desktop_icons/stylo-light/manufacturing.svg"] { content: url("/assets/frappe/icons/desktop_icons/stylo-dark/manufacturing.svg"); }
+[data-theme-mode="dark"] img[src="/assets/frappe/icons/desktop_icons/stylo-light/organization.svg"] { content: url("/assets/frappe/icons/desktop_icons/stylo-dark/organization.svg"); }
+[data-theme-mode="dark"] img[src="/assets/frappe/icons/desktop_icons/stylo-light/payments.svg"] { content: url("/assets/frappe/icons/desktop_icons/stylo-dark/payments.svg"); }
+[data-theme-mode="dark"] img[src="/assets/frappe/icons/desktop_icons/stylo-light/payroll.svg"] { content: url("/assets/frappe/icons/desktop_icons/stylo-dark/payroll.svg"); }
+[data-theme-mode="dark"] img[src="/assets/frappe/icons/desktop_icons/stylo-light/printing.svg"] { content: url("/assets/frappe/icons/desktop_icons/stylo-dark/printing.svg"); }
+[data-theme-mode="dark"] img[src="/assets/frappe/icons/desktop_icons/stylo-light/projects.svg"] { content: url("/assets/frappe/icons/desktop_icons/stylo-dark/projects.svg"); }
+[data-theme-mode="dark"] img[src="/assets/frappe/icons/desktop_icons/stylo-light/purchase.svg"] { content: url("/assets/frappe/icons/desktop_icons/stylo-dark/purchase.svg"); }
+[data-theme-mode="dark"] img[src="/assets/frappe/icons/desktop_icons/stylo-light/quality.svg"] { content: url("/assets/frappe/icons/desktop_icons/stylo-dark/quality.svg"); }
+[data-theme-mode="dark"] img[src="/assets/frappe/icons/desktop_icons/stylo-light/reports.svg"] { content: url("/assets/frappe/icons/desktop_icons/stylo-dark/reports.svg"); }
+[data-theme-mode="dark"] img[src="/assets/frappe/icons/desktop_icons/stylo-light/sales.svg"] { content: url("/assets/frappe/icons/desktop_icons/stylo-dark/sales.svg"); }
+[data-theme-mode="dark"] img[src="/assets/frappe/icons/desktop_icons/stylo-light/selling.svg"] { content: url("/assets/frappe/icons/desktop_icons/stylo-dark/selling.svg"); }
+[data-theme-mode="dark"] img[src="/assets/frappe/icons/desktop_icons/stylo-light/settings.svg"] { content: url("/assets/frappe/icons/desktop_icons/stylo-dark/settings.svg"); }
+[data-theme-mode="dark"] img[src="/assets/frappe/icons/desktop_icons/stylo-light/setup.svg"] { content: url("/assets/frappe/icons/desktop_icons/stylo-dark/setup.svg"); }
+[data-theme-mode="dark"] img[src="/assets/frappe/icons/desktop_icons/stylo-light/share-management.svg"] { content: url("/assets/frappe/icons/desktop_icons/stylo-dark/share-management.svg"); }
+[data-theme-mode="dark"] img[src="/assets/frappe/icons/desktop_icons/stylo-light/stock.svg"] { content: url("/assets/frappe/icons/desktop_icons/stylo-dark/stock.svg"); }
+[data-theme-mode="dark"] img[src="/assets/frappe/icons/desktop_icons/stylo-light/subcontracting.svg"] { content: url("/assets/frappe/icons/desktop_icons/stylo-dark/subcontracting.svg"); }
+[data-theme-mode="dark"] img[src="/assets/frappe/icons/desktop_icons/stylo-light/subscription.svg"] { content: url("/assets/frappe/icons/desktop_icons/stylo-dark/subscription.svg"); }
+[data-theme-mode="dark"] img[src="/assets/frappe/icons/desktop_icons/stylo-light/support.svg"] { content: url("/assets/frappe/icons/desktop_icons/stylo-dark/support.svg"); }
+[data-theme-mode="dark"] img[src="/assets/frappe/icons/desktop_icons/stylo-light/system.svg"] { content: url("/assets/frappe/icons/desktop_icons/stylo-dark/system.svg"); }
+[data-theme-mode="dark"] img[src="/assets/frappe/icons/desktop_icons/stylo-light/taxes.svg"] { content: url("/assets/frappe/icons/desktop_icons/stylo-dark/taxes.svg"); }
+[data-theme-mode="dark"] img[src="/assets/frappe/icons/desktop_icons/stylo-light/users.svg"] { content: url("/assets/frappe/icons/desktop_icons/stylo-dark/users.svg"); }
+[data-theme-mode="dark"] img[src="/assets/frappe/icons/desktop_icons/stylo-light/website.svg"] { content: url("/assets/frappe/icons/desktop_icons/stylo-dark/website.svg"); }
+[data-theme-mode="dark"] img[src="/assets/frappe/icons/desktop_icons/stylo-light/website-v2.svg"] { content: url("/assets/frappe/icons/desktop_icons/stylo-dark/website-v2.svg"); }
+
+/* ── Daily quote + Clock widgets ─────────────────────────────────────────── */
+/* desktop-wrapper needs relative so absolute children stay inside the page   */
+.desktop-wrapper { position: relative; }
+
+/* Live clock — bottom-left corner */
+.stylo-clock {
+  position: absolute;
+  bottom: 28px;
+  left: 28px;
+  z-index: 10;
+  text-align: left;
+  pointer-events: none;
+  user-select: none;
+}
+.stylo-clock-time {
+  font-size: 36px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+  text-shadow: 0 1px 8px rgba(0,0,0,0.35);
+}
+.stylo-clock-date {
+  font-size: 12px;
+  font-weight: 500;
+  margin-top: 4px;
+  opacity: 0.8;
+  text-shadow: 0 1px 4px rgba(0,0,0,0.3);
+}
+[data-theme="light"] .stylo-clock-time,
+[data-theme="light"] .stylo-clock-date { color: #fff; }
+[data-theme="dark"]  .stylo-clock-time,
+[data-theme="dark"]  .stylo-clock-date { color: #e8e8ea; }
+
+/* Daily motivational quote — bottom-center */
+.stylo-daily-quote {
+  position: absolute;
+  bottom: 28px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 10;
+  max-width: 560px;
+  width: max-content;
+  max-width: min(560px, calc(100vw - 220px));
+  text-align: center;
+  padding: 10px 20px 10px;
+  border-radius: 14px;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  pointer-events: none;
+  user-select: none;
+}
+[data-theme="light"] .stylo-daily-quote {
+  background: rgba(255,255,255,0.22);
+  border: 1px solid rgba(255,255,255,0.4);
+}
+[data-theme="dark"] .stylo-daily-quote {
+  background: rgba(0,0,0,0.28);
+  border: 1px solid rgba(255,255,255,0.12);
+}
+.sdq-text {
+  display: block;
+  font-size: 13px;
+  font-style: italic;
+  font-weight: 500;
+  line-height: 1.5;
+  text-shadow: 0 1px 4px rgba(0,0,0,0.25);
+}
+.sdq-author {
+  display: block;
+  font-size: 11px;
+  font-weight: 600;
+  margin-top: 5px;
+  opacity: 0.75;
+  letter-spacing: 0.02em;
+  text-shadow: 0 1px 3px rgba(0,0,0,0.2);
+}
+[data-theme="light"] .sdq-text,
+[data-theme="light"] .sdq-author { color: #fff; }
+[data-theme="dark"]  .sdq-text,
+[data-theme="dark"]  .sdq-author { color: #e8e8ea; }
+
+/* ── Tasks / Reminders widget (bottom-right of desktop page) ─────────────── */
+.stylo-tasks-widget {
+  position: absolute;
+  bottom: 28px;
+  right: 28px;
+  z-index: 10;
+  width: 280px;
+  border-radius: 18px;
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  overflow: hidden;
+}
+[data-theme="light"] .stylo-tasks-widget {
+  background: rgba(255,255,255,0.72);
+  border: 1px solid rgba(255,255,255,0.7);
+  box-shadow: 0 8px 32px rgba(0,0,0,0.12);
+  color: #1d1d1f;
+}
+[data-theme="dark"] .stylo-tasks-widget {
+  background: rgba(28,28,32,0.72);
+  border: 1px solid rgba(255,255,255,0.1);
+  box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+  color: #e8e8ea;
+}
+
+/* Header */
+.stw-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 14px 8px;
+  border-bottom: 1px solid rgba(128,128,128,0.15);
+}
+.stw-title {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  opacity: 0.7;
+  display: flex;
+  align-items: center;
+}
+.stw-add {
+  opacity: 0.5;
+  line-height: 0;
+  color: inherit;
+  transition: opacity 0.15s;
+}
+.stw-add:hover { opacity: 1; }
+
+/* Body */
+.stw-body { max-height: 280px; overflow-y: auto; }
+.stw-body::-webkit-scrollbar { width: 3px; }
+.stw-body::-webkit-scrollbar-thumb { background: rgba(128,128,128,0.3); border-radius: 2px; }
+
+/* Loading */
+.stw-loading {
+  padding: 20px;
+  text-align: center;
+  font-size: 12px;
+  opacity: 0.5;
+}
+
+/* Empty state */
+.stw-empty {
+  padding: 20px 14px;
+  text-align: center;
+  font-size: 12px;
+  opacity: 0.65;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+.stw-link {
+  display: inline-block;
+  margin-top: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--primary);
+  text-decoration: none;
+}
+.stw-link:hover { text-decoration: underline; }
+
+/* Task item */
+.stw-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 8px 14px;
+  border-bottom: 1px solid rgba(128,128,128,0.08);
+  transition: background 0.12s;
+}
+.stw-item:hover { background: rgba(128,128,128,0.06); }
+.stw-item:last-of-type { border-bottom: none; }
+
+/* Done button (circle checkbox) */
+.stw-done {
+  flex-shrink: 0;
+  margin-top: 2px;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 1.5px solid rgba(128,128,128,0.4);
+  background: transparent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s;
+  padding: 0;
+  line-height: 0;
+  color: transparent;
+}
+.stw-done:hover {
+  border-color: var(--primary, #0fbf7f);
+  background: rgba(15,191,127,0.12);
+  color: var(--primary, #0fbf7f);
+}
+.stw-done .icon { width: 10px; height: 10px; }
+
+/* Tick-off animation */
+@keyframes stw-fadeout { to { opacity: 0; transform: translateX(10px); } }
+.stw-done-anim { animation: stw-fadeout 0.5s ease forwards; }
+
+/* Item content */
+.stw-item-body { flex: 1; min-width: 0; }
+.stw-desc {
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1.4;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.stw-meta {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 3px;
+  flex-wrap: wrap;
+}
+
+/* Priority badge */
+.stw-prio {
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  padding: 1px 5px;
+  border-radius: 4px;
+}
+.stw-prio-high   { background: rgba(220,50,50,0.12);  color: #c0392b; }
+.stw-prio-medium { background: rgba(230,150,0,0.12);  color: #b7770d; }
+.stw-prio-low    { background: rgba(60,180,100,0.12); color: #27ae60; }
+[data-theme="dark"] .stw-prio-high   { color: #ff6b6b; }
+[data-theme="dark"] .stw-prio-medium { color: #ffd166; }
+[data-theme="dark"] .stw-prio-low    { color: #6bdf9e; }
+
+/* Due date */
+.stw-due     { font-size: 10px; opacity: 0.6; }
+.stw-overdue { font-size: 10px; color: #e74c3c; font-weight: 600; }
+
+/* Reference link */
+.stw-ref {
+  font-size: 10px;
+  opacity: 0.55;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 110px;
+  color: inherit;
+  text-decoration: none;
+}
+.stw-ref:hover { opacity: 1; text-decoration: underline; }
+
+/* View all link */
+.stw-view-all {
+  display: block;
+  padding: 8px 14px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--primary, #0fbf7f);
+  text-align: center;
+  text-decoration: none;
+  border-top: 1px solid rgba(128,128,128,0.1);
+}
+.stw-view-all:hover { background: rgba(15,191,127,0.06); }
+
+/* Clock and quote: desktop only — hide on mobile */
+@media screen and (max-width: 768px) {
+  .stylo-clock,
+  .stylo-daily-quote,
+  .stylo-tasks-widget { display: none !important; }
+}
+
+/* ── Mobile responsive desktop page ──────────────────────────────────────── */
+/* Behaves like a phone home screen: 4-column icon grid, vertical scroll      */
+@media screen and (max-width: 768px) {
+  /* Wallpaper stays fixed to viewport — no white gap when scrolling */
+  [data-theme="light"] .desktop-wrapper {
+    background-attachment: fixed !important;
+  }
+  [data-theme="dark"] .desktop-wrapper {
+    background-attachment: fixed !important;
+  }
+
+  /* Page fills screen and scrolls */
+  #page-desktop {
+    height: auto !important;
+    min-height: 100dvh !important;
+  }
+  .desktop-wrapper {
+    height: auto !important;
+    min-height: 100dvh !important;
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+  }
+
+  /* Compact navbar */
+  .desktop-wrapper .navbar-container {
+    padding: 8px 14px !important;
+    height: 48px !important;
+  }
+  #brand-logo,
+  #brand-logo-dark {
+    height: 24px !important;
+    width: auto !important;
+  }
+
+  /* Stack icon groups vertically, top-aligned, scrollable */
+  .desktop-wrapper > .desktop-container {
+    min-height: unset !important;
+    align-items: flex-start !important;
+    justify-content: flex-start !important;
+    flex-direction: column !important;
+    padding: 12px 10px 40px !important;
+    overflow: visible !important;
+  }
+
+  /* Full-width frosted glass card per group, no height constraint */
+  #page-desktop .icons-container:not(.folder-icon .icons-container):not(.modal .icons-container) {
+    width: 100% !important;
+    height: auto !important;
+    max-height: none !important;
+    overflow: visible !important;
+    margin-top: 8px !important;
+    padding: 14px 10px !important;
+    border-radius: 20px !important;
+  }
+
+  /* 4-column grid, all rows shown (no row cap), auto height */
+  #page-desktop .icons {
+    grid-template-columns: repeat(4, 1fr) !important;
+    grid-template-rows: none !important;
+    grid-auto-rows: auto !important;
+    height: auto !important;
+    overflow: visible !important;
+    gap: 8px 4px !important;
+    width: 100% !important;
+  }
+
+  /* Show all icon grids (Frappe sets display:none on non-active pages) */
+  #page-desktop .icons-container > .icons {
+    display: grid !important;
+  }
+
+  /* Compact icon tile */
+  #page-desktop .desktop-icon {
+    width: 100% !important;
+    height: auto !important;
+    min-height: 88px !important;
+    padding: 10px 6px 8px !important;
+    border-radius: 16px !important;
+  }
+
+  /* Icon image size */
+  #page-desktop .icon-container {
+    width: 46px !important;
+    height: 46px !important;
+    min-width: 46px !important;
+    min-height: 46px !important;
+  }
+  #page-desktop .icon-container img {
+    width: 46px !important;
+    height: 46px !important;
+  }
+
+  /* Icon label: 2-line clamp, centered */
+  #page-desktop .icon-title {
+    font-size: 10px !important;
+    white-space: normal !important;
+    text-align: center !important;
+    word-break: break-word !important;
+    display: -webkit-box !important;
+    -webkit-line-clamp: 2 !important;
+    -webkit-box-orient: vertical !important;
+    overflow: hidden !important;
+  }
+  #page-desktop .icon-subtitle { display: none !important; }
+
+  /* Hide pagination arrows — vertical scroll replaces pages */
+  .right-page-arrow,
+  .left-page-arrow,
+  .page-indicator-container {
+    display: none !important;
+  }
+}
+[data-theme-mode="dark"] img[src="/assets/frappe/icons/desktop_icons/stylo-light/workspaces.svg"] { content: url("/assets/frappe/icons/desktop_icons/stylo-dark/workspaces.svg"); }

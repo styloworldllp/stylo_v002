@@ -1,0 +1,100 @@
+{
+    "frappe": {
+        "resolution": {
+            "commit_hash": null,
+            "branch": null
+        },
+        "required": [],
+        "idx": 1,
+        "version": "16.17.0"
+    },
+    "payments": {
+        "resolution": {
+            "commit_hash": null,
+            "branch": null
+        },
+        "required": [],
+        "idx": 2,
+        "version": "0.0.1"
+    },
+    "gameplan": {
+        "resolution": {
+            "commit_hash": null,
+            "branch": null
+        },
+        "required": [],
+        "idx": 3,
+        "version": "0.0.1"
+    },
+    "lms": {
+        "resolution": {
+            "commit_hash": null,
+            "branch": null
+        },
+        "required": [],
+        "idx": 4,
+        "version": "2.52.1"
+    },
+    "crm": {
+        "resolution": {
+            "commit_hash": null,
+            "branch": null
+        },
+        "required": [],
+        "idx": 5,
+        "version": "1.70.0"
+    },
+    "india_compliance": {
+        "resolution": {
+            "commit_hash": null,
+            "branch": null
+        },
+        "required": [],
+        "idx": 6,
+        "version": "16.4.0"
+    },
+    "telephony": {
+        "resolution": {
+            "commit_hash": null,
+            "branch": null
+        },
+        "required": [],
+        "idx": 7,
+        "version": "0.0.1"
+    },
+    "erpnext": {
+        "resolution": {
+            "commit_hash": null,
+            "branch": null
+        },
+        "required": [],
+        "idx": 8,
+        "version": "16.15.1"
+    },
+    "helpdesk": {
+        "resolution": {
+            "commit_hash": null,
+            "branch": null
+        },
+        "required": [],
+        "idx": 9,
+        "version": "1.22.2"
+    },
+    "hrms": {
+        "is_repo": true,
+        "resolution": {
+            "commit_hash": "ab2f4bcacac29c5a6dce342d88cae618db03f9ab",
+            "branch": "version-16"
+        },
+        "required": [],
+        "idx": 10,
+        "version": "16.6.0"
+    },
+    "stylo_core": {
+        "is_repo": false,
+        "resolution": "not a repo",
+        "required": [],
+        "idx": 11,
+        "version": "0.0.1"
+    }
+}
