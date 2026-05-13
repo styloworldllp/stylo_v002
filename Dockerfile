@@ -65,7 +65,8 @@ RUN env/bin/pip install --quiet -e apps/frappe \
     && env/bin/pip install --quiet -e apps/gameplan \
     && env/bin/pip install --quiet -e apps/telephony \
     && env/bin/pip install --quiet -e apps/india_compliance \
-    && env/bin/pip install --quiet -e apps/stylo_core
+    && env/bin/pip install --quiet -e apps/stylo_core \
+    && env/bin/pip install --quiet -e apps/brain
 
 # ── Protect stylo_core source — compile to .pyc, delete .py ─────────────────
 # Frappe uses importlib which supports .pyc without .py source files.
@@ -88,7 +89,8 @@ RUN FRAPPE_BENCH_ROOT=/home/frappe/frappe-bench \
     && env/bin/bench build --app crm \
     && env/bin/bench build --app helpdesk \
     && env/bin/bench build --app lms \
-    && env/bin/bench build --app stylo_core
+    && env/bin/bench build --app stylo_core \
+    && env/bin/bench build --app brain
 
 # ── Copy sites config template (entrypoint generates actual config from env vars) ──
 COPY --chown=frappe:frappe sites/common_site_config.json sites/common_site_config.json.template

@@ -1,0 +1,27 @@
+[project]
+name = "brain"
+authors = [
+    { name = "Styloworld", email = "hello@styloworld.io" }
+]
+description = "brAIn — AI intelligence layer for Styloworld"
+requires-python = ">=3.10"
+readme = "README.md"
+dynamic = ["version"]
+dependencies = [
+    "anthropic>=0.30.0",
+    "openai>=1.30.0",
+]
+
+[build-system]
+requires = ["flit_core >=3.4,<4"]
+build-backend = "flit_core.buildapi"
+
+[tool.bench.dev-dependencies]
+
+[tool.ruff]
+line-length = 110
+target-version = "py310"
+
+[tool.ruff.lint]
+select = ["F", "E", "W", "I", "UP", "B", "RUF"]
+ignore = ["E501", "F401", "F403", "W191", "E402", "UP032"]

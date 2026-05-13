@@ -1,0 +1,105 @@
+{
+ "actions": [],
+ "creation": "2026-05-13 00:00:00.000000",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "enabled",
+  "provider",
+  "model",
+  "api_key",
+  "base_url",
+  "column_break_settings",
+  "max_iterations",
+  "temperature",
+  "section_break_about",
+  "about_html"
+ ],
+ "fields": [
+  {
+   "default": "1",
+   "fieldname": "enabled",
+   "fieldtype": "Check",
+   "label": "Enable brAIn"
+  },
+  {
+   "fieldname": "provider",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "AI Provider",
+   "options": "Anthropic (Claude)\nOpenAI\nOllama (Local)\nOpenAI Compatible",
+   "reqd": 1
+  },
+  {
+   "fieldname": "model",
+   "fieldtype": "Data",
+   "label": "Model Name",
+   "description": "e.g. claude-sonnet-4-6 | gpt-4o | llama3.1 | mistral-nemo"
+  },
+  {
+   "fieldname": "api_key",
+   "fieldtype": "Password",
+   "label": "API Key",
+   "description": "Required for Anthropic and OpenAI. Leave blank for Ollama."
+  },
+  {
+   "fieldname": "base_url",
+   "fieldtype": "Data",
+   "label": "Base URL",
+   "description": "Ollama: http://localhost:11434/v1 | Custom OpenAI-compatible endpoint"
+  },
+  {
+   "fieldname": "column_break_settings",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "10",
+   "fieldname": "max_iterations",
+   "fieldtype": "Int",
+   "label": "Max Tool Iterations",
+   "description": "Maximum number of tool calls per conversation turn (default 10)"
+  },
+  {
+   "default": "0.1",
+   "fieldname": "temperature",
+   "fieldtype": "Float",
+   "label": "Temperature",
+   "description": "Lower = more focused (0.0–1.0). Recommended: 0.1 for ERP tasks."
+  },
+  {
+   "fieldname": "section_break_about",
+   "fieldtype": "Section Break",
+   "label": "About"
+  },
+  {
+   "fieldname": "about_html",
+   "fieldtype": "HTML",
+   "options": "<div style=\"padding: 12px; background: #f0f4ff; border-radius: 8px;\">\n  <strong>brAIn</strong> — AI intelligence layer for Styloworld.<br/>\n  Configure your preferred LLM above. For Ollama, install it locally and set Base URL to <code>http://localhost:11434/v1</code>.\n  For Anthropic Claude, get your API key from <a href=\"#\">console.anthropic.com</a>.\n</div>"
+  }
+ ],
+ "issingle": 1,
+ "links": [],
+ "modified": "2026-05-13 00:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "Brain",
+ "name": "Brain Settings",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": [],
+ "track_changes": 0
+}

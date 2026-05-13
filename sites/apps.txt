@@ -9,3 +9,4 @@ telephony
 erpnext
 helpdesk
 stylo_core
+brain
