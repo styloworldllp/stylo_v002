@@ -39,6 +39,9 @@ before_request = [
 # Per-user license check on login
 on_login = ["stylo_core.user_license.check_user_license_on_login"]
 
+# Re-apply Stylo workspace icons after every migrate (Desktop Icons get recreated)
+after_migrate = ["stylo_core.install_icons.run"]
+
 # include js, css files in header of web template
 # web_include_css = "/assets/stylo_core/css/stylo_core.css"
 # web_include_js = "/assets/stylo_core/js/stylo_core.js"
