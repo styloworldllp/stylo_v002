@@ -59,6 +59,7 @@
    "label": "Dropdown items"
   },
   {
+   "default": "Stylo CRM",
    "fieldname": "brand_name",
    "fieldtype": "Data",
    "label": "Name"

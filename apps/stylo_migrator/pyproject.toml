@@ -1,0 +1,18 @@
+[project]
+name = "stylo_migrator"
+authors = [
+    { name = "Styloworld", email = "hello@styloworld.io" }
+]
+description = "ERPNext v14 → v16 Data Migration Tool"
+requires-python = ">=3.10"
+readme = "README.md"
+dynamic = ["version"]
+dependencies = [
+    "pymysql>=1.1.0",
+]
+
+[build-system]
+requires = ["flit_core >=3.4,<4"]
+build-backend = "flit_core.buildapi"
+
+[tool.bench.dev-dependencies]

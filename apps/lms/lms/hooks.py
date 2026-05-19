@@ -11,6 +11,7 @@ app_icon_title = "Learning"
 app_icon_route = "/lms"
 app_color = "grey"
 app_email = "hello@styloworld.io"
+app_logo_url = "/assets/stylo_core/images/stylo-ring.png"
 app_license = "AGPL"
 required_apps = ["frappe/payments"]
 

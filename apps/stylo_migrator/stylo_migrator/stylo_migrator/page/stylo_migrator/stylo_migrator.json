@@ -1,0 +1,14 @@
+{
+ "creation": "2026-01-01 00:00:00.000000",
+ "doctype": "Page",
+ "module": "Stylo Migrator",
+ "name": "stylo-migrator",
+ "page_name": "stylo-migrator",
+ "roles": [
+  {
+   "role": "System Manager"
+  }
+ ],
+ "standard": "Yes",
+ "title": "v14 Migrator"
+}

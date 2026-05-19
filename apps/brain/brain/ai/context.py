@@ -5,16 +5,20 @@ Called fresh on every chat request.
 import frappe
 
 
-def get_page_context(route: list = None, doctype: str = None, doc_name: str = None) -> dict:
+def get_page_context(route: list = None, doctype: str = None, doc_name: str = None, ui: dict = None, insights_ctx: dict = None) -> dict:
 	"""
-	Called by the frontend with the current route info.
+	Called by the frontend with the current route info and live UI state.
 	Returns a context dict that's embedded into the system prompt.
+	insights_ctx is set when the request comes from the Stylo Insights SPA.
 	"""
 	ctx = {
 		"current_route": route or [],
 		"current_doctype": doctype,
 		"current_doc": doc_name,
+		"ui": ui or {},
 	}
+	if insights_ctx:
+		ctx["insights_ctx"] = insights_ctx
 
 	# Current user profile
 	try:
@@ -52,11 +56,16 @@ def get_page_context(route: list = None, doctype: str = None, doc_name: str = No
 
 
 def get_accessible_doctypes() -> list[str]:
-	"""Return doctypes the current user can at least read."""
+	"""Return doctypes the current user can at least read. Cached per user for 5 min."""
+	cache_key = f"brain:accessible_doctypes:{frappe.session.user}"
+	cached = frappe.cache.get_value(cache_key)
+	if cached is not None:
+		return cached
 	try:
 		all_dts = [d.name for d in frappe.get_all("DocType", filters={"istable": 0, "issingle": 0}, fields=["name"])]
-		accessible = [dt for dt in all_dts if frappe.has_permission(dt, "read")]
-		return sorted(accessible)
+		accessible = sorted(dt for dt in all_dts if frappe.has_permission(dt, "read"))
+		frappe.cache.set_value(cache_key, accessible, expires_in_sec=300)
+		return accessible
 	except Exception:
 		return []
 

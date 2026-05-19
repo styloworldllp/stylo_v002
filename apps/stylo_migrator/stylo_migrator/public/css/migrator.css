@@ -1,0 +1,309 @@
+/* ── Stylo Migrator Dashboard ───────────────────────────────────────────── */
+#stylo-migrator-root {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 24px 16px 60px;
+  font-family: var(--font-stack, system-ui, sans-serif);
+  color: var(--text-color, #1a1a2e);
+}
+
+/* Header */
+.smig-header {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 28px;
+}
+.smig-header-icon {
+  width: 44px; height: 44px;
+  background: linear-gradient(135deg, #0FBF7F, #0a8f5f);
+  border-radius: 12px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 22px; color: #fff;
+}
+.smig-header h1 { font-size: 22px; font-weight: 700; margin: 0; }
+.smig-header p  { font-size: 13px; margin: 2px 0 0; opacity: .65; }
+
+/* Steps */
+.smig-steps {
+  display: flex;
+  gap: 0;
+  margin-bottom: 28px;
+  border-radius: 10px;
+  overflow: hidden;
+  border: 1px solid var(--border-color, #e0e0e0);
+}
+.smig-step {
+  flex: 1;
+  padding: 10px 14px;
+  font-size: 13px;
+  font-weight: 500;
+  text-align: center;
+  background: var(--fg-color, #f5f5f5);
+  color: var(--text-muted, #888);
+  border-right: 1px solid var(--border-color, #e0e0e0);
+  cursor: default;
+}
+.smig-step:last-child { border-right: none; }
+.smig-step.active {
+  background: #0FBF7F;
+  color: #fff;
+}
+.smig-step.done {
+  background: #e6faf3;
+  color: #0a8f5f;
+}
+
+/* Cards */
+.smig-card {
+  background: var(--card-bg, #fff);
+  border: 1px solid var(--border-color, #e0e0e0);
+  border-radius: 12px;
+  padding: 22px 24px;
+  margin-bottom: 18px;
+}
+.smig-card h3 {
+  font-size: 15px; font-weight: 600; margin: 0 0 16px;
+}
+
+/* Form */
+.smig-form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+.smig-field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.smig-field label {
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: .04em;
+  opacity: .7;
+}
+.smig-field input {
+  border: 1px solid var(--border-color, #d0d0d0);
+  border-radius: 6px;
+  padding: 8px 10px;
+  font-size: 14px;
+  outline: none;
+  background: var(--input-bg, #fff);
+  color: var(--text-color, #1a1a2e);
+  transition: border-color .15s;
+}
+.smig-field input:focus {
+  border-color: #0FBF7F;
+  box-shadow: 0 0 0 3px rgba(15,191,127,.12);
+}
+.smig-field.full { grid-column: 1 / -1; }
+
+/* Buttons */
+.smig-btn {
+  display: inline-flex; align-items: center; gap: 7px;
+  padding: 9px 20px;
+  border-radius: 7px;
+  font-size: 14px; font-weight: 600;
+  cursor: pointer;
+  border: none;
+  transition: opacity .15s, transform .1s;
+}
+.smig-btn:active { transform: scale(.97); }
+.smig-btn:disabled { opacity: .45; cursor: not-allowed; }
+.smig-btn-primary   { background: #0FBF7F; color: #fff; }
+.smig-btn-secondary { background: var(--fg-color, #f0f0f0); color: var(--text-color, #333); }
+.smig-btn-danger    { background: #e53935; color: #fff; }
+.smig-btn-row { display: flex; gap: 10px; margin-top: 16px; flex-wrap: wrap; }
+
+/* Status badge */
+.smig-status-badge {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 99px;
+  font-size: 12px; font-weight: 600;
+}
+.smig-status-badge.connected { background: #e6faf3; color: #0a8f5f; }
+.smig-status-badge.error     { background: #fdecea; color: #c62828; }
+
+/* Preview table */
+.smig-preview-phase {
+  margin-bottom: 16px;
+  border: 1px solid var(--border-color, #e8e8e8);
+  border-radius: 10px;
+  overflow: hidden;
+}
+.smig-preview-phase-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 14px;
+  background: var(--fg-color, #f8fffe);
+  border-bottom: 1px solid var(--border-color, #e8e8e8);
+}
+.smig-preview-phase h4 { font-size: 13px; font-weight: 700; margin: 0; color: #0FBF7F; }
+.smig-phase-total { font-size: 12px; font-weight: 700; color: #0984e3; }
+
+.smig-preview-phase-skipped {
+  padding: 10px 14px;
+  background: var(--fg-color, #fafafa);
+}
+.smig-preview-phase-skipped h4 { color: #aaa; font-weight: 500; margin: 0; font-size: 12px; }
+
+.smig-preview-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+.smig-preview-table th {
+  text-align: left; padding: 6px 14px;
+  border-bottom: 1px solid var(--border-color, #eee);
+  font-size: 11px; text-transform: uppercase; letter-spacing: .04em; opacity: .6;
+  background: var(--fg-color, #fafafa);
+}
+.smig-preview-table td {
+  padding: 7px 14px;
+  border-bottom: 1px solid var(--border-color, #f4f4f4);
+}
+.smig-preview-table td:last-child { text-align: right; }
+.smig-preview-table tr.smig-row-empty td { opacity: .4; }
+.smig-preview-table tr:last-child td { border-bottom: none; }
+
+.smig-count-badge {
+  display: inline-block;
+  background: #e8f4fd;
+  color: #0984e3;
+  padding: 2px 9px;
+  border-radius: 99px;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+/* Streaming loader */
+.smig-phase-loader {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 4px;
+  font-size: 13px;
+  opacity: .65;
+}
+.smig-spinner-sm {
+  width: 14px; height: 14px;
+  border-width: 2px;
+}
+
+/* Preview summary banner */
+.smig-preview-summary {
+  margin-top: 14px;
+  padding: 11px 16px;
+  background: #e6faf3;
+  border-radius: 8px;
+  font-size: 13px;
+  color: #0a8f5f;
+}
+
+/* Fade-in for streaming phases */
+@keyframes smig-fadein {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.smig-fade-in {
+  animation: smig-fadein 0.25s ease both;
+}
+
+/* Progress section */
+.smig-progress-section { }
+.smig-progress-phase   { margin-bottom: 20px; }
+.smig-progress-phase h4 { font-size: 13px; font-weight: 700; margin: 0 0 8px; }
+
+.smig-progress-row {
+  display: flex; align-items: center; gap: 10px;
+  margin-bottom: 6px;
+}
+.smig-progress-label {
+  width: 200px; min-width: 200px;
+  font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.smig-progress-bar-wrap {
+  flex: 1;
+  height: 8px;
+  background: var(--fg-color, #f0f0f0);
+  border-radius: 99px;
+  overflow: hidden;
+}
+.smig-progress-bar {
+  height: 100%;
+  background: #0984e3;
+  border-radius: 99px;
+  transition: width 0.5s ease, background 0.3s ease;
+  width: 0%;
+}
+.smig-progress-count {
+  font-size: 12px; width: 160px; text-align: right; opacity: .7; white-space: nowrap;
+}
+.smig-progress-row.active .smig-progress-label { font-weight: 700; color: #6c5ce7; }
+.smig-progress-row.active .smig-progress-bar   { background: #6c5ce7; animation: smig-pulse 1.2s ease-in-out infinite; }
+.smig-progress-row.done   .smig-progress-bar   { background: #00b894; animation: none; }
+.smig-progress-row.failed .smig-progress-bar   { background: #e53935; animation: none; }
+
+@keyframes smig-pulse {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.65; }
+}
+
+/* Summary stats */
+.smig-stats {
+  display: flex; gap: 16px; margin-bottom: 20px; flex-wrap: wrap;
+}
+.smig-stat {
+  background: var(--fg-color, #f8f8f8);
+  border-radius: 10px;
+  padding: 12px 18px;
+  flex: 1; min-width: 140px;
+  text-align: center;
+}
+.smig-stat-num { font-size: 28px; font-weight: 800; color: #0FBF7F; }
+.smig-stat-num.failed { color: #e53935; }
+.smig-stat-label { font-size: 12px; opacity: .65; margin-top: 2px; }
+
+/* Failure log */
+.smig-log-table {
+  width: 100%; border-collapse: collapse; font-size: 12px;
+}
+.smig-log-table th {
+  text-align: left; padding: 6px 8px;
+  border-bottom: 2px solid var(--border-color, #e0e0e0);
+  font-size: 11px; text-transform: uppercase; letter-spacing: .04em; opacity: .6;
+}
+.smig-log-table td {
+  padding: 5px 8px;
+  border-bottom: 1px solid var(--border-color, #f0f0f0);
+  vertical-align: top;
+}
+.smig-log-table tr:hover td { background: var(--fg-color, #fafafa); }
+
+.smig-tag {
+  display: inline-block;
+  padding: 2px 7px;
+  border-radius: 4px;
+  font-size: 11px; font-weight: 600;
+}
+.smig-tag-error  { background: #fdecea; color: #c62828; }
+.smig-tag-fix    { background: #fff8e1; color: #f57f17; }
+.smig-tag-skip   { background: #e3f2fd; color: #1565c0; }
+
+/* Spinner */
+@keyframes smig-spin { to { transform: rotate(360deg); } }
+.smig-spinner {
+  width: 18px; height: 18px;
+  border: 3px solid rgba(15,191,127,.2);
+  border-top-color: #0FBF7F;
+  border-radius: 50%;
+  animation: smig-spin .7s linear infinite;
+  display: inline-block;
+}
+
+.smig-hidden { display: none !important; }

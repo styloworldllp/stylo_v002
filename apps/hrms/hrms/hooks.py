@@ -1,12 +1,12 @@
 app_name = "hrms"
 app_title = "HRMS"
-app_publisher = "Frappe Technologies Pvt. Ltd."
-app_description = "Modern HR and Payroll Software"
-app_email = "contact@frappe.io"
+app_publisher = "Styloworld"
+app_description = "StyloHR — Modern HR and Payroll Software"
+app_email = "hello@styloworld.io"
 app_license = "GNU General Public License (v3)"
 required_apps = ["frappe/erpnext"]
 source_link = "http://github.com/frappe/hrms"
-app_logo_url = "/assets/frappe/icons/stylobms/light/hrms.png"
+app_logo_url = "/assets/stylo_core/images/stylo-ring.png"
 app_home = "/desk/people"
 
 add_to_apps_screen = [

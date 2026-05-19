@@ -5,8 +5,13 @@ lms
 crm
 india_compliance
 hrms
+lending
 telephony
 erpnext
+drive
 helpdesk
 stylo_core
+insights
+mint
 brain
+stylo_migrator

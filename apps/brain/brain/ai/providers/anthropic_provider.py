@@ -22,6 +22,19 @@ class AnthropicProvider(BaseLLMProvider):
 			for t in tools
 		]
 
+	def stream_text(self, system: str, messages: list, tools: list):
+		"""Yield text chunks for the final response using Anthropic streaming."""
+		with self.client.messages.stream(
+			model=self.model,
+			max_tokens=4096,
+			temperature=self.temperature,
+			system=system,
+			messages=messages,
+			tools=self._to_anthropic_tools(tools),
+		) as stream:
+			for text in stream.text_stream:
+				yield text
+
 	def chat(self, system: str, messages: list, tools: list) -> dict:
 		response = self.client.messages.create(
 			model=self.model,

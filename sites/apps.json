@@ -96,5 +96,25 @@
         "required": [],
         "idx": 11,
         "version": "0.0.1"
+    },
+    "lending": {
+        "is_repo": true,
+        "resolution": {
+            "commit_hash": "e36bda1d73f9e844f517e71fc1069dda201a5053",
+            "branch": "develop"
+        },
+        "required": [],
+        "idx": 12,
+        "version": "0.0.1"
+    },
+    "drive": {
+        "is_repo": true,
+        "resolution": {
+            "commit_hash": "ebfb284d391388255727a3ea5790baef7fa1f87c",
+            "branch": "main"
+        },
+        "required": [],
+        "idx": 13,
+        "version": "0.3.0"
     }
 }

@@ -1,7 +1,7 @@
 app_name = "erpnext"
 app_title = "StyloBMS"
-app_publisher = "Frappe Technologies Pvt. Ltd."
-app_description = """ERP made simple"""
+app_publisher = "Styloworld"
+app_description = """StyloBMS — Complete Business Management Suite"""
 app_icon = "fa fa-th"
 app_color = "#e74c3c"
 app_email = "hello@frappe.io"
@@ -496,8 +496,8 @@ email_brand_image = "assets/frappe/icons/stylobms/light/erp-core.png"
 default_mail_footer = """
 	<span>
 		Sent via
-		<a class="text-muted" href="https://frappe.io/erpnext?source=via_email_footer" target="_blank">
-			ERPNext
+		<a class="text-muted" href="https://styloworld.io" target="_blank">
+			StyloBMS
 		</a>
 	</span>
 """

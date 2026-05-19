@@ -5,6 +5,7 @@ app_description = "StyloDesk — Customer Service Software"
 app_icon = "octicon octicon-file-directory"
 app_color = "grey"
 app_email = "hello@styloworld.io"
+app_logo_url = "/assets/stylo_core/images/stylo-ring.png"
 app_license = "AGPLv3"
 required_apps = ["telephony"]
 require_type_annotated_api_methods = True

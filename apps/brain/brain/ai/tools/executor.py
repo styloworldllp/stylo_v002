@@ -10,6 +10,7 @@ import frappe
 
 def execute_tool(name: str, inputs: dict) -> dict:
 	_map = {
+		"present_action_choice": _present_action_choice,
 		"search_records": _search_records,
 		"get_record": _get_record,
 		"get_doctype_meta": _get_doctype_meta,
@@ -22,8 +23,14 @@ def execute_tool(name: str, inputs: dict) -> dict:
 		"cancel_document": _cancel_document,
 		"delete_record": _delete_record,
 		"navigate_to": _navigate_to,
+		"fill_form": _fill_form,
+		"guide_user": _guide_user,
 		"get_value": _get_value,
 		"get_system_info": _get_system_info,
+		# Stylo Insights
+		"insights_get_data_sources":  _insights_get_data_sources,
+		"insights_get_tables":        _insights_get_tables,
+		"insights_create_dashboard":  _insights_create_dashboard,
 	}
 	fn = _map.get(name)
 	if not fn:
@@ -227,6 +234,53 @@ def _navigate_to(type: str, doctype: str = None, name: str = None,
 	}
 
 
+# ── AI Interaction (browser-side) ─────────────────────────────────────────────
+
+def _present_action_choice(doctype: str, title: str, name: str = None,
+							known_values: dict = None, required_fields: list = None) -> dict:
+	if not frappe.has_permission(doctype, "read"):
+		return {"error": f"No permission on {doctype}"}
+	return {
+		"success": True,
+		"message": f"Choose how to {title}",
+		"_action": {
+			"type": "action_choice",
+			"doctype": doctype,
+			"title": title,
+			"name": name,
+			"known_values": known_values or {},
+			"required_fields": required_fields or [],
+		},
+	}
+
+
+def _fill_form(doctype: str, values: dict, name: str = None) -> dict:
+	if not frappe.has_permission(doctype, "read"):
+		return {"error": f"No permission on {doctype}"}
+	return {
+		"success": True,
+		"message": f"Opening {doctype} form and filling {len(values)} fields with AI animation.",
+		"_action": {
+			"type": "fill_form",
+			"doctype": doctype,
+			"name": name,
+			"values": values,
+		},
+	}
+
+
+def _guide_user(title: str, steps: list) -> dict:
+	return {
+		"success": True,
+		"message": f"Starting guided walkthrough: {title} ({len(steps)} steps).",
+		"_action": {
+			"type": "guide_user",
+			"title": title,
+			"steps": steps,
+		},
+	}
+
+
 # ── Utility ───────────────────────────────────────────────────────────────────
 
 def _get_value(doctype: str, name: str, fieldname: str) -> dict:
@@ -251,3 +305,136 @@ def _get_system_info() -> dict:
 		"roles": frappe.get_roles(frappe.session.user),
 		"today": frappe.utils.today(),
 	}
+
+
+# ── Stylo Insights (Dashboard Creation) ───────────────────────────────────────
+
+def _insights_get_data_sources() -> dict:
+	"""Return all active Insights Data Source v3 records."""
+	try:
+		sources = frappe.get_list(
+			"Insights Data Source v3",
+			fields=["name", "title", "database_type", "is_site_db", "status"],
+			filters={"status": "Active"},
+		)
+		return {"data_sources": [dict(s) for s in sources]}
+	except Exception as e:
+		return {"error": str(e)}
+
+
+def _insights_get_tables(data_source: str, search_term: str = None) -> dict:
+	"""Return tables available in a given Insights data source."""
+	try:
+		filters = {"data_source": data_source}
+		tables = frappe.get_list(
+			"Insights Table v3",
+			filters=filters,
+			fields=["name", "table", "label", "data_source"],
+			limit=200,
+		)
+		result = [
+			{"table_name": t.table, "label": t.label or t.table, "data_source": t.data_source}
+			for t in tables
+		]
+		if search_term:
+			q = search_term.lower()
+			result = [r for r in result if q in r["table_name"].lower() or q in r["label"].lower()]
+		return {"data_source": data_source, "tables": result}
+	except Exception as e:
+		return {"error": str(e)}
+
+
+def _insights_create_dashboard(
+	workbook_title: str,
+	dashboard_title: str,
+	charts: list,
+) -> dict:
+	"""
+	Atomically create Insights Workbook → Queries → Charts → Dashboard.
+	Returns workbook_name, dashboard_name, and an open_insights_dashboard action.
+	"""
+	import uuid as _uuid
+
+	try:
+		# 1. Create Workbook
+		workbook = frappe.new_doc("Insights Workbook")
+		workbook.title = workbook_title
+		workbook.insert(ignore_permissions=False)
+		frappe.db.commit()
+		workbook_name = workbook.name
+
+		layout_items = []
+
+		for idx, chart_spec in enumerate(charts):
+			chart_title = chart_spec.get("title", f"Chart {idx + 1}")
+			chart_type  = chart_spec.get("chart_type", "Bar")
+			operations  = chart_spec.get("operations", [])
+			config      = chart_spec.get("config", {})
+			layout      = chart_spec.get("layout") or {
+				"x": (idx % 2) * 10,
+				"y": (idx // 2) * 9,
+				"w": 10,
+				"h": 3 if chart_type == "Number" else 8,
+			}
+
+			# 2. Create query
+			query = frappe.new_doc("Insights Query v3")
+			query.title          = chart_title
+			query.workbook       = workbook_name
+			query.is_builder_query = 1
+			query.operations     = frappe.as_json(operations)
+			query.sort_order     = idx
+			query.insert(ignore_permissions=False)
+
+			# 3. Create chart — set data_query = query.name to prevent before_save stub
+			chart = frappe.new_doc("Insights Chart v3")
+			chart.title      = chart_title
+			chart.workbook   = workbook_name
+			chart.chart_type = chart_type
+			chart.query      = query.name
+			chart.data_query = query.name  # prevents before_save from creating an orphan stub
+			chart.config     = frappe.as_json(config)
+			chart.sort_order = idx
+			chart.insert(ignore_permissions=False)
+
+			item_id = str(_uuid.uuid4())
+			layout_items.append({
+				"id":     item_id,
+				"type":   "chart",
+				"chart":  chart.name,
+				"layout": {
+					"i": item_id,
+					"x": layout.get("x", 0),
+					"y": layout.get("y", idx * 9),
+					"w": layout.get("w", 10),
+					"h": layout.get("h", 8),
+				},
+			})
+
+		# 4. Create Dashboard
+		dashboard = frappe.new_doc("Insights Dashboard v3")
+		dashboard.title    = dashboard_title
+		dashboard.workbook = workbook_name
+		dashboard.items    = frappe.as_json(layout_items)
+		dashboard.insert(ignore_permissions=False)
+		frappe.db.commit()
+
+		return {
+			"success": True,
+			"workbook_name":  workbook_name,
+			"dashboard_name": dashboard.name,
+			"charts_created": len(charts),
+			"message": (
+				f"Created workbook '{workbook_title}' with {len(charts)} chart(s) "
+				f"on dashboard '{dashboard_title}'."
+			),
+			"_action": {
+				"type":      "open_insights_dashboard",
+				"workbook":  workbook_name,
+				"dashboard": dashboard.name,
+			},
+		}
+
+	except Exception as e:
+		frappe.db.rollback()
+		return {"error": str(e)}

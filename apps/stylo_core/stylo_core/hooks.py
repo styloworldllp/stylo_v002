@@ -6,7 +6,7 @@
 #
 # Architecture note:
 #   stylo_core is a thin overlay app installed on top of the standard Frappe
-#   bench.  It owns all Stylo branding (CSS, JS) and both tiers of the
+#   bench.  It owns all Styloworld branding (CSS, JS) and both tiers of the
 #   license system:
 #     1. Domain-level HMAC key  → license.validate_license  (before_request)
 #     2. Per-user license check → user_license.check_user_license_on_login
@@ -14,8 +14,8 @@
 # ─────────────────────────────────────────────────────────────────────────────
 app_name = "stylo_core"
 app_title = "Stylo Core"
-app_publisher = "Stylo"
-app_description = "Stylo — Branding and customizations layer"
+app_publisher = "Styloworld"
+app_description = "Styloworld — Branding and customizations layer"
 app_email = "hello@styloworld.io"
 app_license = "mit"
 app_logo_url = "/assets/stylo_core/images/stylo-logo-light.png"
@@ -31,15 +31,12 @@ app_include_css = [
 ]
 
 # License enforcement — runs before every request
-before_request = [
-    "stylo_core.license.validate_license",
-    "stylo_core.module_guard.check_module_license",
-]
+before_request = ["stylo_core.license.validate_license"]
 
 # Per-user license check on login
 on_login = ["stylo_core.user_license.check_user_license_on_login"]
 
-# Re-apply Stylo workspace icons after every migrate (Desktop Icons get recreated)
+# Re-apply Stylo icons and white-label after every migrate
 after_migrate = ["stylo_core.install_icons.run"]
 
 # include js, css files in header of web template
@@ -184,14 +181,10 @@ scheduler_events = {
 
 # Overriding Methods
 # ------------------------------
-# Suppress broken API calls that generate noise in Error Log
-override_whitelisted_methods = {
-    "frappe.onboarding.get_onboarding_status": "stylo_core.stubs.noop_empty_dict",
-    "frappe.onboarding.update_user_onboarding_status": "stylo_core.stubs.noop_empty_dict",
-    "telephony.api.is_call_integration_enabled": "stylo_core.stubs.noop_false",
-    "frappe.utils.change_log.get_change_log": "stylo_core.stubs.noop_empty_list",
-    "frappe.desk.doctype.changelog_feed.changelog_feed.get_changelog_feed": "stylo_core.stubs.noop_empty_list",
-}
+#
+# override_whitelisted_methods = {
+# 	"frappe.desk.doctype.event.event.get_events": "stylo_core.event.get_events"
+# }
 #
 # each overriding function accepts a `data` argument;
 # generated from the base implementation of the doctype dashboard,

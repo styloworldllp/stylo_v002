@@ -41,13 +41,21 @@ def _get_all_licenses() -> dict:
     return cached
 
 
+_ALL_LICENSES = ["pro", "bms", "crm", "hr", "lms"]
+
+
 def get_user_licenses(email: str) -> list[str]:
-    """Return the list of license keys held by this user, e.g. ["bms", "crm"]."""
+    """Return the list of license keys held by this user, e.g. ["bms", "crm"].
+    Administrator always gets all licenses regardless of Control Center config."""
+    if email in ("Administrator", "administrator"):
+        return _ALL_LICENSES
     return _get_all_licenses().get(email, [])
 
 
 def has_license(email: str, license_key: str) -> bool:
     """Return True if the user holds the given license key or a Pro license."""
+    if email in ("Administrator", "administrator"):
+        return True
     licenses = get_user_licenses(email)
     return "pro" in licenses or license_key in licenses
 

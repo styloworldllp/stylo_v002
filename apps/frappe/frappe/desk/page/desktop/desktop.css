@@ -78,6 +78,7 @@
 }
 .icons-container{
     margin-top: 60px;
+    margin-bottom: 90px;
     padding: 20px;
 }
 .icons-container:has(.sidebar-card){

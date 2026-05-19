@@ -17,7 +17,7 @@ def get_context():
 	frappe.db.commit()
 
 	app_path = frappe.form_dict.get("app_path")
-	favicon = "/assets/stylo_core/images/stylo-lms-logo.png?v=2"
+	favicon = "/assets/stylo_core/images/stylo-ring.png?v=3"
 	title = frappe.db.get_single_value("Website Settings", "app_name") or "Stylo LMS"
 
 	context.meta = get_meta(app_path, title, favicon)

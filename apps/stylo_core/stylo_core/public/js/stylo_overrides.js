@@ -41,9 +41,13 @@
 	// ── Helpers ────────────────────────────────────────────────────────────────
 	function sanitize(text) {
 		if (typeof text !== "string") return text;
-		// Replace "frappe" (any case) with "Stylo" in user-visible strings,
-		// but keep internal Python paths readable by lowercasing "frappe" → "stylo"
 		return text
+			.replace(/\bERPNext\b/g, "StyloBMS")
+			.replace(/\berpnext\b/g, "stylobms")
+			.replace(/\bFrappe HR\b/g, "StyloHR")
+			.replace(/\bFrappe CRM\b/g, "Stylo CRM")
+			.replace(/\bFrappe Helpdesk\b/g, "StyloDesk")
+			.replace(/\bFrappe Learning\b/g, "Stylo LMS")
 			.replace(/\bFrappe\b/g, "Stylo")
 			.replace(/\bfrappe\b/g, "stylo");
 	}
@@ -177,39 +181,178 @@
 		patch_links(document);
 	});
 
-	// ── DOM observer: catch any remaining "frappe" text in toasts/dialogs ──────
-	function patch_node(node) {
-		if (node.nodeType === Node.TEXT_NODE) {
-			const t = node.textContent;
-			if (t && (t.includes("frappe") || t.includes("Frappe"))) {
-				node.textContent = sanitize(t);
-			}
+	// ── Patch frappe.utils.set_title — the single source for ALL tab titles ───
+	// Every page, form, list, report, workspace sets its browser tab title
+	// through frappe.utils.set_title(). Patching here covers 100% of cases.
+	$(document).on("app_ready", function () {
+		const _orig_set_title = frappe.utils.set_title.bind(frappe.utils);
+		frappe.utils.set_title = function (title) {
+			return _orig_set_title(sanitize(title));
+		};
+		// Sanitize whatever title is already set
+		if (frappe._original_title) {
+			frappe.utils.set_title(frappe._original_title);
 		}
+	});
+
+	// ── Sanitize Frappe search utils (recently visited + nav results) ──────────
+	// Patches frappe.search.utils after app_ready so it's available.
+	$(document).on("app_ready", function () {
+		try {
+			const su = frappe.search && frappe.search.utils;
+			if (!su) return;
+
+			// 1. Sanitize the raw recent list stored in memory
+			if (su.recent && Array.isArray(su.recent)) {
+				su.recent = su.recent.map(function (item) {
+					if (Array.isArray(item)) {
+						// item = [doctype, docname]
+						return [sanitize(item[0]), item[1]];
+					}
+					return item;
+				});
+			}
+
+			// 2. Patch setup_recent so future calls also sanitize
+			const _orig_setup = su.setup_recent.bind(su);
+			su.setup_recent = function () {
+				_orig_setup();
+				this.recent = this.recent.map(function (item) {
+					if (Array.isArray(item)) return [sanitize(item[0]), item[1]];
+					return item;
+				});
+			};
+
+			// 3. Patch get_recent_pages to sanitize all result labels/values
+			const _orig_recent = su.get_recent_pages.bind(su);
+			su.get_recent_pages = function (keywords) {
+				const results = _orig_recent(keywords);
+				return results.map(function (r) {
+					if (r.label) r.label = sanitize(r.label);
+					if (r.value) r.value = sanitize(r.value);
+					return r;
+				});
+			};
+
+			// 4. Patch get_nav_results which includes recent + doctype nav items
+			if (su.get_nav_results) {
+				const _orig_nav = su.get_nav_results.bind(su);
+				su.get_nav_results = function (keywords) {
+					const results = _orig_nav(keywords);
+					return results.map(function (section) {
+						if (section && section.results) {
+							section.title = sanitize(section.title || "");
+							section.results = section.results.map(function (r) {
+								if (r.label) r.label = sanitize(r.label);
+								if (r.value) r.value = sanitize(r.value);
+								if (r.description) r.description = sanitize(r.description);
+								return r;
+							});
+						}
+						return section;
+					});
+				};
+			}
+		} catch (e) {}
+	});
+
+	// ── DOM brand sanitizer ────────────────────────────────────────────────────
+	// Selectors that are safe to sanitize (avoid code editors / JSON fields).
+	const SAFE_SELECTORS = [
+		// Page chrome
+		".page-head", ".page-title", ".title-text", ".breadcrumb",
+		".page-head-content", ".head-form", ".indicator-pill",
+		// Form field labels and descriptions (covers DocType field names shown in UI)
+		".control-label", ".field-description", ".frappe-control label",
+		".form-column", ".form-layout", ".form-dashboard",
+		".section-head", ".collapsible-section-head",
+		// Alerts, toasts, dialogs
+		".frappe-toast", ".msgprint-dialog", ".modal-dialog", ".alert",
+		// Global search, recently visited, awesomplete
+		".awesomplete", ".awesomplete ul", ".awesomplete li",
+		".search-results", ".search-box", ".search-result-item",
+		".recently-visited", ".recently-visited-list",
+		"[data-result-type]",
+		// Sidebar and list views
+		".sidebar-label", ".list-row", ".list-subject",
+		".form-sidebar", ".form-message", ".widget-title",
+		// Desktop home
+		"#page-desktop",
+		// Dropdown menus
+		".dropdown-menu",
+	];
+
+	// Never sanitize inside these (would corrupt code/data)
+	const SKIP_SELECTORS = [
+		".CodeMirror", ".ace_editor", "code", "pre",
+		"[data-fieldtype='Code']", "[data-fieldtype='JSON']",
+	];
+
+	function should_patch(node) {
+		if (!node) return false;
+		if (SKIP_SELECTORS.some((sel) => node.closest && node.closest(sel))) return false;
+		return SAFE_SELECTORS.some((sel) => node.closest && node.closest(sel));
+	}
+
+	function patch_node(node) {
+		if (node.nodeType !== Node.TEXT_NODE) return;
+		const t = node.textContent;
+		if (!t) return;
+		if (t.includes("frappe") || t.includes("Frappe") ||
+		    t.includes("ERPNext") || t.includes("erpnext")) {
+			node.textContent = sanitize(t);
+		}
+	}
+
+	function patch_subtree(root) {
+		if (!root || !root.querySelectorAll) return;
+		const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
+		while (walker.nextNode()) {
+			const node = walker.currentNode;
+			if (!should_patch(node.parentElement)) continue;
+			patch_node(node);
+		}
+		patch_links(root);
+	}
+
+	// Run a full sanitization pass over all safe zones
+	function patch_page() {
+		SAFE_SELECTORS.forEach(function (sel) {
+			document.querySelectorAll(sel).forEach(function (el) {
+				patch_subtree(el);
+			});
+		});
 	}
 
 	const observer = new MutationObserver(function (mutations) {
 		mutations.forEach(function (m) {
 			m.addedNodes.forEach(function (node) {
-				// Only patch inside alert/dialog areas to avoid touching code editors
-				const parents = [
-					".frappe-toast", ".msgprint-dialog", ".modal-dialog",
-					".alert", "#page-desktop"
-				];
-				const inTarget = parents.some((sel) => node.closest && node.closest(sel));
-				if (!inTarget) return;
 				if (node.nodeType === Node.TEXT_NODE) {
-					patch_node(node);
+					if (should_patch(node.parentElement)) patch_node(node);
 				} else if (node.nodeType === Node.ELEMENT_NODE) {
-					const walker = document.createTreeWalker(node, NodeFilter.SHOW_TEXT);
-					while (walker.nextNode()) patch_node(walker.currentNode);
-					patch_links(node);
+					patch_subtree(node);
 				}
 			});
+			// Also catch characterData changes (text node edits by Frappe)
+			if (m.type === "characterData") {
+				if (should_patch(m.target.parentElement)) patch_node(m.target);
+			}
 		});
 	});
 
 	document.addEventListener("DOMContentLoaded", function () {
-		observer.observe(document.body, { childList: true, subtree: true });
+		observer.observe(document.body, {
+			childList: true,
+			subtree: true,
+			characterData: true,
+		});
+		// Initial pass after boot
+		setTimeout(patch_page, 500);
+	});
+
+	// Re-run on every Frappe route change (handles page title / breadcrumb updates)
+	$(document).on("page-change", function () {
+		setTimeout(patch_page, 100);
 	});
 
 	// ── Theme toggle button (sun = light, moon = dark) ────────────────────────

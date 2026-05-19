@@ -1,0 +1,68 @@
+{
+ "actions": [],
+ "autoname": "autoincrement",
+ "creation": "2026-01-01 00:00:00.000000",
+ "doctype": "DocType",
+ "document_type": "System",
+ "engine": "InnoDB",
+ "field_order": [
+  "job",
+  "doctype_name",
+  "v14_name",
+  "skipped",
+  "error",
+  "auto_fix_applied"
+ ],
+ "fields": [
+  {
+   "fieldname": "job",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Migration Job",
+   "options": "Migration Job"
+  },
+  {
+   "fieldname": "doctype_name",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "DocType"
+  },
+  {
+   "fieldname": "v14_name",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "v14 Record Name"
+  },
+  {
+   "default": "0",
+   "fieldname": "skipped",
+   "fieldtype": "Check",
+   "in_list_view": 1,
+   "label": "Skipped (Duplicate)"
+  },
+  {
+   "fieldname": "error",
+   "fieldtype": "Small Text",
+   "label": "Error"
+  },
+  {
+   "fieldname": "auto_fix_applied",
+   "fieldtype": "Small Text",
+   "label": "Auto-Fix Applied"
+  }
+ ],
+ "modified": "2026-01-01 00:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "Stylo Migrator",
+ "name": "Migration Log",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "role": "System Manager",
+   "delete": 1,
+   "read": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC"
+}

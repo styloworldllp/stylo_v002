@@ -12,13 +12,10 @@ node_modules/
 */node_modules/
 */frontend/node_modules/
 */desk/node_modules/
-# Numbered duplicates
-node_modules 2/
-node_modules 3/
-node_modules 4/
-node_modules 5/
-node_modules 6/
-node_modules 7/
+*/public/node_modules*/
+# Numbered duplicates (macOS creates these on copy)
+node_modules[_ ][0-9]*/
+node_modules [0-9]*/
 
 # ── Python virtualenv & compiled files ─────────────────────────────────────
 env/
@@ -47,6 +44,13 @@ archived/
 *.dmg
 *.iso
 *.img
+*.zip
+
+# ── Large apps (cloned locally but not part of core bench commit) ────────────
+apps/drive/
+apps/insights/
+apps/lending/
+apps/mint/
 
 # ── Design assets / icons (large binary files not needed in Docker build) ───
 styloworld-icons 2/
