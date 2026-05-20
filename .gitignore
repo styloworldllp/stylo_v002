@@ -14,8 +14,8 @@ node_modules/
 */desk/node_modules/
 */public/node_modules*/
 # Numbered duplicates (macOS creates these on copy)
-node_modules[_ ][0-9]*/
-node_modules [0-9]*/
+node_modules[_ ][0-9]*
+node_modules [0-9]*
 
 # ── Python virtualenv & compiled files ─────────────────────────────────────
 env/
