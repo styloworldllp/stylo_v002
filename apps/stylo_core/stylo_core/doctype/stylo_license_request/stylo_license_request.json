@@ -1,0 +1,160 @@
+{
+ "actions": [],
+ "creation": "2026-05-30 00:00:00.000000",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "consultant", "client_name", "client_contact_email", "site",
+  "column_break_1",
+  "module_pack", "modules", "num_users", "duration_months",
+  "section_break_pricing",
+  "monthly_rate", "total_amount",
+  "section_break_status",
+  "status", "payment_reference",
+  "section_break_notes",
+  "notes"
+ ],
+ "fields": [
+  {
+   "fieldname": "consultant",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Consultant",
+   "options": "User",
+   "reqd": 1
+  },
+  {
+   "fieldname": "client_name",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Client Name",
+   "reqd": 1
+  },
+  {
+   "fieldname": "client_contact_email",
+   "fieldtype": "Data",
+   "label": "Client Contact Email",
+   "options": "Email"
+  },
+  {
+   "fieldname": "site",
+   "fieldtype": "Data",
+   "label": "Site Name",
+   "description": "e.g. clientname.stylo.io"
+  },
+  {
+   "fieldname": "column_break_1",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "module_pack",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "Module Pack",
+   "options": "Single\nDuo\nFull",
+   "reqd": 1
+  },
+  {
+   "fieldname": "modules",
+   "fieldtype": "Small Text",
+   "label": "Modules Selected",
+   "description": "Comma-separated list, e.g. StyloBMS, StyloHR"
+  },
+  {
+   "fieldname": "num_users",
+   "fieldtype": "Int",
+   "in_list_view": 1,
+   "label": "Number of Users",
+   "reqd": 1
+  },
+  {
+   "fieldname": "duration_months",
+   "fieldtype": "Int",
+   "label": "Duration (Months)",
+   "default": "12",
+   "reqd": 1
+  },
+  {
+   "fieldname": "section_break_pricing",
+   "fieldtype": "Section Break",
+   "label": "Pricing"
+  },
+  {
+   "fieldname": "monthly_rate",
+   "fieldtype": "Currency",
+   "label": "Monthly Rate (per user)",
+   "read_only": 1
+  },
+  {
+   "fieldname": "total_amount",
+   "fieldtype": "Currency",
+   "in_list_view": 1,
+   "label": "Total Amount",
+   "read_only": 1
+  },
+  {
+   "fieldname": "section_break_status",
+   "fieldtype": "Section Break",
+   "label": "Status"
+  },
+  {
+   "fieldname": "status",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "Status",
+   "options": "Draft\nPending Payment\nConfirmed\nIssued\nRejected",
+   "default": "Draft",
+   "reqd": 1
+  },
+  {
+   "fieldname": "payment_reference",
+   "fieldtype": "Data",
+   "label": "Payment Reference",
+   "description": "Bank transfer reference / UTR number"
+  },
+  {
+   "fieldname": "section_break_notes",
+   "fieldtype": "Section Break",
+   "label": "Notes"
+  },
+  {
+   "fieldname": "notes",
+   "fieldtype": "Text",
+   "label": "Notes"
+  }
+ ],
+ "links": [],
+ "modified": "2026-05-30 00:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "Stylo Core",
+ "name": "Stylo License Request",
+ "naming_rule": "Expression",
+ "autoname": "format:SLR-{YYYY}-{#####}",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "submit": 0,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "read": 1,
+   "role": "Stylo Consultant",
+   "write": 1,
+   "if_owner": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": [],
+ "track_changes": 1
+}

@@ -1,0 +1,152 @@
+{
+ "actions": [],
+ "creation": "2026-05-30 00:00:00.000000",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "license_key", "site", "client_name", "client_contact_email",
+  "column_break_1",
+  "consultant", "license_request",
+  "section_break_modules",
+  "module_pack", "modules", "user_limit",
+  "section_break_dates",
+  "start_date", "end_date", "grace_end_date",
+  "column_break_2",
+  "status"
+ ],
+ "fields": [
+  {
+   "fieldname": "license_key",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "License Key",
+   "read_only": 1
+  },
+  {
+   "fieldname": "site",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Site Name",
+   "reqd": 1
+  },
+  {
+   "fieldname": "client_name",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Client Name",
+   "reqd": 1
+  },
+  {
+   "fieldname": "client_contact_email",
+   "fieldtype": "Data",
+   "label": "Client Contact Email",
+   "options": "Email"
+  },
+  {
+   "fieldname": "column_break_1",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "consultant",
+   "fieldtype": "Link",
+   "label": "Consultant",
+   "options": "User"
+  },
+  {
+   "fieldname": "license_request",
+   "fieldtype": "Link",
+   "label": "License Request",
+   "options": "Stylo License Request"
+  },
+  {
+   "fieldname": "section_break_modules",
+   "fieldtype": "Section Break",
+   "label": "License Scope"
+  },
+  {
+   "fieldname": "module_pack",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "Module Pack",
+   "options": "Single\nDuo\nFull"
+  },
+  {
+   "fieldname": "modules",
+   "fieldtype": "Small Text",
+   "label": "Modules"
+  },
+  {
+   "fieldname": "user_limit",
+   "fieldtype": "Int",
+   "in_list_view": 1,
+   "label": "User Limit"
+  },
+  {
+   "fieldname": "section_break_dates",
+   "fieldtype": "Section Break",
+   "label": "Validity"
+  },
+  {
+   "fieldname": "start_date",
+   "fieldtype": "Date",
+   "in_list_view": 1,
+   "label": "Start Date"
+  },
+  {
+   "fieldname": "end_date",
+   "fieldtype": "Date",
+   "in_list_view": 1,
+   "label": "End Date"
+  },
+  {
+   "fieldname": "grace_end_date",
+   "fieldtype": "Date",
+   "label": "Grace Period Ends",
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_2",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "status",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "Status",
+   "options": "Active\nGrace Period\nExpired\nSuspended",
+   "default": "Active",
+   "reqd": 1
+  }
+ ],
+ "links": [],
+ "modified": "2026-05-30 00:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "Stylo Core",
+ "name": "Stylo License",
+ "naming_rule": "Expression",
+ "autoname": "format:LIC-{YYYY}-{#####}",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "read": 1,
+   "role": "Stylo Consultant",
+   "if_owner": 1
+  }
+ ],
+ "sort_field": "end_date",
+ "sort_order": "DESC",
+ "states": [],
+ "track_changes": 1
+}

@@ -24,7 +24,10 @@ app_logo_url = "/assets/stylo_core/images/stylo-logo-light.png"
 # ------------------
 
 # Desk (authenticated Frappe UI) — inject brand CSS and JS overrides
-app_include_js = ["/assets/stylo_core/js/stylo_overrides.js"]
+app_include_js = [
+    "/assets/stylo_core/js/stylo_overrides.js",
+    "/assets/stylo_core/js/license_lock.js",
+]
 app_include_css = [
     "/assets/stylo_core/css/stylo_theme.css",
     "/assets/stylo_core/css/stylo_icons.css",
@@ -162,7 +165,10 @@ after_migrate = ["stylo_core.install_icons.run"]
 
 scheduler_events = {
     "all": [
-        "stylo_core.user_license.refresh_licensed_users"  # polls Control Center every 5 min
+        "stylo_core.user_license.refresh_licensed_users",  # polls Control Center every 5 min
+    ],
+    "daily": [
+        "stylo_core.license_management.check_expiring_licenses",  # renewal notifications + status sync
     ],
 }
 
