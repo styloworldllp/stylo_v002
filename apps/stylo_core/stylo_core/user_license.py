@@ -29,6 +29,18 @@ LICENSE_CACHE_TTL = 86400  # 24 hours
 
 # ── Site-level license ────────────────────────────────────────────────────
 
+def _is_demo_or_unconfigured() -> bool:
+	"""Returns True if this site is a demo or has no Stylo Cloud URL configured."""
+	if not STYLO_CLOUD_URL:
+		return True
+	try:
+		return bool(frappe.db.get_single_value("System Settings", "skip_license_check")
+		            or frappe.conf.get("is_demo")
+		            or frappe.conf.get("skip_license_check"))
+	except Exception:
+		return True
+
+
 def get_site_license_status() -> dict:
 	"""
 	Call Stylo Cloud master to get this site's license status.
@@ -36,6 +48,9 @@ def get_site_license_status() -> dict:
 	Fails open (returns active) if master is unreachable — prevents
 	false lockouts due to network issues.
 	"""
+	if _is_demo_or_unconfigured():
+		return {"status": "active", "user_limit": 9999}
+
 	cached = frappe.cache.get_value(LICENSE_CACHE_KEY)
 	if cached:
 		return cached
@@ -75,6 +90,9 @@ def check_user_license_on_login(login_manager=None):
 	user = login_manager.user if login_manager else frappe.session.user
 	if user in ("Administrator", "Guest"):
 		return
+
+	if _is_demo_or_unconfigured():
+		return  # Demo or unconfigured — no license checks
 
 	# ── Site-level check ──────────────────────────────────────────────────
 	site_status = get_site_license_status()
