@@ -31,6 +31,7 @@ app_include_js = [
 app_include_css = [
     "/assets/stylo_core/css/stylo_theme.css",
     "/assets/stylo_core/css/stylo_icons.css",
+    "/assets/stylo_core/css/stylo_marketplace.css",
 ]
 
 # License enforcement — runs before every request

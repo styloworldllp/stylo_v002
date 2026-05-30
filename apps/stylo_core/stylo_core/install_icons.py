@@ -165,6 +165,7 @@ ICON_MAP = {
     "Stylo Reco":              "stylo-reco",
     # ── Misc ──────────────────────────────────────────────────────────────
     "Home":                    "desktop",
+    "Stylo App Store":         "integrations",
 }
 
 
@@ -213,6 +214,12 @@ DESKTOP_CREATE = {
         "link":        "/app/brain-settings",
         "logo_file":   "ai-assistant",
         "app":         "brain",
+    },
+    "Stylo App Store": {
+        "label":       "Stylo App Store",
+        "link":        "/app/stylo-marketplace",
+        "logo_file":   "integrations",
+        "app":         "stylo_core",
     },
 }
 
