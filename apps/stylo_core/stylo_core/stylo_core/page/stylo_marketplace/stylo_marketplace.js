@@ -119,7 +119,8 @@ class StyloMarketplace {
 		this.wrapper = wrapper;
 		this.page = wrapper.page;
 		this.requested = JSON.parse(localStorage.getItem("stylo_requested") || "{}");
-		this.installed_apps = frappe.boot.installed_apps || [];
+		// frappe.boot.versions = {frappe: "2.1.3", erpnext: "2.0.7", ...}
+		this.installed_apps = Object.keys(frappe.boot.versions || {});
 		this.active_category = "All";
 		this.search_term = "";
 		this.render();
