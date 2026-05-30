@@ -335,7 +335,51 @@ def run():
                 if row.logo_url != url:
                     frappe.db.set_value("Desktop Icon", row.name, "logo_url", url, update_modified=False)
 
+    # ── Step 7: Clean up stale-branded Workspace Sidebar records ──────────────
+    # Apps recreate their own sidebars on every migrate/install via fixtures.
+    # This step deletes the stale Frappe-branded ones so only Stylo names remain.
+    sidebar_fixed = 0
+
+    # CRM app recreates "Frappe CRM" sidebar on every migrate — delete it.
+    # The correct sidebar is "Stylo CRM" (also created by the CRM app, module=FCRM).
+    if frappe.db.exists("Workspace Sidebar", "Frappe CRM"):
+        frappe.delete_doc("Workspace Sidebar", "Frappe CRM", ignore_permissions=True, force=True)
+        sidebar_fixed += 1
+
+    # ERPNext creates "ERPNext Settings" sidebar — "BMS Settings" already exists.
+    if frappe.db.exists("Workspace Sidebar", "ERPNext Settings") and \
+       frappe.db.exists("Workspace Sidebar", "BMS Settings"):
+        frappe.delete_doc("Workspace Sidebar", "ERPNext Settings", ignore_permissions=True, force=True)
+        sidebar_fixed += 1
+
+    # Mint app creates a "Mint" sidebar — rename to "Stylo Reco".
+    if frappe.db.exists("Workspace Sidebar", "Mint") and \
+       not frappe.db.exists("Workspace Sidebar", "Stylo Reco"):
+        frappe.db.sql("UPDATE `tabWorkspace Sidebar` SET name=%s, title=%s WHERE name=%s",
+                      ("Stylo Reco", "Stylo Reco", "Mint"))
+        frappe.db.sql("UPDATE `tabWorkspace Sidebar Item` SET parent=%s WHERE parent=%s",
+                      ("Stylo Reco", "Mint"))
+        frappe.db.sql(
+            "UPDATE `tabWorkspace Sidebar Item` SET link_to=%s "
+            "WHERE parent=%s AND link_to=%s AND link_type=%s",
+            ("Stylo Reco", "Stylo Reco", "Mint", "Workspace")
+        )
+        sidebar_fixed += 1
+    elif frappe.db.exists("Workspace Sidebar", "Mint"):
+        frappe.db.set_value("Workspace Sidebar", "Mint", "title", "Stylo Reco", update_modified=False)
+        sidebar_fixed += 1
+
+    # Set app_name in System Settings and Website Settings to "Stylo"
+    for doctype in ("System Settings", "Website Settings"):
+        if frappe.db.exists("DocType", doctype):
+            current = frappe.db.get_single_value(doctype, "app_name")
+            if current != "Stylo":
+                frappe.db.set_single_value(doctype, "app_name", "Stylo")
+                sidebar_fixed += 1
+
     frappe.db.commit()
     frappe.cache.delete_key("desktop_icons")
     frappe.cache.delete_value("desktop_icons")
-    print(f"Stylo icons: {created} created, {renamed} renamed, {fixed} parent_icon fixed, {link_fixed} links fixed, {updated} logos updated, {brand_fixed} app brands fixed.")
+    print(f"Stylo icons: {created} created, {renamed} renamed, {fixed} parent_icon fixed, "
+          f"{link_fixed} links fixed, {updated} logos updated, {brand_fixed} app brands fixed, "
+          f"{sidebar_fixed} sidebars/settings cleaned.")
