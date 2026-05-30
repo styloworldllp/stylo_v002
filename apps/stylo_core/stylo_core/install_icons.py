@@ -384,6 +384,17 @@ def run():
                 frappe.db.set_single_value(doctype, "app_name", "Stylo")
                 sidebar_fixed += 1
 
+    # ── Step 8: Ensure Stylo App Store page exists in DB ─────────────────────
+    # Pages require developer_mode to create via ORM, so use SQL directly.
+    if not frappe.db.exists("Page", "stylo-marketplace"):
+        frappe.db.sql("""
+            INSERT IGNORE INTO `tabPage`
+              (name, page_name, title, module, standard, docstatus, creation, modified, modified_by, owner)
+            VALUES (%s, %s, %s, %s, %s, 0, NOW(), NOW(), %s, %s)
+        """, ("stylo-marketplace", "stylo-marketplace", "Stylo App Store",
+              "Stylo Core", "Yes", "Administrator", "Administrator"))
+        sidebar_fixed += 1
+
     frappe.db.commit()
     frappe.cache.delete_key("desktop_icons")
     frappe.cache.delete_value("desktop_icons")
