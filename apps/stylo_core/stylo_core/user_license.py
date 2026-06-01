@@ -41,6 +41,35 @@ def _is_demo_or_unconfigured() -> bool:
 		return True
 
 
+def get_user_limit_from_config() -> int:
+	"""Read user limit directly from site_config — set during provisioning."""
+	try:
+		limit = frappe.conf.get("stylo_user_limit")
+		return int(limit) if limit else 9999
+	except Exception:
+		return 9999
+
+
+def check_user_count_against_license():
+	"""Block login if active user count exceeds the licensed user limit."""
+	limit = get_user_limit_from_config()
+	if limit >= 9999:
+		return  # unlimited
+
+	active_users = frappe.db.count("User", {
+		"enabled": 1,
+		"user_type": "System User",
+		"name": ["!=", "Administrator"],
+	})
+
+	if active_users >= limit:
+		frappe.throw(
+			f"User license limit reached ({active_users}/{limit} users). "
+			"Contact your Stylo consultant to upgrade your license.",
+			frappe.AuthenticationError,
+		)
+
+
 def get_site_license_status() -> dict:
 	"""
 	Call Stylo Cloud master to get this site's license status.
@@ -113,6 +142,9 @@ def check_user_license_on_login(login_manager=None):
 			"This site has been suspended. Please contact your Stylo consultant.",
 			frappe.AuthenticationError,
 		)
+
+	# ── User count enforcement (from site_config.stylo_user_limit) ───────────
+	check_user_count_against_license()
 
 	if status == "grace_period":
 		end_date = site_status.get("end_date", "")
