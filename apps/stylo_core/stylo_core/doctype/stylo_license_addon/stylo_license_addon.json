@@ -1,0 +1,42 @@
+{
+ "actions": [],
+ "creation": "2026-06-02 00:00:00.000000",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": ["module_key", "display_name", "price_per_user"],
+ "fields": [
+  {
+   "fieldname": "module_key",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "Module",
+   "options": "manufacturing\nprojects\ngst\nhr\ncrm\nlms\ndesk\nbrain\ninsights",
+   "reqd": 1
+  },
+  {
+   "fieldname": "display_name",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Display Name",
+   "read_only": 1
+  },
+  {
+   "fieldname": "price_per_user",
+   "fieldtype": "Currency",
+   "in_list_view": 1,
+   "label": "Price per User/Month",
+   "read_only": 1
+  }
+ ],
+ "istable": 1,
+ "links": [],
+ "modified": "2026-06-02 00:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "Stylo Core",
+ "name": "Stylo License Addon",
+ "owner": "Administrator",
+ "permissions": [],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}

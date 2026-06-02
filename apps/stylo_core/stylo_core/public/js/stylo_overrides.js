@@ -11,7 +11,7 @@
 //                       show_progress / call to replace "Frappe"→"Stylo" in
 //                       every user-visible string
 //   4. Link redirect  — intercept window.open + DOM <a> tags pointing to
-//                       docs.frappe.io / erpnext.com etc → styloworld.io
+//                       docs.frappe.io / erpnext.com etc → stylo.io
 //   5. DOM observer   — MutationObserver catches toasts/dialogs rendered after
 //                       page load and sanitizes their text nodes
 //   6. Theme toggle   — sun/moon button injected into navbar and desktop page
@@ -129,7 +129,7 @@
 		return _orig_call(opts, ...rest);
 	};
 
-	// ── Redirect all external frappe/erpnext doc links → styloworld.io ─────────
+	// ── Redirect all external frappe/erpnext doc links → stylo.io ─────────
 	const EXTERNAL_DOMAINS = [
 		"docs.erpnext.com",
 		"docs.frappe.io",
@@ -146,7 +146,7 @@
 	}
 
 	function redirect_link(href) {
-		return "https://styloworld.io";
+		return "https://stylo.io";
 	}
 
 	// Intercept window.open for programmatic link opens
@@ -162,7 +162,7 @@
 			if (is_external_frappe_url(a.href)) {
 				a.href = redirect_link(a.href);
 				a.textContent = a.textContent
-					.replace(/https?:\/\/(www\.)?(docs\.)?(erpnext|frappe)\.[a-z.]+\/?[^\s]*/gi, "styloworld.io")
+					.replace(/https?:\/\/(www\.)?(docs\.)?(erpnext|frappe)\.[a-z.]+\/?[^\s]*/gi, "stylo.io")
 					.replace(/\bFrappe\b/g, "Stylo")
 					.replace(/\bERPNext\b/g, "StyloBMS");
 			}

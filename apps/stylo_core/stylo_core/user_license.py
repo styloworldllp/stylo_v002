@@ -1,10 +1,10 @@
 """
-user_license.py — runs on CLIENT sites (not on master).
+user_license.py — runs on CLIENT sites (not on cloud.stylo.io).
 
-Two concerns:
-1. Per-user module license gating  (via Control Center URL)
-2. Site-level license status check (via Stylo Cloud master API)
-   — shows grace-period warning or blocks login when expired
+Enforces:
+1. Site-level license validity (expiry, grace period, suspension)
+2. Total user count against licensed user limit
+3. Module access based on stylo_licensed_modules in site_config
 """
 
 import os
@@ -12,70 +12,38 @@ import os
 import frappe
 import requests
 
-# ── Control Center (per-user module gating) ───────────────────────────────
-
-CONTROL_CENTER_URL = os.environ.get("STYLO_CONTROL_URL", "")
-SITE_API_KEY = os.environ.get("STYLO_SITE_API_KEY", "")
-
-CACHE_KEY = "stylo:user_licenses"
-CACHE_TTL = 900  # 15 minutes
-
-# ── Stylo Cloud master (site-level license) ───────────────────────────────
+# ── Environment ───────────────────────────────────────────────────────────────
 
 STYLO_CLOUD_URL = os.environ.get("STYLO_CLOUD_URL", "")
 LICENSE_CACHE_KEY = "stylo:site_license_status"
 LICENSE_CACHE_TTL = 86400  # 24 hours
 
+# Control Center is kept for backward compatibility but no longer primary source
+CONTROL_CENTER_URL = os.environ.get("STYLO_CONTROL_URL", "")
+SITE_API_KEY = os.environ.get("STYLO_SITE_API_KEY", "")
+CACHE_KEY = "stylo:user_licenses"
+CACHE_TTL = 900  # 15 minutes
 
-# ── Site-level license ────────────────────────────────────────────────────
+
+# ── Helper: is this a demo / unconfigured site? ───────────────────────────────
 
 def _is_demo_or_unconfigured() -> bool:
-	"""Returns True if this site is a demo or has no Stylo Cloud URL configured."""
-	if not STYLO_CLOUD_URL:
-		return True
 	try:
-		return bool(frappe.db.get_single_value("System Settings", "skip_license_check")
-		            or frappe.conf.get("is_demo")
-		            or frappe.conf.get("skip_license_check"))
-	except Exception:
-		return True
-
-
-def get_user_limit_from_config() -> int:
-	"""Read user limit directly from site_config — set during provisioning."""
-	try:
-		limit = frappe.conf.get("stylo_user_limit")
-		return int(limit) if limit else 9999
-	except Exception:
-		return 9999
-
-
-def check_user_count_against_license():
-	"""Block login if active user count exceeds the licensed user limit."""
-	limit = get_user_limit_from_config()
-	if limit >= 9999:
-		return  # unlimited
-
-	active_users = frappe.db.count("User", {
-		"enabled": 1,
-		"user_type": "System User",
-		"name": ["!=", "Administrator"],
-	})
-
-	if active_users >= limit:
-		frappe.throw(
-			f"User license limit reached ({active_users}/{limit} users). "
-			"Contact your Stylo consultant to upgrade your license.",
-			frappe.AuthenticationError,
+		return bool(
+			not STYLO_CLOUD_URL
+			or frappe.conf.get("is_demo")
+			or frappe.conf.get("skip_license_check")
 		)
+	except Exception:
+		return True
 
+
+# ── Site-level license status ─────────────────────────────────────────────────
 
 def get_site_license_status() -> dict:
 	"""
-	Call Stylo Cloud master to get this site's license status.
-	Result is cached in Redis for 24 hours.
-	Fails open (returns active) if master is unreachable — prevents
-	false lockouts due to network issues.
+	Fetch site license status from Stylo Cloud master.
+	Cached for 24 hours. Fails open if master is unreachable.
 	"""
 	if _is_demo_or_unconfigured():
 		return {"status": "active", "user_limit": 9999}
@@ -83,10 +51,6 @@ def get_site_license_status() -> dict:
 	cached = frappe.cache.get_value(LICENSE_CACHE_KEY)
 	if cached:
 		return cached
-
-	if not STYLO_CLOUD_URL:
-		# No master configured — development mode, treat as active
-		return {"status": "active", "user_limit": 9999}
 
 	try:
 		resp = requests.get(
@@ -101,29 +65,121 @@ def get_site_license_status() -> dict:
 	except Exception:
 		pass
 
-	# Fail open — use cached value if available, else assume active
 	return cached or {"status": "active", "user_limit": 9999}
 
 
 def invalidate_license_cache():
-	"""Call this after a license is released so the site picks it up immediately."""
 	frappe.cache.delete_value(LICENSE_CACHE_KEY)
 
 
+# ── User count enforcement ────────────────────────────────────────────────────
+
+def get_user_limit_from_config() -> int:
+	"""Read user limit set during site provisioning."""
+	try:
+		limit = frappe.conf.get("stylo_user_limit")
+		return int(limit) if limit else 9999
+	except Exception:
+		return 9999
+
+
+def check_user_count_against_license():
+	"""
+	Block if TOTAL System Users (active + inactive) >= license limit.
+	Every user slot is consumed whether the user is active or not.
+	Administrator and Guest are excluded from the count.
+	"""
+	limit = get_user_limit_from_config()
+	if limit >= 9999:
+		return
+
+	total_users = frappe.db.count("User", {
+		"user_type": "System User",
+		"name": ["not in", ["Administrator", "Guest"]],
+	})
+
+	if total_users >= limit:
+		frappe.throw(
+			f"User license limit reached ({total_users}/{limit} users). "
+			"All user slots are consumed — active and inactive users both count. "
+			"Contact your Stylo consultant to add more user licenses.",
+			frappe.AuthenticationError,
+		)
+
+
+def check_user_count_on_user_create(doc, method=None):
+	"""
+	Blocks creating a new System User when the license limit is reached.
+	Hooked on User before_insert and validate.
+	"""
+	if getattr(doc, "user_type", "") != "System User":
+		return
+	if getattr(doc, "name", "") in ("Administrator", "Guest"):
+		return
+	if _is_demo_or_unconfigured():
+		return
+	check_user_count_against_license()
+
+
+# ── Module access (site-level) ────────────────────────────────────────────────
+
+def get_licensed_modules() -> list[str]:
+	"""
+	Returns the list of module keys licensed for this site.
+	Source priority:
+	  1. site_config.stylo_licensed_modules  (set during provisioning)
+	  2. Control Center per-user data        (legacy fallback)
+
+	All users on the site share the same module access — licensing is
+	site-level, not per-user.
+	"""
+	# Priority 1: site_config (primary — set by Stylo Cloud when creating the site)
+	site_modules = frappe.conf.get("stylo_licensed_modules", "")
+	if site_modules:
+		return [m.strip() for m in site_modules.split(",") if m.strip()]
+
+	# Priority 2: Control Center per-user data (legacy / development)
+	if CONTROL_CENTER_URL:
+		return _get_cc_licenses().get(frappe.session.user, [])
+
+	return []
+
+
+def get_user_licenses(email: str) -> list[str]:
+	"""
+	Returns module keys this user can access.
+	Administrator always gets everything.
+	All other users get the site-level licensed modules.
+	"""
+	from stylo_core.license_map import ALL_MODULE_KEYS
+	if email in ("Administrator", "administrator"):
+		return ALL_MODULE_KEYS + ["pro"]
+
+	return get_licensed_modules()
+
+
+def has_license(email: str, license_key: str) -> bool:
+	"""True if the user (and therefore the site) has access to this module key."""
+	if email in ("Administrator", "administrator"):
+		return True
+	modules = get_user_licenses(email)
+	return "pro" in modules or license_key in modules
+
+
+# ── Login hook ────────────────────────────────────────────────────────────────
+
 def check_user_license_on_login(login_manager=None):
 	"""
-	on_login hook — runs on every login.
-	1. Checks site-level license (block/warn if expired/grace)
-	2. Checks per-user module license (block if no modules)
+	on_login hook — enforces license on every login attempt.
 	"""
 	user = login_manager.user if login_manager else frappe.session.user
 	if user in ("Administrator", "Guest"):
 		return
 
 	if _is_demo_or_unconfigured():
-		return  # Demo or unconfigured — no license checks
+		return
 
-	# ── Site-level check ──────────────────────────────────────────────────
+	# 1. Site-level license status
 	site_status = get_site_license_status()
 	status = site_status.get("status", "active")
 
@@ -131,7 +187,8 @@ def check_user_license_on_login(login_manager=None):
 		if login_manager:
 			login_manager.logout()
 		frappe.throw(
-			"Your Stylo license has expired. Please contact your implementation consultant to renew.",
+			"Your Stylo license has expired. "
+			"Please contact your implementation consultant to renew.",
 			frappe.AuthenticationError,
 		)
 
@@ -143,44 +200,41 @@ def check_user_license_on_login(login_manager=None):
 			frappe.AuthenticationError,
 		)
 
-	# ── User count enforcement (from site_config.stylo_user_limit) ───────────
+	# 2. Total user count (active + inactive both count)
 	check_user_count_against_license()
 
+	# 3. Grace period warning
 	if status == "grace_period":
 		end_date = site_status.get("end_date", "")
 		grace_end = site_status.get("grace_end_date", "")
 		frappe.msgprint(
 			f"⚠ Your Stylo license expired on {end_date}. "
 			f"Grace period ends {grace_end}. "
-			"Please contact your consultant to renew and avoid a site lock.",
+			"Please contact your consultant to renew.",
 			alert=True,
 			indicator="orange",
 		)
 
-	# ── Per-user module check (Control Center) ────────────────────────────
-	if not CONTROL_CENTER_URL:
-		return
-
-	if not get_user_licenses(user):
+	# 4. Must have at least one licensed module
+	if not _is_demo_or_unconfigured() and not get_licensed_modules():
 		if login_manager:
 			login_manager.logout()
 		frappe.throw(
-			"Your license is not active for this site. Contact your administrator.",
+			"No modules are licensed for this site. "
+			"Contact your Stylo consultant.",
 			frappe.AuthenticationError,
 		)
 
 
-# ── Per-user module gating ────────────────────────────────────────────────
+# ── Control Center legacy ─────────────────────────────────────────────────────
 
 def refresh_licensed_users():
-	"""Scheduled task: pull per-user module licenses from Control Center every 5 min."""
+	"""Scheduled: refresh Control Center data (legacy, kept for compatibility)."""
 	if not CONTROL_CENTER_URL or not SITE_API_KEY:
 		return
-
-	site_name = frappe.local.site
 	try:
 		resp = requests.get(
-			f"{CONTROL_CENTER_URL}/api/sync/{site_name}/users",
+			f"{CONTROL_CENTER_URL}/api/sync/{frappe.local.site}/users",
 			headers={"X-Site-Api-Key": SITE_API_KEY},
 			timeout=10,
 		)
@@ -191,7 +245,7 @@ def refresh_licensed_users():
 		pass
 
 
-def _get_all_licenses() -> dict:
+def _get_cc_licenses() -> dict:
 	cached = frappe.cache.get_value(CACHE_KEY)
 	if cached is None:
 		refresh_licensed_users()
@@ -199,21 +253,7 @@ def _get_all_licenses() -> dict:
 	return cached
 
 
-_ALL_LICENSES = ["pro", "bms", "crm", "hr", "lms"]
-
-
-def get_user_licenses(email: str) -> list[str]:
-	if email in ("Administrator", "administrator"):
-		return _ALL_LICENSES
-	return _get_all_licenses().get(email, [])
-
-
-def has_license(email: str, license_key: str) -> bool:
-	if email in ("Administrator", "administrator"):
-		return True
-	licenses = get_user_licenses(email)
-	return "pro" in licenses or license_key in licenses
-
+# ── Whitelisted endpoints ─────────────────────────────────────────────────────
 
 @frappe.whitelist()
 def get_current_user_licenses():
@@ -222,5 +262,4 @@ def get_current_user_licenses():
 
 @frappe.whitelist()
 def get_site_license_info():
-	"""Whitelisted — returns license status for the JS lock screen check."""
 	return get_site_license_status()

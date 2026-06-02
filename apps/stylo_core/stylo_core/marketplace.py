@@ -8,7 +8,7 @@ def request_app(product_key: str, product_title: str, message: str = ""):
 	site = frappe.local.site
 
 	frappe.sendmail(
-		recipients=["hello@styloworld.io"],
+		recipients=["hello@stylo.io"],
 		subject=f"App Request: {product_title} — {site}",
 		message=f"""
 <p>A client has requested installation of a Stylo module.</p>

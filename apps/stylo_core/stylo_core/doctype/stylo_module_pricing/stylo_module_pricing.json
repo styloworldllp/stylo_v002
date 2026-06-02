@@ -1,33 +1,47 @@
 {
  "actions": [],
- "creation": "2026-05-30 00:00:00.000000",
+ "creation": "2026-06-02 00:00:00.000000",
  "doctype": "DocType",
  "engine": "InnoDB",
- "field_order": ["module_pack", "price_per_user_per_month"],
+ "field_order": ["module_key", "display_name", "price_per_user_per_month", "is_base_module"],
  "fields": [
   {
-   "fieldname": "module_pack",
+   "fieldname": "module_key",
    "fieldtype": "Select",
    "in_list_view": 1,
-   "label": "Module Pack",
-   "options": "Single\nDuo\nFull",
+   "label": "Module Key",
+   "options": "bms\nmanufacturing\nprojects\ngst\nhr\ncrm\nlms\ndesk\nbrain\ninsights",
+   "reqd": 1
+  },
+  {
+   "fieldname": "display_name",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Display Name",
    "reqd": 1
   },
   {
    "fieldname": "price_per_user_per_month",
    "fieldtype": "Currency",
    "in_list_view": 1,
-   "label": "Price per User per Month",
+   "label": "Price per User / Month",
    "reqd": 1
+  },
+  {
+   "fieldname": "is_base_module",
+   "fieldtype": "Check",
+   "label": "Can be Base Module",
+   "default": "1",
+   "description": "If checked, this module can be selected as the required base module"
   }
  ],
  "links": [],
- "modified": "2026-05-30 00:00:00.000000",
+ "modified": "2026-06-02 00:00:00.000000",
  "modified_by": "Administrator",
  "module": "Stylo Core",
  "name": "Stylo Module Pricing",
  "naming_rule": "Expression",
- "autoname": "field:module_pack",
+ "autoname": "field:module_key",
  "owner": "Administrator",
  "permissions": [
   {
@@ -43,8 +57,8 @@
    "write": 1
   }
  ],
- "sort_field": "modified",
- "sort_order": "DESC",
+ "sort_field": "module_key",
+ "sort_order": "ASC",
  "states": [],
  "track_changes": 0
 }

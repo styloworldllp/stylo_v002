@@ -30,6 +30,13 @@ def release_license(license_request_name: str):
 	start = today()
 	end = add_months(start, int(req.duration_months or 12))
 
+	# Build licensed_modules from base + all addons (store keys only, not display names)
+	all_modules = [req.base_module] if req.base_module else []
+	for addon in req.addon_modules or []:
+		if addon.module_key and addon.module_key not in all_modules:
+			all_modules.append(addon.module_key)
+	licensed_modules_str = ",".join(all_modules)
+
 	lic = frappe.new_doc("Stylo License")
 	lic.license_key = str(uuid.uuid4())
 	lic.site = req.site or ""
@@ -37,8 +44,8 @@ def release_license(license_request_name: str):
 	lic.client_contact_email = req.client_contact_email or ""
 	lic.consultant = req.consultant
 	lic.license_request = req.name
-	lic.module_pack = req.module_pack
-	lic.modules = req.modules or ""
+	lic.base_module = req.base_module or ""
+	lic.licensed_modules = licensed_modules_str
 	lic.user_limit = int(req.num_users or 0)
 	lic.start_date = start
 	lic.end_date = end
@@ -68,8 +75,8 @@ def _send_license_confirmation(lic, req):
 <table>
 <tr><td><b>Client:</b></td><td>{lic.client_name}</td></tr>
 <tr><td><b>Site:</b></td><td>{lic.site or 'TBD'}</td></tr>
-<tr><td><b>Pack:</b></td><td>{lic.module_pack}</td></tr>
-<tr><td><b>Users:</b></td><td>{lic.user_limit}</td></tr>
+<tr><td><b>Modules:</b></td><td>{lic.licensed_modules}</td></tr>
+<tr><td><b>Users:</b></td><td>{lic.user_limit} (total slots)</td></tr>
 <tr><td><b>Valid until:</b></td><td>{lic.end_date}</td></tr>
 <tr><td><b>License key:</b></td><td><code>{lic.license_key}</code></td></tr>
 </table>
@@ -118,7 +125,7 @@ def _send_renewal_reminders():
 
 	admin_email = (
 		frappe.db.get_single_value("System Settings", "email_footer_address")
-		or "hello@styloworld.io"
+		or "hello@stylo.io"
 	)
 
 	licenses = frappe.get_all(

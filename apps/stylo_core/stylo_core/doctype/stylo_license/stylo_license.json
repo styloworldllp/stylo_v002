@@ -1,6 +1,6 @@
 {
  "actions": [],
- "creation": "2026-05-30 00:00:00.000000",
+ "creation": "2026-06-02 00:00:00.000000",
  "doctype": "DocType",
  "engine": "InnoDB",
  "field_order": [
@@ -8,7 +8,7 @@
   "column_break_1",
   "consultant", "license_request",
   "section_break_modules",
-  "module_pack", "modules", "user_limit",
+  "base_module", "licensed_modules", "user_limit",
   "section_break_dates",
   "start_date", "end_date", "grace_end_date",
   "column_break_2",
@@ -61,25 +61,29 @@
   {
    "fieldname": "section_break_modules",
    "fieldtype": "Section Break",
-   "label": "License Scope"
+   "label": "Licensed Modules"
   },
   {
-   "fieldname": "module_pack",
+   "fieldname": "base_module",
    "fieldtype": "Select",
    "in_list_view": 1,
-   "label": "Module Pack",
-   "options": "Single\nDuo\nFull"
+   "label": "Base Module",
+   "options": "bms\nhr\ncrm\nlms\ndesk\nbrain\ninsights"
   },
   {
-   "fieldname": "modules",
+   "fieldname": "licensed_modules",
    "fieldtype": "Small Text",
-   "label": "Modules"
+   "in_list_view": 1,
+   "label": "Licensed Modules (keys)",
+   "description": "Comma-separated module keys e.g. bms,hr,crm — written to site_config.json on release",
+   "read_only": 1
   },
   {
    "fieldname": "user_limit",
    "fieldtype": "Int",
    "in_list_view": 1,
-   "label": "User Limit"
+   "label": "User Limit",
+   "description": "Total users (active + inactive both count)"
   },
   {
    "fieldname": "section_break_dates",
@@ -119,7 +123,7 @@
   }
  ],
  "links": [],
- "modified": "2026-05-30 00:00:00.000000",
+ "modified": "2026-06-02 00:00:00.000000",
  "modified_by": "Administrator",
  "module": "Stylo Core",
  "name": "Stylo License",

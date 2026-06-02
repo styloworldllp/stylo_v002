@@ -1,14 +1,16 @@
 {
  "actions": [],
- "creation": "2026-05-30 00:00:00.000000",
+ "creation": "2026-06-02 00:00:00.000000",
  "doctype": "DocType",
  "engine": "InnoDB",
  "field_order": [
   "consultant", "client_name", "client_contact_email", "site",
   "column_break_1",
-  "module_pack", "modules", "num_users", "duration_months",
+  "base_module", "num_users", "duration_months",
+  "section_break_addons",
+  "addon_modules",
   "section_break_pricing",
-  "monthly_rate", "total_amount",
+  "base_price_per_user", "total_amount",
   "section_break_status",
   "status", "payment_reference",
   "section_break_notes",
@@ -47,25 +49,21 @@
    "fieldtype": "Column Break"
   },
   {
-   "fieldname": "module_pack",
+   "fieldname": "base_module",
    "fieldtype": "Select",
    "in_list_view": 1,
-   "label": "Module Pack",
-   "options": "Single\nDuo\nFull",
-   "reqd": 1
-  },
-  {
-   "fieldname": "modules",
-   "fieldtype": "Small Text",
-   "label": "Modules Selected",
-   "description": "Comma-separated list, e.g. StyloBMS, StyloHR"
+   "label": "Base Module",
+   "options": "bms\nhr\ncrm\nlms\ndesk\nbrain\ninsights",
+   "reqd": 1,
+   "description": "One required base module. Add-ons are optional."
   },
   {
    "fieldname": "num_users",
    "fieldtype": "Int",
    "in_list_view": 1,
    "label": "Number of Users",
-   "reqd": 1
+   "reqd": 1,
+   "description": "Total user count — active and inactive both consume slots"
   },
   {
    "fieldname": "duration_months",
@@ -75,14 +73,26 @@
    "reqd": 1
   },
   {
+   "fieldname": "section_break_addons",
+   "fieldtype": "Section Break",
+   "label": "Add-on Modules"
+  },
+  {
+   "fieldname": "addon_modules",
+   "fieldtype": "Table",
+   "label": "Add-on Modules",
+   "options": "Stylo License Addon",
+   "description": "Each add-on unlocks an additional module for all users on the site"
+  },
+  {
    "fieldname": "section_break_pricing",
    "fieldtype": "Section Break",
    "label": "Pricing"
   },
   {
-   "fieldname": "monthly_rate",
+   "fieldname": "base_price_per_user",
    "fieldtype": "Currency",
-   "label": "Monthly Rate (per user)",
+   "label": "Base Module Price (per user/month)",
    "read_only": 1
   },
   {
@@ -124,7 +134,7 @@
   }
  ],
  "links": [],
- "modified": "2026-05-30 00:00:00.000000",
+ "modified": "2026-06-02 00:00:00.000000",
  "modified_by": "Administrator",
  "module": "Stylo Core",
  "name": "Stylo License Request",
@@ -142,7 +152,6 @@
    "report": 1,
    "role": "System Manager",
    "share": 1,
-   "submit": 0,
    "write": 1
   },
   {

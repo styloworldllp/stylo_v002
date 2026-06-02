@@ -15,8 +15,8 @@
 app_name = "stylo_core"
 app_title = "Stylo Core"
 app_publisher = "Styloworld"
-app_description = "Styloworld — Branding and customizations layer"
-app_email = "hello@styloworld.io"
+app_description = "Stylo — Branding, licensing and customizations layer"
+app_email = "hello@stylo.io"
 app_license = "mit"
 app_logo_url = "/assets/stylo_core/images/stylo-logo-light.png"
 
@@ -151,15 +151,15 @@ after_migrate = ["stylo_core.install_icons.run"]
 
 # Document Events
 # ---------------
-# Hook on document methods and events
 
-# doc_events = {
-# 	"*": {
-# 		"on_update": "method",
-# 		"on_cancel": "method",
-# 		"on_trash": "method"
-# 	}
-# }
+doc_events = {
+    "User": {
+        # Block creating a new user when total user count >= license limit.
+        # validate also catches changing a Website User → System User.
+        "before_insert": "stylo_core.user_license.check_user_count_on_user_create",
+        "validate": "stylo_core.user_license.check_user_count_on_user_create",
+    }
+}
 
 # Scheduled Tasks
 # ---------------

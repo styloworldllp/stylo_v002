@@ -1,65 +1,85 @@
-# Workspace name → license key mapping.
-# Keep granular (workspace/route level) so individual modules can be
-# independently licensed without touching this file's consumers.
+# Workspace/route → module key mapping for Stylo license enforcement.
 #
-# License keys: bms | crm | hr | lms | pro
-# "pro" is a wildcard that grants access to everything.
+# Module keys (each is a separately purchasable add-on):
+#   bms           — Core ERP: Finance, Buying, Selling, Inventory, Quality, Assets
+#   manufacturing — Manufacturing: BOM, Work Orders, Job Cards
+#   projects      — Projects & Timesheets
+#   gst           — India Compliance: GST, Income Tax India
+#   hr            — HRMS: Payroll, Leave, Attendance, Appraisals, Recruitment
+#   crm           — CRM: Leads, Deals, Pipeline
+#   lms           — Learning: Courses, Certifications, Batches
+#   desk          — Helpdesk: Tickets, SLA, Knowledge Base
+#   brain         — brAIn AI Assistant
+#   insights      — BI Dashboards & Analytics
+#   pro           — wildcard, grants all modules
 
 WORKSPACE_LICENSE_MAP: dict[str, str] = {
-    # ── StyloBMS ──────────────────────────────────────────────────
-    "Accounting":          "bms",
-    "Accounts Setup":      "bms",
-    "Assets":              "bms",
-    "Banking":             "bms",
-    "Budget":              "bms",
-    "Buying":              "bms",
-    "Financial Reports":   "bms",
-    "Home":                "bms",
-    "Integrations":        "bms",
-    "Invoicing":           "bms",
-    "Manufacturing":       "bms",
-    "Organization":        "bms",
-    "Payments":            "bms",
-    "Printing":            "bms",
-    "Projects":            "bms",
-    "Quality":             "bms",
-    "Selling":             "bms",
-    "Share Management":    "bms",
-    "Stock":               "bms",
-    "StyloBMS":            "bms",
-    "StyloBMS Settings":   "bms",
-    "Subcontracting":      "bms",
-    "Subscription":        "bms",
-    "Taxes":               "bms",
-    "Tax & Benefits":      "bms",
-    "GST India":           "bms",
-    "Income Tax India":    "bms",
-    "India Compliance":    "bms",
-    "Helpdesk":            "bms",
-    # ── StyloHR ───────────────────────────────────────────────────
-    "HRMS":                "hr",
-    "HR Setup":            "hr",
-    "Leaves":              "hr",
-    "Payroll":             "hr",
-    "Performance":         "hr",
-    "Recruitment":         "hr",
-    "Shift & Attendance":  "hr",
-    "Tenure":              "hr",
-    # ── StyloCRM ──────────────────────────────────────────────────
-    "Frappe CRM":          "crm",
-    # ── StyloLMS ──────────────────────────────────────────────────
-    "LMS":                 "lms",
+    # ── BMS (Core ERP) ────────────────────────────────────────────────────────
+    "Accounting":           "bms",
+    "Accounts Setup":       "bms",
+    "Assets":               "bms",
+    "Banking":              "bms",
+    "Budget":               "bms",
+    "Buying":               "bms",
+    "Financial Reports":    "bms",
+    "Invoicing":            "bms",
+    "Payments":             "bms",
+    "Quality":              "bms",
+    "Selling":              "bms",
+    "Share Management":     "bms",
+    "Stock":                "bms",
+    "Subcontracting":       "bms",
+    "Subscription":         "bms",
+    "Taxes":                "bms",
+    "StyloBMS":             "bms",
+    "BMS Settings":         "bms",
+    "BMS CRM":              "bms",
+    "Accounting":           "bms",
+
+    # ── Manufacturing ──────────────────────────────────────────────────────────
+    "Manufacturing":        "manufacturing",
+
+    # ── Projects ───────────────────────────────────────────────────────────────
+    "Projects":             "projects",
+
+    # ── GST / India Compliance ─────────────────────────────────────────────────
+    "GST India":            "gst",
+    "Income Tax India":     "gst",
+    "India Compliance":     "gst",
+
+    # ── HRMS ───────────────────────────────────────────────────────────────────
+    "HRMS":                 "hr",
+    "HR Setup":             "hr",
+    "Leaves":               "hr",
+    "Payroll":              "hr",
+    "Performance":          "hr",
+    "Recruitment":          "hr",
+    "Shift & Attendance":   "hr",
+    "Tax & Benefits":       "hr",
+    "Tenure":               "hr",
+    "Expenses":             "hr",
+
+    # ── CRM ────────────────────────────────────────────────────────────────────
+    "Stylo CRM":            "crm",
+    "CRM":                  "crm",
+
+    # ── LMS ────────────────────────────────────────────────────────────────────
+    "Learning":             "lms",
+
+    # ── Desk (Helpdesk) ────────────────────────────────────────────────────────
+    "Helpdesk":             "desk",
 }
 
-# URL route prefix → license key.
-# Checked against frappe.request.path before WORKSPACE_LICENSE_MAP.
+# URL route prefix → module key.
 ROUTE_LICENSE_MAP: dict[str, str] = {
-    "/crm":        "crm",
-    "/lms":        "lms",
-    "/helpdesk":   "bms",
+    "/crm":       "crm",
+    "/lms":       "lms",
+    "/helpdesk":  "desk",
+    "/insights":  "insights",
+    "/reco":      "bms",      # Bank reconciliation — part of BMS Finance
 }
 
-# Workspaces always accessible regardless of license (Stylo infra pages).
+# Workspaces always accessible — no license required.
 UNLICENSED_WORKSPACES: set[str] = {
     "My Workspaces",
     "Automation",
@@ -69,4 +89,38 @@ UNLICENSED_WORKSPACES: set[str] = {
     "System",
     "Users",
     "Website",
+    "Integrations",
+    "Organization",
+    "Printing",
+    "Home",
+    "Stylo",
+}
+
+# All purchasable module keys
+ALL_MODULE_KEYS: list[str] = [
+    "bms",
+    "manufacturing",
+    "projects",
+    "gst",
+    "hr",
+    "crm",
+    "lms",
+    "desk",
+    "brain",
+    "insights",
+]
+
+# Human-readable names for display in UI / License Requests
+MODULE_DISPLAY_NAMES: dict[str, str] = {
+    "bms":           "StyloBMS",
+    "manufacturing": "Manufacturing",
+    "projects":      "Projects",
+    "gst":           "GST & India Compliance",
+    "hr":            "StyloHR",
+    "crm":           "StyloCRM",
+    "lms":           "StyloLMS",
+    "desk":          "StyloDesk",
+    "brain":         "brAIn",
+    "insights":      "Stylo Insights",
+    "pro":           "All Modules",
 }
