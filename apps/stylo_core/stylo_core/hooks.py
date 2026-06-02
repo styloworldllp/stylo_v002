@@ -158,7 +158,11 @@ doc_events = {
         # validate also catches changing a Website User → System User.
         "before_insert": "stylo_core.user_license.check_user_count_on_user_create",
         "validate": "stylo_core.user_license.check_user_count_on_user_create",
-    }
+    },
+    "Has Role": {
+        # Block assigning brAIn User role when brain_user_limit is reached.
+        "before_insert": "stylo_core.user_license.check_brain_role_limit",
+    },
 }
 
 # Scheduled Tasks

@@ -83,6 +83,40 @@ def get_user_limit_from_config() -> int:
 		return 9999
 
 
+def get_brain_user_limit_from_config() -> int:
+	"""Read brAIn-specific user limit from site_config."""
+	try:
+		limit = frappe.conf.get("brain_user_limit")
+		return int(limit) if limit else 0
+	except Exception:
+		return 0
+
+
+def check_brain_user_limit():
+	"""
+	Block assigning the brAIn User role when the brain_user_limit is reached.
+	Call this from the Has Role before_insert hook for the brAIn User role.
+	"""
+	brain_limit = get_brain_user_limit_from_config()
+	if brain_limit == 0:
+		frappe.throw(
+			"brAIn is not licensed for this site. "
+			"Contact your Stylo consultant to add the brAIn module.",
+			frappe.PermissionError,
+		)
+
+	brain_users = frappe.db.count(
+		"Has Role",
+		{"role": "brAIn User", "parenttype": "User"},
+	)
+	if brain_users >= brain_limit:
+		frappe.throw(
+			f"brAIn user limit reached ({brain_users}/{brain_limit}). "
+			"Contact your consultant to add more brAIn user slots.",
+			frappe.PermissionError,
+		)
+
+
 def check_user_count_against_license():
 	"""
 	Block if TOTAL System Users (active + inactive) >= license limit.
@@ -105,6 +139,15 @@ def check_user_count_against_license():
 			"Contact your Stylo consultant to add more user licenses.",
 			frappe.AuthenticationError,
 		)
+
+
+def check_brain_role_limit(doc, method=None):
+	"""Hook on Has Role before_insert — blocks brAIn User role when limit reached."""
+	if getattr(doc, "role", "") != "brAIn User":
+		return
+	if _is_demo_or_unconfigured():
+		return
+	check_brain_user_limit()
 
 
 def check_user_count_on_user_create(doc, method=None):

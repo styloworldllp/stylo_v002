@@ -62,6 +62,76 @@ def release_license(license_request_name: str):
 	return {"license": lic.name, "key": lic.license_key}
 
 
+# ── Add module to existing site ────────────────────────────────────────────
+
+@frappe.whitelist()
+def release_addon(addon_request_name: str):
+	"""Admin action: unlock an additional module on an existing site's license."""
+	req = frappe.get_doc("Stylo License Addon Request", addon_request_name)
+
+	if req.status == "Applied":
+		frappe.throw("This addon has already been applied.")
+	if req.status not in ("Pending Payment", "Confirmed"):
+		frappe.throw(f"Cannot apply addon — status is: {req.status}")
+
+	frappe.only_for("System Manager")
+
+	lic = frappe.get_doc("Stylo License", req.license)
+
+	# 1. Add module to licensed_modules
+	existing = [m.strip() for m in (lic.licensed_modules or "").split(",") if m.strip()]
+	if req.module_to_add not in existing:
+		existing.append(req.module_to_add)
+	lic.licensed_modules = ",".join(existing)
+
+	# 2. Handle brAIn sub-limit if adding brain
+	if req.module_to_add == "brain":
+		brain_users = int(lic.user_limit or 0) + int(req.user_count_change or 0)
+		lic.brain_user_limit = brain_users
+
+	# 3. Increase user limit if requested
+	if int(req.user_count_change or 0) > 0:
+		lic.user_limit = int(lic.user_limit or 0) + int(req.user_count_change)
+
+	lic.save(ignore_permissions=True)
+
+	req.status = "Applied"
+	req.save(ignore_permissions=True)
+	frappe.db.commit()
+
+	_send_addon_confirmation(lic, req)
+
+	return {
+		"success": True,
+		"licensed_modules": lic.licensed_modules,
+		"user_limit": lic.user_limit,
+		"brain_user_limit": lic.brain_user_limit,
+	}
+
+
+def _send_addon_confirmation(lic, req):
+	from stylo_core.license_map import MODULE_DISPLAY_NAMES
+	module_name = MODULE_DISPLAY_NAMES.get(req.module_to_add, req.module_to_add)
+	recipients = [req.consultant]
+	if lic.client_contact_email:
+		recipients.append(lic.client_contact_email)
+
+	frappe.sendmail(
+		recipients=list(set(recipients)),
+		subject=f"{module_name} unlocked for {lic.site}",
+		message=f"""
+<p>The module <b>{module_name}</b> has been added to your Stylo license.</p>
+<table>
+<tr><td><b>Site:</b></td><td>{lic.site}</td></tr>
+<tr><td><b>All Licensed Modules:</b></td><td>{lic.licensed_modules}</td></tr>
+<tr><td><b>User Limit:</b></td><td>{lic.user_limit}</td></tr>
+</table>
+<p>Users on {lic.site} will have access to {module_name} on their next login.</p>
+""",
+		now=True,
+	)
+
+
 def _send_license_confirmation(lic, req):
 	recipients = [req.consultant]
 	if req.client_contact_email:
