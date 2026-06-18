@@ -11,7 +11,7 @@ app_logo_url = "/assets/stylo_core/images/stylo-logo-light.png"
 develop_version = "15.x.x-develop"
 app_home = "/app/build"
 
-app_email = "developers@frappe.io"
+app_email = "support@stylo.io"
 
 before_install = "frappe.utils.install.before_install"
 after_install = "frappe.utils.install.after_install"
