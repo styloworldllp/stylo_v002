@@ -462,6 +462,7 @@ frappe.router = {
 				frappe.route_options = a;
 				return null;
 			} else {
+				if (a === undefined || a === null) return null;
 				return encodeURIComponent(String(a));
 			}
 		}).join("/");

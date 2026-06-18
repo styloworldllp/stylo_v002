@@ -7,62 +7,51 @@ import json
 import frappe
 
 from .context import get_accessible_doctypes, get_page_context
-from .system_prompt import build_fast_system_prompt, build_system_prompt
+from .system_prompt import build_system_prompt
 from .tools.definitions import TOOL_DEFINITIONS
 from .tools.executor import execute_tool
 
 
 def get_settings():
-	"""Load Brain Settings as a plain dict — no Document.onload, no password field side effects."""
-	return frappe.db.get_singles_dict("Brain Settings")
+	return frappe.get_single("Brain Settings")
 
 
-def _get_api_key(settings: dict, fieldname: str = "api_key") -> str:
-	"""Safely fetch the API key from __Auth without triggering frappe.throw()."""
+def _safe_get_password(settings, fieldname: str) -> str:
+	"""Return password value without ever triggering frappe.throw() / message_log."""
 	try:
-		rows = frappe.db.sql(
-			"SELECT `password` FROM `__Auth` WHERE doctype=%s AND name=%s AND fieldname=%s AND encrypted=1",
-			("Brain Settings", "Brain Settings", fieldname),
-		)
-		if rows and rows[0][0]:
-			from frappe.utils.password import decrypt
-			return decrypt(rows[0][0]) or ""
+		return settings.get_password(fieldname, raise_exception=False) or ""
 	except Exception:
-		pass
-	return ""
+		return ""
 
 
-def get_provider(settings: dict):
-	provider_name = settings.get("provider") or "Anthropic (Claude)"
+def get_provider(settings):
+	provider_name = settings.provider or "Anthropic (Claude)"
 
 	if "Anthropic" in provider_name:
 		from .providers.anthropic_provider import AnthropicProvider
 		return AnthropicProvider(
-			api_key=_get_api_key(settings),
-			model=settings.get("model") or "claude-sonnet-4-6",
-			temperature=float(settings.get("temperature") or 0.1),
+			api_key=_safe_get_password(settings, "api_key"),
+			model=settings.model or "claude-sonnet-4-6",
+			temperature=float(settings.temperature or 0.1),
 		)
 
 	if "Ollama" in provider_name or "Neurix" in provider_name:
-		from .model_registry import resolve as resolve_engine
 		from .providers.openai_compat import OpenAICompatProvider
-		# Prefer the branded engine name (e.g. "Falcon" → "qwen2.5:1.5b")
-		raw_model = settings.get("nuerix_engine") or settings.get("model") or "Falcon"
+		base_url = settings.base_url or "http://localhost:11434/v1"
 		return OpenAICompatProvider(
 			api_key="ollama",
-			model=resolve_engine(raw_model),
-			base_url="http://localhost:11434/v1",
-			temperature=float(settings.get("temperature") or 0.1),
-			is_local=True,
+			model=settings.model or "qwen2.5:3b",
+			base_url=base_url,
+			temperature=float(settings.temperature or 0.1),
 		)
 
 	# OpenAI or any OpenAI-compatible endpoint
 	from .providers.openai_compat import OpenAICompatProvider
 	return OpenAICompatProvider(
-		api_key=_get_api_key(settings),
-		model=settings.get("model") or "gpt-4o",
-		base_url=settings.get("base_url") or None,
-		temperature=float(settings.get("temperature") or 0.1),
+		api_key=_safe_get_password(settings, "api_key"),
+		model=settings.model or "gpt-4o",
+		base_url=settings.base_url or None,
+		temperature=float(settings.temperature or 0.1),
 	)
 
 
@@ -82,7 +71,7 @@ def run(user_message: str, conversation_history: list, page_context: dict,
 	"""
 	settings = get_settings()
 
-	if not frappe.utils.cint(settings.get("enabled")):
+	if not settings.enabled:
 		return {"message": "brAIn is currently disabled. Enable it in Brain Settings.", "actions": []}
 
 	# Build full context
@@ -93,21 +82,15 @@ def run(user_message: str, conversation_history: list, page_context: dict,
 		ui=page_context.get("ui"),
 		insights_ctx=page_context.get("insights_ctx"),
 	)
-	cache_key = f"brain_doctypes_{frappe.session.user}"
-	accessible_doctypes = frappe.cache().get_value(cache_key)
-	if not accessible_doctypes:
-		accessible_doctypes = get_accessible_doctypes()
-		frappe.cache().set_value(cache_key, accessible_doctypes, expires_in_sec=60)
-
-	is_local = "Neurix" in (settings.get("provider") or "") or "Ollama" in (settings.get("provider") or "")
-	system = build_fast_system_prompt(full_ctx, accessible_doctypes) if is_local else build_system_prompt(full_ctx, accessible_doctypes)
+	accessible_doctypes = get_accessible_doctypes()
+	system = build_system_prompt(full_ctx, accessible_doctypes)
 
 	# Build initial message list for this turn
 	messages = list(conversation_history)  # Plain text prior turns
 	messages.append({"role": "user", "content": user_message})
 
 	provider = get_provider(settings)
-	max_iter = int(settings.get("max_iterations") or 5)
+	max_iter = int(settings.max_iterations or 10)
 	all_actions = []
 	final_text = ""
 
@@ -201,8 +184,6 @@ _TOOL_LABELS = {
 	"guide_user":       "🎯 Starting guide…",
 	"get_value":        "📌 Getting value…",
 	"get_system_info":  "ℹ️ Getting info…",
-	# Market data
-	"get_market_data":            "📈 Fetching market data…",
 	# Stylo Insights
 	"insights_get_data_sources":  "🗄️ Fetching data sources…",
 	"insights_get_tables":        "📋 Listing tables…",
@@ -219,7 +200,7 @@ def run_stream(user_message: str, conversation_history: list, page_context: dict
 	  {type: 'done',  message: str, actions: list}  — final complete event
 	"""
 	settings = get_settings()
-	if not frappe.utils.cint(settings.get("enabled")):
+	if not settings.enabled:
 		yield {"type": "done", "message": "brAIn is currently disabled. Enable it in Brain Settings.", "actions": []}
 		return
 
@@ -230,30 +211,14 @@ def run_stream(user_message: str, conversation_history: list, page_context: dict
 		ui=page_context.get("ui"),
 		insights_ctx=page_context.get("insights_ctx"),
 	)
+	accessible_doctypes = get_accessible_doctypes()
+	system = build_system_prompt(full_ctx, accessible_doctypes)
 
-	# Cache accessible_doctypes for 60s — the list changes rarely and is expensive to build
-	cache_key = f"brain_doctypes_{frappe.session.user}"
-	accessible_doctypes = frappe.cache().get_value(cache_key)
-	if not accessible_doctypes:
-		accessible_doctypes = get_accessible_doctypes()
-		frappe.cache().set_value(cache_key, accessible_doctypes, expires_in_sec=60)
-
-	# Use fast prompt for all providers — 10x smaller, much faster API calls
-	# Full prompt is 10K chars; fast prompt is 1K chars
-	insights_ctx = page_context.get("insights_ctx")
-	if insights_ctx:
-		from .system_prompt import _build_insights_prompt
-		system = _build_insights_prompt(full_ctx)
-	else:
-		system = build_fast_system_prompt(full_ctx, accessible_doctypes)
-
-	# Keep only last 6 messages (3 turns) to prevent history bloat
-	trimmed_history = list(conversation_history)[-6:] if len(conversation_history) > 6 else list(conversation_history)
-	messages = trimmed_history
+	messages = list(conversation_history)
 	messages.append({"role": "user", "content": user_message})
 
 	provider = get_provider(settings)
-	max_iter = int(settings.get("max_iterations") or 5)
+	max_iter = int(settings.max_iterations or 10)
 	all_actions = []
 	final_text = ""
 

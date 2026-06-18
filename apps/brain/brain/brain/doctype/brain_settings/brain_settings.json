@@ -5,13 +5,29 @@
  "engine": "InnoDB",
  "field_order": [
   "enabled",
+  "display_name",
   "provider",
+  "nuerix_engine",
   "model",
   "api_key",
   "base_url",
   "column_break_settings",
   "max_iterations",
   "temperature",
+  "section_break_context",
+  "context_status",
+  "context_built_at",
+  "build_context_btn",
+  "column_break_context",
+  "custom_context",
+  "section_break_compliance",
+  "enable_audit_trail",
+  "data_retention_days",
+  "require_reason_for_actions",
+  "column_break_compliance2",
+  "data_classification",
+  "gdpr_controller_name",
+  "gdpr_controller_email",
   "section_break_about",
   "about_html"
  ],
@@ -23,30 +39,49 @@
    "label": "Enable brAIn"
   },
   {
+   "fieldname": "display_name",
+   "fieldtype": "Data",
+   "label": "Display Name",
+   "default": "Nuerix",
+   "description": "Name shown to users in the chat UI (e.g. Nuerix, brAIn, Your Company AI)"
+  },
+  {
    "fieldname": "provider",
    "fieldtype": "Select",
    "in_list_view": 1,
    "label": "AI Provider",
-   "options": "Anthropic (Claude)\nOpenAI\nOllama (Local)\nOpenAI Compatible",
+   "options": "Anthropic (Claude)\nOpenAI\nNeurix (Local AI)\nOpenAI Compatible",
    "reqd": 1
+  },
+  {
+   "fieldname": "nuerix_engine",
+   "fieldtype": "Select",
+   "label": "Nuerix Engine",
+   "options": "Falcon\nFalcon Pro\nKiwi\nKiwi Pro\nSwift\nSwift Pro\nStorm\nAtlas\nMint",
+   "default": "Falcon",
+   "description": "Choose your Nuerix engine. Falcon = fastest, Kiwi = most accurate.",
+   "depends_on": "eval:doc.provider === 'Neurix (Local AI)'"
   },
   {
    "fieldname": "model",
    "fieldtype": "Data",
    "label": "Model Name",
-   "description": "e.g. claude-sonnet-4-6 | gpt-4o | llama3.1 | mistral-nemo"
+   "description": "e.g. claude-sonnet-4-6 | gpt-4o | qwen2.5:3b | mistral-nemo",
+   "depends_on": "eval:doc.provider && doc.provider !== 'Neurix (Local AI)'"
   },
   {
    "fieldname": "api_key",
    "fieldtype": "Password",
    "label": "API Key",
-   "description": "Required for Anthropic and OpenAI. Leave blank for Ollama."
+   "description": "Required for Anthropic and OpenAI.",
+   "depends_on": "eval:doc.provider && doc.provider !== 'Neurix (Local AI)'"
   },
   {
    "fieldname": "base_url",
    "fieldtype": "Data",
    "label": "Base URL",
-   "description": "Ollama: http://localhost:11434/v1 | Custom OpenAI-compatible endpoint"
+   "description": "Only needed for custom OpenAI-compatible endpoints.",
+   "depends_on": "eval:doc.provider === 'OpenAI Compatible'"
   },
   {
    "fieldname": "column_break_settings",
@@ -67,6 +102,89 @@
    "description": "Lower = more focused (0.0–1.0). Recommended: 0.1 for ERP tasks."
   },
   {
+   "fieldname": "section_break_context",
+   "fieldtype": "Section Break",
+   "label": "Site Intelligence Context"
+  },
+  {
+   "default": "Not Built",
+   "fieldname": "context_status",
+   "fieldtype": "Data",
+   "label": "Context Status",
+   "read_only": 1,
+   "description": "Nuerix pre-builds a compact knowledge snapshot of your company data before answering queries."
+  },
+  {
+   "fieldname": "context_built_at",
+   "fieldtype": "Datetime",
+   "label": "Last Built At",
+   "read_only": 1
+  },
+  {
+   "fieldname": "build_context_btn",
+   "fieldtype": "Button",
+   "label": "Build / Refresh Context"
+  },
+  {
+   "fieldname": "column_break_context",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "custom_context",
+   "fieldtype": "Long Text",
+   "label": "Custom Context (Optional)",
+   "description": "Add anything Nuerix should always know: your company speciality, key contacts, business rules, product lines, etc. This is injected into every query."
+  },
+  {
+   "fieldname": "section_break_compliance",
+   "fieldtype": "Section Break",
+   "label": "Compliance & Audit (21 CFR Part 11 / GDPR)"
+  },
+  {
+   "default": "1",
+   "fieldname": "enable_audit_trail",
+   "fieldtype": "Check",
+   "label": "Enable Audit Trail",
+   "description": "Log all conversations, tool calls, and data access. Required for 21 CFR Part 11."
+  },
+  {
+   "default": "2555",
+   "fieldname": "data_retention_days",
+   "fieldtype": "Int",
+   "label": "Data Retention (Days)",
+   "description": "Audit logs retained for this many days (2555 = 7 years, FDA minimum). After this period records are anonymized."
+  },
+  {
+   "default": "0",
+   "fieldname": "require_reason_for_actions",
+   "fieldtype": "Check",
+   "label": "Require Reason for Write Actions",
+   "description": "Prompt user to provide a reason before AI creates, updates, or deletes records."
+  },
+  {
+   "fieldname": "column_break_compliance2",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "data_classification",
+   "fieldtype": "Select",
+   "label": "Data Classification",
+   "options": "Internal\nConfidential\nRestricted\nRegulated (21 CFR)",
+   "default": "Regulated (21 CFR)",
+   "description": "Classification label applied to all audit log entries."
+  },
+  {
+   "fieldname": "gdpr_controller_name",
+   "fieldtype": "Data",
+   "label": "GDPR Data Controller Name",
+   "description": "Organisation responsible for personal data (GDPR Art. 4)"
+  },
+  {
+   "fieldname": "gdpr_controller_email",
+   "fieldtype": "Data",
+   "label": "GDPR Controller Email"
+  },
+  {
    "fieldname": "section_break_about",
    "fieldtype": "Section Break",
    "label": "About"
@@ -74,12 +192,12 @@
   {
    "fieldname": "about_html",
    "fieldtype": "HTML",
-   "options": "<div style=\"padding: 12px; background: #f0f4ff; border-radius: 8px;\">\n  <strong>brAIn</strong> — AI intelligence layer for Styloworld.<br/>\n  Configure your preferred LLM above. For Ollama, install it locally and set Base URL to <code>http://localhost:11434/v1</code>.\n  For Anthropic Claude, get your API key from <a href=\"#\">console.anthropic.com</a>.\n</div>"
+   "options": "<div style=\"padding:12px;background:#f0f4ff;border-radius:8px;\">\n  <strong>brAIn / Nuerix</strong> — AI intelligence layer for Styloworld.<br/>\n  Local engine (Nuerix): set Base URL to <code>http://localhost:11434/v1</code>, model to <code>qwen2.5:3b</code>.<br/>\n  For Anthropic Claude, get your API key from <code>console.anthropic.com</code>.<br/>\n  <br/>\n  <strong>21 CFR Part 11:</strong> Enable Audit Trail to record all interactions with tamper-evident hash chaining.<br/>\n  <strong>GDPR:</strong> Use Brain &rarr; GDPR Tools to export or anonymize user data.\n</div>"
   }
  ],
  "issingle": 1,
  "links": [],
- "modified": "2026-05-13 00:00:00.000000",
+ "modified": "2026-06-08 00:00:00.000000",
  "modified_by": "Administrator",
  "module": "Brain",
  "name": "Brain Settings",
@@ -101,5 +219,5 @@
  "sort_field": "modified",
  "sort_order": "DESC",
  "states": [],
- "track_changes": 0
+ "track_changes": 1
 }

@@ -124,18 +124,11 @@
 	z-index: 9999;
 	display: flex;
 	flex-direction: column;
-	transition: right 0.3s cubic-bezier(0.4, 0, 0.2, 1), width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+	transition: right 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 	font-family: var(--font-stack, system-ui, -apple-system, sans-serif);
 }
 #brain-panel.brain-panel-open {
 	right: 0;
-}
-#brain-panel.brain-wide {
-	width: 700px;
-}
-#brain-panel.brain-fullscreen {
-	width: 100vw;
-	border-left: none;
 }
 
 /* Header */
@@ -1053,9 +1046,6 @@
 					<button class="brain-btn-icon" id="brain-clear-btn" title="Clear conversation">
 						<svg viewBox="0 0 24 24"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3"/></svg>
 					</button>
-					<button class="brain-btn-icon" id="brain-expand-btn" title="Expand panel">
-						<svg viewBox="0 0 24 24"><polyline points="15 3 21 3 21 9"/><polyline points="9 21 3 21 3 15"/><line x1="21" y1="3" x2="14" y2="10"/><line x1="3" y1="21" x2="10" y2="14"/></svg>
-					</button>
 					<button class="brain-btn-icon" id="brain-close-btn" title="Close">
 						<svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
 					</button>
@@ -1090,7 +1080,6 @@
 		document.getElementById("brain-send-btn").addEventListener("click", sendMessage);
 		document.getElementById("brain-stop-btn").addEventListener("click", stopGeneration);
 		document.getElementById("brain-diagnose-btn").addEventListener("click", runDiagnostic);
-		document.getElementById("brain-expand-btn").addEventListener("click", cycleExpandMode);
 
 		const textarea = document.getElementById("brain-input");
 		textarea.addEventListener("keydown", (e) => {
@@ -1146,41 +1135,9 @@
 
 	function closePanel() {
 		STATE.open = false;
-		const panel = document.getElementById("brain-panel");
-		panel.classList.remove("brain-panel-open", "brain-wide", "brain-fullscreen");
+		document.getElementById("brain-panel").classList.remove("brain-panel-open");
 		document.getElementById("brain-overlay").classList.remove("brain-overlay-show");
 		document.getElementById("brain-bubble").classList.remove("brain-active");
-		_updateExpandIcon("normal");
-	}
-
-	// ── Expand cycle: normal (400px) → wide (700px) → fullscreen → normal ─────
-	const _EXPAND_MODES = ["normal", "wide", "fullscreen"];
-	let _expandMode = "normal";
-
-	function cycleExpandMode() {
-		const idx = _EXPAND_MODES.indexOf(_expandMode);
-		_expandMode = _EXPAND_MODES[(idx + 1) % _EXPAND_MODES.length];
-		const panel = document.getElementById("brain-panel");
-		panel.classList.remove("brain-wide", "brain-fullscreen");
-		if (_expandMode === "wide")       panel.classList.add("brain-wide");
-		if (_expandMode === "fullscreen") panel.classList.add("brain-fullscreen");
-		_updateExpandIcon(_expandMode);
-	}
-
-	function _updateExpandIcon(mode) {
-		const btn = document.getElementById("brain-expand-btn");
-		if (!btn) return;
-		if (mode === "fullscreen") {
-			// Show compress icon
-			btn.title = "Compress panel";
-			btn.querySelector("svg").innerHTML = '<polyline points="4 14 10 14 10 20"/><polyline points="20 10 14 10 14 4"/><line x1="10" y1="14" x2="3" y2="21"/><line x1="21" y1="3" x2="14" y2="10"/>';
-		} else if (mode === "wide") {
-			btn.title = "Full screen";
-			btn.querySelector("svg").innerHTML = '<polyline points="15 3 21 3 21 9"/><polyline points="9 21 3 21 3 15"/><line x1="21" y1="3" x2="14" y2="10"/><line x1="3" y1="21" x2="10" y2="14"/>';
-		} else {
-			btn.title = "Expand panel";
-			btn.querySelector("svg").innerHTML = '<polyline points="15 3 21 3 21 9"/><polyline points="9 21 3 21 3 15"/><line x1="21" y1="3" x2="14" y2="10"/><line x1="3" y1="21" x2="10" y2="14"/>';
-		}
 	}
 
 	function clearConversation() {

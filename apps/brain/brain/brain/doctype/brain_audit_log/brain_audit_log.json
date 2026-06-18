@@ -1,0 +1,141 @@
+{
+ "actions": [],
+ "creation": "2026-06-08 00:00:00.000000",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "session",
+  "event_type",
+  "actor",
+  "timestamp",
+  "column_break_1",
+  "site_name",
+  "data_classification",
+  "ip_address",
+  "section_break_detail",
+  "event_detail",
+  "section_break_integrity",
+  "entry_hash",
+  "previous_hash",
+  "hash_verified"
+ ],
+ "fields": [
+  {
+   "fieldname": "session",
+   "fieldtype": "Link",
+   "label": "Session",
+   "options": "Brain Chat Session",
+   "in_list_view": 1,
+   "search_index": 1
+  },
+  {
+   "fieldname": "event_type",
+   "fieldtype": "Select",
+   "label": "Event Type",
+   "options": "session_start\nsession_end\nuser_message\nassistant_response\ntool_call\ntool_result\ngdpr_export\ngdpr_anonymize\nsettings_change\nerror",
+   "reqd": 1,
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "actor",
+   "fieldtype": "Link",
+   "label": "Actor (User)",
+   "options": "User",
+   "reqd": 1,
+   "in_list_view": 1,
+   "search_index": 1
+  },
+  {
+   "fieldname": "timestamp",
+   "fieldtype": "Datetime",
+   "label": "Timestamp",
+   "reqd": 1,
+   "read_only": 1,
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "column_break_1",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "site_name",
+   "fieldtype": "Data",
+   "label": "Site",
+   "read_only": 1
+  },
+  {
+   "fieldname": "data_classification",
+   "fieldtype": "Data",
+   "label": "Data Classification",
+   "read_only": 1
+  },
+  {
+   "fieldname": "ip_address",
+   "fieldtype": "Data",
+   "label": "IP Address",
+   "read_only": 1
+  },
+  {
+   "fieldname": "section_break_detail",
+   "fieldtype": "Section Break",
+   "label": "Event Detail"
+  },
+  {
+   "fieldname": "event_detail",
+   "fieldtype": "JSON",
+   "label": "Event Detail (JSON)",
+   "read_only": 1,
+   "description": "Structured payload for this event (message snippet, tool name, error, etc.)"
+  },
+  {
+   "fieldname": "section_break_integrity",
+   "fieldtype": "Section Break",
+   "label": "Tamper-Evidence (21 CFR Part 11)"
+  },
+  {
+   "fieldname": "entry_hash",
+   "fieldtype": "Data",
+   "label": "Entry Hash (SHA-256)",
+   "read_only": 1,
+   "description": "SHA-256 of (timestamp + event_type + actor + event_detail + previous_hash)"
+  },
+  {
+   "fieldname": "previous_hash",
+   "fieldtype": "Data",
+   "label": "Previous Entry Hash",
+   "read_only": 1,
+   "description": "Hash of the previous audit log entry. Forms a tamper-evident chain."
+  },
+  {
+   "default": "0",
+   "fieldname": "hash_verified",
+   "fieldtype": "Check",
+   "label": "Chain Verified",
+   "read_only": 1,
+   "description": "Set to 1 after integrity verification confirms the chain is intact."
+  }
+ ],
+ "issingle": 0,
+ "links": [],
+ "modified": "2026-06-08 00:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "Brain",
+ "name": "Brain Audit Log",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "read": 1,
+   "write": 0,
+   "create": 1,
+   "delete": 0,
+   "export": 1,
+   "report": 1,
+   "role": "System Manager"
+  }
+ ],
+ "sort_field": "timestamp",
+ "sort_order": "ASC",
+ "states": [],
+ "track_changes": 0,
+ "autoname": "UUID"
+}

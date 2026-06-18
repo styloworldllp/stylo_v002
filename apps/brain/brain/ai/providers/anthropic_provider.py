@@ -8,7 +8,7 @@ class AnthropicProvider(BaseLLMProvider):
 		except ImportError:
 			raise ImportError("anthropic package not installed. Run: pip install anthropic")
 
-		self.client = anthropic.Anthropic(api_key=api_key)
+		self.client = anthropic.Anthropic(api_key=api_key, timeout=60.0)
 		self.model = model or "claude-sonnet-4-6"
 		self.temperature = temperature
 
@@ -38,7 +38,7 @@ class AnthropicProvider(BaseLLMProvider):
 	def chat(self, system: str, messages: list, tools: list) -> dict:
 		response = self.client.messages.create(
 			model=self.model,
-			max_tokens=4096,
+			max_tokens=2048,
 			temperature=self.temperature,
 			system=system,
 			messages=messages,

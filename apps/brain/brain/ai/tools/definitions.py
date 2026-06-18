@@ -385,6 +385,50 @@ TOOL_DEFINITIONS = [
 		},
 	},
 
+	# ── Market Data (Public benchmarks — no company data sent) ───────────────────
+	{
+		"name": "get_market_data",
+		"description": (
+			"Fetch public market benchmarks and reference data for business comparison. "
+			"IMPORTANT: This tool only fetches publicly available data — it NEVER sends any company data externally. "
+			"Use for: currency exchange rates, RBI policy rates, GST rate tables, commodity prices, "
+			"Nifty/Sensex indices, industry benchmark margins, Indian inflation data. "
+			"Useful when user wants to compare their business performance against market standards."
+		),
+		"parameters": {
+			"type": "object",
+			"properties": {
+				"category": {
+					"type": "string",
+					"enum": [
+						"exchange_rates",
+						"rbi_rates",
+						"gst_rates",
+						"commodity_prices",
+						"market_indices",
+						"industry_benchmarks",
+						"inflation_data",
+					],
+					"description": (
+						"exchange_rates: USD/EUR/GBP/etc vs INR. "
+						"rbi_rates: Repo rate, reverse repo, CRR, SLR. "
+						"gst_rates: GST slab reference table. "
+						"commodity_prices: Gold, silver, crude oil (INR). "
+						"market_indices: Nifty 50, Sensex current values. "
+						"industry_benchmarks: Typical margins by sector (FMCG, IT, manufacturing, etc). "
+						"inflation_data: CPI, WPI, current inflation rates."
+					),
+				},
+				"base_currency": {
+					"type": "string",
+					"description": "For exchange_rates: base currency to convert from, e.g. 'USD', 'EUR'. Default: USD",
+					"default": "USD",
+				},
+			},
+			"required": ["category"],
+		},
+	},
+
 	# ── Stylo Insights (Dashboard Creation) ──────────────────────────────────────
 	{
 		"name": "insights_get_data_sources",

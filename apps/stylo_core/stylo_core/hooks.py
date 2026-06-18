@@ -15,8 +15,8 @@
 app_name = "stylo_core"
 app_title = "Stylo Core"
 app_publisher = "Styloworld"
-app_description = "Styloworld — Branding and customizations layer"
-app_email = "hello@styloworld.io"
+app_description = "Stylo — Branding, licensing and customizations layer"
+app_email = "hello@stylo.io"
 app_license = "mit"
 app_logo_url = "/assets/stylo_core/images/stylo-logo-light.png"
 
@@ -24,10 +24,14 @@ app_logo_url = "/assets/stylo_core/images/stylo-logo-light.png"
 # ------------------
 
 # Desk (authenticated Frappe UI) — inject brand CSS and JS overrides
-app_include_js = ["/assets/stylo_core/js/stylo_overrides.js"]
+app_include_js = [
+    "/assets/stylo_core/js/stylo_overrides.js",
+    "/assets/stylo_core/js/license_lock.js",
+]
 app_include_css = [
     "/assets/stylo_core/css/stylo_theme.css",
     "/assets/stylo_core/css/stylo_icons.css",
+    "/assets/stylo_core/css/stylo_marketplace.css",
 ]
 
 # License enforcement — runs before every request
@@ -147,22 +151,29 @@ after_migrate = ["stylo_core.install_icons.run"]
 
 # Document Events
 # ---------------
-# Hook on document methods and events
 
-# doc_events = {
-# 	"*": {
-# 		"on_update": "method",
-# 		"on_cancel": "method",
-# 		"on_trash": "method"
-# 	}
-# }
+doc_events = {
+    "User": {
+        # Block creating a new user when total user count >= license limit.
+        # validate also catches changing a Website User → System User.
+        "before_insert": "stylo_core.user_license.check_user_count_on_user_create",
+        "validate": "stylo_core.user_license.check_user_count_on_user_create",
+    },
+    "Has Role": {
+        # Block assigning brAIn User role when brain_user_limit is reached.
+        "before_insert": "stylo_core.user_license.check_brain_role_limit",
+    },
+}
 
 # Scheduled Tasks
 # ---------------
 
 scheduler_events = {
     "all": [
-        "stylo_core.user_license.refresh_licensed_users"  # polls Control Center every 5 min
+        "stylo_core.user_license.refresh_licensed_users",  # polls Control Center every 5 min
+    ],
+    "daily": [
+        "stylo_core.license_management.check_expiring_licenses",  # renewal notifications + status sync
     ],
 }
 
