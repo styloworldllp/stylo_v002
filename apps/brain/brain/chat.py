@@ -12,24 +12,18 @@ from werkzeug.wrappers import Response as WerkzeugResponse
 def _get_or_create_session(session_id: str, page_context: dict, provider: str, model: str) -> str:
     """Return an existing open session or create a new one. Returns session name."""
     if session_id:
-        row = frappe.db.get_value(
-            "Brain Chat Session", session_id, ["status", "user"], as_dict=True
-        )
-        if row and row.status == "Active" and row.user == frappe.session.user:
-            frappe.db.set_value("Brain Chat Session", session_id, "last_active", frappe.utils.now_datetime())
-            return session_id
+        try:
+            session = frappe.get_doc("Brain Chat Session", session_id)
+            if session.status == "Active" and session.user == frappe.session.user:
+                # Touch last_active
+                frappe.db.set_value("Brain Chat Session", session_id, "last_active", frappe.utils.now_datetime())
+                return session_id
+        except frappe.DoesNotExistError:
+            pass
 
     user = frappe.session.user
     user_doc = frappe.get_cached_doc("User", user)
-
-    # Read settings via raw dict — avoids Document.onload and any password field loading
-    s = frappe.db.get_singles_dict("Brain Settings")
-    data_classification = s.get("data_classification") or "Regulated (21 CFR)"
-
-    # Route may arrive as a list from the browser — convert to a readable string
-    route = page_context.get("route", "")
-    if isinstance(route, list):
-        route = " > ".join(str(r) for r in route)
+    settings = frappe.get_single("Brain Settings")
 
     session = frappe.get_doc({
         "doctype": "Brain Chat Session",
@@ -37,10 +31,10 @@ def _get_or_create_session(session_id: str, page_context: dict, provider: str, m
         "user_fullname": user_doc.full_name,
         "status": "Active",
         "ip_address": _get_ip(),
-        "initial_route": route,
+        "initial_route": page_context.get("route", ""),
         "provider_used": provider,
         "model_used": model,
-        "data_classification": data_classification,
+        "data_classification": settings.data_classification or "Regulated (21 CFR)",
         "message_count": 0,
         "tool_call_count": 0,
     })
@@ -51,7 +45,7 @@ def _get_or_create_session(session_id: str, page_context: dict, provider: str, m
     write_audit_log(
         event_type="session_start",
         session=session.name,
-        detail={"route": route, "provider": provider, "model": model},
+        detail={"route": page_context.get("route", ""), "provider": provider, "model": model},
     )
 
     return session.name
@@ -101,10 +95,10 @@ def _get_ip() -> str:
 
 
 def _provider_info():
-    """Return (provider_name, model_name) from Brain Settings — no Document load, no password side effects."""
+    """Return (provider_name, model_name) from Brain Settings."""
     try:
-        s = frappe.db.get_singles_dict("Brain Settings")
-        return (s.get("provider") or "Unknown"), (s.get("model") or "")
+        s = frappe.get_single("Brain Settings")
+        return (s.provider or "Unknown"), (s.model or "")
     except Exception:
         return "Unknown", ""
 
@@ -196,77 +190,56 @@ def send_stream(message: str, history: str = "[]", context: str = "{}", session_
     except Exception:
         page_context = {}
 
-    # Pre-flight: collect everything we need before opening the stream.
-    # Any crash here returns an SSE error event instead of HTTP 500.
-    setup_error = None
-    sid = None
-    seq_base = 0
-    provider = "Unknown"
-    model = ""
-    write_audit_log = None
+    provider, model = _provider_info()
+    sid = _get_or_create_session(session_id, page_context, provider, model)
+    seq_base = frappe.db.count("Brain Chat Message", {"session": sid})
 
-    try:
-        provider, model = _provider_info()
-        sid = _get_or_create_session(session_id, page_context, provider, model)
-        seq_base = frappe.db.count("Brain Chat Message", {"session": sid}) or 0
-        _save_message(sid, "user", message, seq_base + 1)
+    _save_message(sid, "user", message, seq_base + 1)
 
-        from brain.ai.audit import write_audit_log as _wal
-        write_audit_log = _wal
-        write_audit_log(
-            event_type="user_message",
-            session=sid,
-            detail={"sequence": seq_base + 1, "char_count": len(message)},
-        )
+    from brain.ai.audit import write_audit_log
+    write_audit_log(
+        event_type="user_message",
+        session=sid,
+        detail={"sequence": seq_base + 1, "char_count": len(message)},
+    )
 
-        if not history_list and sid:
-            history_list = _load_server_history(sid, exclude_last=1)
-
-    except Exception as e:
-        setup_error = str(e)
-        frappe.log_error(frappe.get_traceback(), "Nuerix send_stream setup error")
+    if not history_list and sid:
+        history_list = _load_server_history(sid, exclude_last=1)
 
     from brain.ai.agent import run_stream
 
     def _generate():
-        # Always start with session_id (even if setup failed, so client clears state)
-        yield f"data: {json.dumps({'type': 'session', 'session_id': sid or ''})}\n\n"
-
-        if setup_error:
-            yield f"data: {json.dumps({'type': 'error', 'message': setup_error})}\n\n"
-            return
-
         collected_text = []
         tool_events = []
         try:
-            for event in run_stream(message, history_list, page_context, session_id=sid):
+            # First event: send session_id so the client can track it
+            yield f"data: {json.dumps({'type': 'session', 'session_id': sid})}\n\n"
+
+            for event in run_stream(message, history_list, page_context):
                 if event.get("type") == "tool":
                     tool_events.append(event.get("label", ""))
                 elif event.get("type") == "chunk":
                     collected_text.append(event.get("text", ""))
                 elif event.get("type") == "done":
+                    # Persist assistant message and commit before sending done
                     full_text = event.get("message", "".join(collected_text))
-                    try:
-                        _save_message(sid, "assistant", full_text, seq_base + 2,
-                                      tools_called=event.get("actions", []), provider=provider, model=model)
-                        _increment_session_count(sid, messages=2, tools=len(tool_events))
-                        if write_audit_log:
-                            write_audit_log(
-                                event_type="assistant_response",
-                                session=sid,
-                                detail={"sequence": seq_base + 2, "tool_count": len(tool_events)},
-                            )
-                        frappe.db.commit()
-                    except Exception:
-                        pass  # persistence failure must not break the response
+                    _save_message(sid, "assistant", full_text, seq_base + 2,
+                                  tools_called=event.get("actions", []), provider=provider, model=model)
+                    _increment_session_count(sid, messages=2, tools=len(tool_events))
+
+                    write_audit_log(
+                        event_type="assistant_response",
+                        session=sid,
+                        detail={"sequence": seq_base + 2, "tool_count": len(tool_events)},
+                    )
+                    frappe.db.commit()
 
                 yield f"data: {json.dumps(event)}\n\n"
 
         except Exception as e:
-            frappe.log_error(frappe.get_traceback(), "Nuerix run_stream error")
             yield f"data: {json.dumps({'type': 'error', 'message': str(e)})}\n\n"
 
-    return WerkzeugResponse(
+    frappe.local.response = WerkzeugResponse(
         _generate(),
         mimetype="text/event-stream",
         headers={
@@ -354,76 +327,6 @@ def _safe_pw(settings):
         return settings.get_password("api_key", raise_exception=False) or ""
     except Exception:
         return ""
-
-
-@frappe.whitelist()
-def health_check():
-    """
-    Diagnostic endpoint — tests Ollama connectivity and Python imports.
-    Returns a plain dict so the UI can show specific error messages.
-    """
-    result = {"ok": True, "issues": [], "details": {}}
-
-    # 1. Check Brain Settings readable
-    try:
-        s = frappe.db.get_singles_dict("Brain Settings")
-        result["details"]["provider"] = s.get("provider", "not set")
-        result["details"]["enabled"] = s.get("enabled", "0")
-    except Exception as e:
-        result["ok"] = False
-        result["issues"].append(f"Brain Settings unreadable: {e}")
-
-    # 2. Check Brain Chat Session table exists
-    try:
-        frappe.db.count("Brain Chat Session", {})
-    except Exception as e:
-        result["ok"] = False
-        result["issues"].append(f"Brain Chat Session table missing — run bench migrate: {e}")
-
-    # 3. Check Brain Chat Message table exists
-    try:
-        frappe.db.count("Brain Chat Message", {})
-    except Exception as e:
-        result["ok"] = False
-        result["issues"].append(f"Brain Chat Message table missing — run bench migrate: {e}")
-
-    # 4. Check Brain Audit Log table exists
-    try:
-        frappe.db.count("Brain Audit Log", {})
-    except Exception as e:
-        result["ok"] = False
-        result["issues"].append(f"Brain Audit Log table missing — run bench migrate: {e}")
-
-    # 5. Check Python imports
-    try:
-        from brain.ai.agent import get_settings, get_provider  # noqa
-        from brain.ai.system_prompt import build_fast_system_prompt  # noqa
-        from brain.ai.tools.executor import execute_tool  # noqa
-    except Exception as e:
-        result["ok"] = False
-        result["issues"].append(f"Python import error: {e}")
-
-    # 6. Check Ollama reachability (for Nuerix/Ollama providers)
-    provider = result["details"].get("provider", "")
-    if "Neurix" in provider or "Ollama" in provider:
-        try:
-            import urllib.request
-            req = urllib.request.Request(
-                "http://localhost:11434/api/tags",
-                headers={"User-Agent": "NuerixHealthCheck/1.0"},
-            )
-            with urllib.request.urlopen(req, timeout=5) as resp:
-                import json as _json
-                data = _json.loads(resp.read())
-                models = [m.get("name", "") for m in data.get("models", [])]
-                result["details"]["ollama_models"] = models
-                result["details"]["ollama_ok"] = True
-        except Exception as e:
-            result["ok"] = False
-            result["details"]["ollama_ok"] = False
-            result["issues"].append(f"Ollama not reachable at localhost:11434 — is it running? Error: {e}")
-
-    return result
 
 
 @frappe.whitelist()

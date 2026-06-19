@@ -1,0 +1,155 @@
+{
+ "actions": [],
+ "creation": "2026-06-08 00:00:00.000000",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "session",
+  "sequence",
+  "role",
+  "timestamp",
+  "column_break_1",
+  "provider_used",
+  "model_used",
+  "tools_called",
+  "section_break_content",
+  "content",
+  "content_hash",
+  "section_break_gdpr",
+  "is_anonymized",
+  "anonymized_at",
+  "anonymized_by"
+ ],
+ "fields": [
+  {
+   "fieldname": "session",
+   "fieldtype": "Link",
+   "label": "Session",
+   "options": "Brain Chat Session",
+   "reqd": 1,
+   "in_list_view": 1,
+   "search_index": 1
+  },
+  {
+   "default": "0",
+   "fieldname": "sequence",
+   "fieldtype": "Int",
+   "label": "Sequence",
+   "reqd": 1,
+   "description": "Message order within the session (1-based)"
+  },
+  {
+   "fieldname": "role",
+   "fieldtype": "Select",
+   "label": "Role",
+   "options": "user\nassistant\ntool",
+   "reqd": 1,
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "timestamp",
+   "fieldtype": "Datetime",
+   "label": "Timestamp",
+   "reqd": 1,
+   "read_only": 1,
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "column_break_1",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "provider_used",
+   "fieldtype": "Data",
+   "label": "AI Provider",
+   "read_only": 1
+  },
+  {
+   "fieldname": "model_used",
+   "fieldtype": "Data",
+   "label": "Model",
+   "read_only": 1
+  },
+  {
+   "fieldname": "tools_called",
+   "fieldtype": "JSON",
+   "label": "Tools Called",
+   "read_only": 1,
+   "description": "JSON array of tool calls made in this message (assistant role only)"
+  },
+  {
+   "fieldname": "section_break_content",
+   "fieldtype": "Section Break",
+   "label": "Message Content"
+  },
+  {
+   "fieldname": "content",
+   "fieldtype": "Long Text",
+   "label": "Content",
+   "read_only": 1,
+   "description": "Replaced with [ANONYMIZED BY GDPR REQUEST] when is_anonymized=1"
+  },
+  {
+   "fieldname": "content_hash",
+   "fieldtype": "Data",
+   "label": "Content Hash (SHA-256)",
+   "read_only": 1,
+   "description": "SHA-256 of (content + timestamp + session). Tamper-evidence for 21 CFR Part 11."
+  },
+  {
+   "fieldname": "section_break_gdpr",
+   "fieldtype": "Section Break",
+   "label": "GDPR"
+  },
+  {
+   "default": "0",
+   "fieldname": "is_anonymized",
+   "fieldtype": "Check",
+   "label": "Anonymized",
+   "read_only": 1,
+   "description": "Set when content anonymized via GDPR erasure request. Record is preserved for audit integrity."
+  },
+  {
+   "fieldname": "anonymized_at",
+   "fieldtype": "Datetime",
+   "label": "Anonymized At",
+   "read_only": 1
+  },
+  {
+   "fieldname": "anonymized_by",
+   "fieldtype": "Link",
+   "label": "Anonymized By",
+   "options": "User",
+   "read_only": 1
+  }
+ ],
+ "issingle": 0,
+ "links": [],
+ "modified": "2026-06-08 00:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "Brain",
+ "name": "Brain Chat Message",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "read": 1,
+   "write": 0,
+   "create": 1,
+   "delete": 0,
+   "export": 1,
+   "report": 1,
+   "role": "System Manager"
+  },
+  {
+   "read": 1,
+   "role": "All",
+   "permlevel": 0,
+   "if_owner": 0
+  }
+ ],
+ "sort_field": "timestamp",
+ "sort_order": "ASC",
+ "states": [],
+ "track_changes": 0,
+ "autoname": "UUID"
+}

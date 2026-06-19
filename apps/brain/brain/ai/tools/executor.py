@@ -27,6 +27,8 @@ def execute_tool(name: str, inputs: dict) -> dict:
 		"guide_user": _guide_user,
 		"get_value": _get_value,
 		"get_system_info": _get_system_info,
+		# Market data (public benchmarks)
+		"get_market_data": _get_market_data,
 		# Stylo Insights
 		"insights_get_data_sources":  _insights_get_data_sources,
 		"insights_get_tables":        _insights_get_tables,
@@ -305,6 +307,193 @@ def _get_system_info() -> dict:
 		"roles": frappe.get_roles(frappe.session.user),
 		"today": frappe.utils.today(),
 	}
+
+
+# ── Market Data (Public benchmarks, no company data transmitted) ──────────────
+
+def _get_market_data(category: str, base_currency: str = "USD") -> dict:
+	"""
+	Fetch public market reference data for business benchmarking.
+	PRIVACY: Only fetches public data from public APIs — zero company data transmitted.
+	"""
+	import urllib.request
+	import json as _json
+
+	def _http_get(url, timeout=8):
+		req = urllib.request.Request(url, headers={"User-Agent": "Nuerix-Market-Data/1.0"})
+		with urllib.request.urlopen(req, timeout=timeout) as resp:
+			return _json.loads(resp.read().decode())
+
+	if category == "exchange_rates":
+		try:
+			base = (base_currency or "USD").upper()
+			data = _http_get(f"https://open.er-api.com/v6/latest/{base}")
+			rates = data.get("rates", {})
+			inr_rate = rates.get("INR", "N/A")
+			key_pairs = {k: v for k, v in rates.items() if k in ("INR", "USD", "EUR", "GBP", "AED", "SGD", "JPY", "CNY")}
+			return {
+				"category": "Exchange Rates",
+				"base": base,
+				"inr_rate": inr_rate,
+				"key_rates": key_pairs,
+				"source": "open.er-api.com (public)",
+				"note": "No company data was transmitted. These are public exchange rates.",
+				"last_updated": data.get("time_last_update_utc", ""),
+			}
+		except Exception as e:
+			return {"error": f"Could not fetch exchange rates: {e}"}
+
+	elif category == "rbi_rates":
+		# RBI policy rates — updated manually here when they change (RBI site has no public JSON API)
+		return {
+			"category": "RBI Policy Rates",
+			"source": "Reserve Bank of India (indicative — verify at rbi.org.in)",
+			"note": "No company data was transmitted. These are public RBI reference rates.",
+			"rates": {
+				"Repo Rate": "6.50%",
+				"Reverse Repo Rate": "3.35%",
+				"Marginal Standing Facility (MSF)": "6.75%",
+				"Bank Rate": "6.75%",
+				"CRR (Cash Reserve Ratio)": "4.00%",
+				"SLR (Statutory Liquidity Ratio)": "18.00%",
+			},
+			"effective_from": "April 2024 (verify latest on rbi.org.in)",
+		}
+
+	elif category == "gst_rates":
+		return {
+			"category": "GST Rate Reference",
+			"source": "GST Council India (public)",
+			"note": "No company data was transmitted.",
+			"slabs": {
+				"0%": "Fresh vegetables, milk, eggs, printed books, newspapers, salt, grains",
+				"5%": "Branded food, economy flights, fertilizers, drugs/medicine, footwear <₹1000",
+				"12%": "Processed food, business flights, mobile phones (basic), printing & stationery",
+				"18%": "IT/consulting/telecom services, restaurants, electronics, paints, cement",
+				"28%": "Luxury goods, automobiles, tobacco, aerated beverages, premium consumer goods",
+			},
+			"special": {
+				"Gold/Silver/Jewellery": "3%",
+				"Diamonds/Precious stones": "0.25%",
+				"Affordable housing": "1%",
+				"Non-affordable housing": "5%",
+			},
+			"frappe_doctypes": {
+				"GST Tax Template": "For sales and purchase transactions",
+				"Item Tax Template": "Override GST rate per item",
+				"Tax Category": "Assign tax rules per customer/supplier",
+				"Tax Withholding Category": "For TDS configuration",
+			},
+		}
+
+	elif category == "commodity_prices":
+		try:
+			# Gold price via public metals API (no key required)
+			gold_data = _http_get("https://api.metals.live/v1/spot/gold")
+			gold_usd = gold_data[0].get("gold") if isinstance(gold_data, list) and gold_data else None
+			# Get INR rate to convert
+			fx = _http_get("https://open.er-api.com/v6/latest/USD")
+			inr = fx.get("rates", {}).get("INR", 83.5)
+			gold_inr_per_gram = round((gold_usd / 31.1035) * inr, 2) if gold_usd else "N/A"
+			silver_data = _http_get("https://api.metals.live/v1/spot/silver")
+			silver_usd = silver_data[0].get("silver") if isinstance(silver_data, list) and silver_data else None
+			silver_inr_per_gram = round((silver_usd / 31.1035) * inr, 2) if silver_usd else "N/A"
+			return {
+				"category": "Commodity Prices",
+				"source": "metals.live + open.er-api.com (public)",
+				"note": "No company data was transmitted. Prices are spot rates.",
+				"gold_per_gram_inr": gold_inr_per_gram,
+				"silver_per_gram_inr": silver_inr_per_gram,
+				"usd_inr": inr,
+			}
+		except Exception as e:
+			return {
+				"category": "Commodity Prices",
+				"error": f"Live fetch failed: {e}",
+				"indicative": {
+					"Gold (per gram, INR)": "~₹7,200–7,800 (verify on MCX)",
+					"Silver (per gram, INR)": "~₹85–95 (verify on MCX)",
+					"Crude Oil (per barrel, USD)": "~$75–85 (verify on MCX/NYMEX)",
+				},
+				"source": "MCX India / NYMEX (verify live prices)",
+			}
+
+	elif category == "market_indices":
+		return {
+			"category": "Indian Market Indices",
+			"note": (
+				"Live index data requires NSE/BSE API subscriptions. "
+				"No company data was transmitted. "
+				"For real-time values, visit nseindia.com or bseindia.com."
+			),
+			"source": "NSE / BSE (public reference)",
+			"indices": {
+				"Nifty 50": "~22,000–24,500 range (FY 2024-25). Check nseindia.com for live value.",
+				"Sensex": "~73,000–80,000 range (FY 2024-25). Check bseindia.com for live value.",
+				"Nifty Bank": "~46,000–52,000 range. Check nseindia.com.",
+				"Nifty IT": "~35,000–40,000 range. Check nseindia.com.",
+			},
+			"how_to_compare": (
+				"To compare your portfolio or business valuation against these, "
+				"use your own data from this ERP with search_records, and compare ratios manually."
+			),
+		}
+
+	elif category == "industry_benchmarks":
+		return {
+			"category": "Industry Benchmark Margins (India, indicative)",
+			"source": "SEBI/RBI annual reports, CRISIL, public research (indicative)",
+			"note": "No company data was transmitted. These are indicative public benchmarks.",
+			"gross_profit_margins": {
+				"FMCG / Consumer Goods": "40–60%",
+				"IT Services / Software": "25–40%",
+				"Pharmaceuticals": "50–70%",
+				"Manufacturing (General)": "15–35%",
+				"Retail / Trading": "10–25%",
+				"Construction / Real Estate": "15–30%",
+				"Banking / NBFC (NIM)": "3–5%",
+				"Textiles": "10–20%",
+				"Automobile (OEM)": "10–20%",
+				"Hospitality / Hotels": "30–50%",
+				"Logistics / Transport": "8–15%",
+				"Agriculture / Food Processing": "5–15%",
+			},
+			"net_profit_margins": {
+				"IT Services": "15–25%",
+				"FMCG": "10–20%",
+				"Pharmaceuticals": "12–22%",
+				"Manufacturing": "5–12%",
+				"Retail": "2–6%",
+				"Real Estate": "8–18%",
+			},
+			"key_ratios": {
+				"Debt-to-Equity (healthy)": "< 1.0 for most sectors",
+				"Current Ratio (healthy)": "> 1.5",
+				"ROE (good)": "> 15%",
+				"ROCE (good)": "> 15%",
+			},
+		}
+
+	elif category == "inflation_data":
+		return {
+			"category": "Indian Inflation Data",
+			"source": "MOSPI / RBI (indicative — verify at mospi.gov.in)",
+			"note": "No company data was transmitted.",
+			"data": {
+				"CPI Inflation (FY 2024-25)": "~4.5–5.5% (target: 4±2%)",
+				"WPI Inflation (FY 2024-25)": "~1–3%",
+				"Core CPI (ex food & fuel)": "~3.5–4.5%",
+				"Food Inflation": "~6–8%",
+				"RBI Inflation Target": "4% (tolerance band 2–6%)",
+			},
+			"impact": {
+				"Cost escalation clause": "Index contracts to CPI for multi-year deals",
+				"Raw material pricing": "Track WPI for manufacturing cost planning",
+				"Salary revision": "Typically benchmark to CPI + 1–3% premium",
+			},
+		}
+
+	return {"error": f"Unknown category: {category}"}
 
 
 # ── Stylo Insights (Dashboard Creation) ───────────────────────────────────────

@@ -38,6 +38,7 @@ frappe.views.ListViewSelect = class ListViewSelect {
 	}
 
 	set_route(view, calendar_name) {
+		if (!view) return;
 		const route = [this.slug(), "view", view];
 		if (calendar_name) route.push(calendar_name);
 

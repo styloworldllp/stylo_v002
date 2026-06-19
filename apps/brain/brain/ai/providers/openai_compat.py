@@ -8,7 +8,8 @@ from .base import BaseLLMProvider
 
 
 class OpenAICompatProvider(BaseLLMProvider):
-	def __init__(self, api_key: str, model: str, base_url: str = None, temperature: float = 0.1):
+	def __init__(self, api_key: str, model: str, base_url: str = None,
+	             temperature: float = 0.1, is_local: bool = False):
 		try:
 			from openai import OpenAI
 		except ImportError:
@@ -20,6 +21,7 @@ class OpenAICompatProvider(BaseLLMProvider):
 		)
 		self.model = model or "gpt-4o"
 		self.temperature = temperature
+		self.is_local = is_local  # True for Ollama/Nuerix
 
 	def _to_openai_tools(self, tools: list) -> list:
 		return [
@@ -101,10 +103,22 @@ class OpenAICompatProvider(BaseLLMProvider):
 			model=self.model,
 			messages=oai_messages,
 			temperature=self.temperature,
+			max_tokens=600,
 		)
+
 		if tools:
 			kwargs["tools"] = self._to_openai_tools(tools)
 			kwargs["tool_choice"] = "auto"
+
+		# Ollama-specific speed params passed via extra_body
+		if self.is_local:
+			kwargs["extra_body"] = {
+				"options": {
+					"num_thread": 2,      # use all CPU cores
+					"num_predict": 600,   # cap output tokens — don't over-generate
+					"num_ctx": 2048,      # keep context window small = faster attention
+				}
+			}
 
 		response = self.client.chat.completions.create(**kwargs)
 		choice = response.choices[0]
