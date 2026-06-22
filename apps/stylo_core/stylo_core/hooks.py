@@ -163,6 +163,10 @@ doc_events = {
         # Block assigning brAIn User role when brain_user_limit is reached.
         "before_insert": "stylo_core.user_license.check_brain_role_limit",
     },
+    "Workflow Action": {
+        # Send Expo push notification to the approver's mobile device.
+        "after_insert": "stylo_core.notifications.push_workflow_notification",
+    },
 }
 
 # Scheduled Tasks
