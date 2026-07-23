@@ -96,6 +96,15 @@ LINK_FIX = {
         "hidden":      0,
         "parent_icon": "",
     },
+    "India Compliance": {
+        "link":        "/desk/gst-india",
+        "link_to":     "",
+        "icon_type":   "Link",
+        "link_type":   "External",
+        "hidden":      0,
+        "parent_icon": "",
+        "bg_color":    "",
+    },
 }
 
 # Label (after renaming) → PNG filename in workspace_icons/
