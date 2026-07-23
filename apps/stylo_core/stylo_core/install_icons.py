@@ -6,6 +6,10 @@ Run with:
   bench --site <site> execute stylo_core.install_icons.run
 """
 
+import glob
+import os
+import stat
+
 import frappe
 
 BASE = "/assets/stylo_core/images/workspace_icons"
@@ -410,6 +414,21 @@ def run():
     frappe.db.commit()
     frappe.cache.delete_key("desktop_icons")
     frappe.cache.delete_value("desktop_icons")
+
+    # ── Step 9: Fix world-readable permissions on stylo_core public assets ──
+    # Prevents nginx 403 when rsync accidentally copies 0600 source perms.
+    perms_fixed = 0
+    try:
+        bench_path = frappe.utils.get_bench_path()
+        asset_css_dir = os.path.join(bench_path, "sites", "assets", "stylo_core", "css")
+        for f in glob.glob(os.path.join(asset_css_dir, "*.css")):
+            current = stat.S_IMODE(os.stat(f).st_mode)
+            if not (current & stat.S_IROTH):
+                os.chmod(f, current | stat.S_IRGRP | stat.S_IROTH)
+                perms_fixed += 1
+    except Exception:
+        pass
+
     print(f"Stylo icons: {created} created, {renamed} renamed, {fixed} parent_icon fixed, "
           f"{link_fixed} links fixed, {updated} logos updated, {brand_fixed} app brands fixed, "
-          f"{sidebar_fixed} sidebars/settings cleaned.")
+          f"{sidebar_fixed} sidebars/settings cleaned, {perms_fixed} asset perms fixed.")
