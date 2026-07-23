@@ -65,20 +65,22 @@
 	left: 0;
 	right: 0;
 	z-index: 10000;
-	height: 60px;
+	/* Height accounts for the brAIn pill that rises above the bar */
+	height: 64px;
 	padding-bottom: env(safe-area-inset-bottom, 0px);
-	background: rgba(255, 255, 255, 0.88);
-	backdrop-filter: blur(20px) saturate(1.5);
-	-webkit-backdrop-filter: blur(20px) saturate(1.5);
-	border-top: 1px solid rgba(0, 0, 0, 0.08);
-	box-shadow: 0 -4px 24px rgba(0, 0, 0, 0.08);
-	align-items: center;
-	justify-content: space-around;
+	box-sizing: content-box;
+	background: rgba(255, 255, 255, 0.92);
+	backdrop-filter: blur(24px) saturate(1.6);
+	-webkit-backdrop-filter: blur(24px) saturate(1.6);
+	border-top: 1px solid rgba(0, 0, 0, 0.07);
+	box-shadow: 0 -2px 20px rgba(0, 0, 0, 0.07);
+	align-items: stretch;
+	justify-content: space-evenly;
 }
 [data-theme="dark"] #stylo-bottom-nav {
-	background: rgba(18, 18, 22, 0.90);
-	border-top: 1px solid rgba(255, 255, 255, 0.08);
-	box-shadow: 0 -4px 24px rgba(0, 0, 0, 0.4);
+	background: rgba(18, 18, 22, 0.93);
+	border-top: 1px solid rgba(255, 255, 255, 0.07);
+	box-shadow: 0 -2px 20px rgba(0, 0, 0, 0.4);
 }
 @media (max-width: 768px) {
 	#stylo-bottom-nav { display: flex; }
@@ -87,40 +89,46 @@
 	#page-desktop .navbar-container { display: none !important; }
 	/* Give the icon grid room above the bottom nav */
 	#page-desktop .desktop-container,
-	.desktop-wrapper > .desktop-container { padding-bottom: 80px !important; }
+	.desktop-wrapper > .desktop-container { padding-bottom: 88px !important; }
 	/* Move brAIn floating bubble away — bottom nav handles it */
 	#brain-bubble { display: none !important; }
+	/* Inner pages: pad content above bottom nav */
+	.page-container { padding-bottom: 64px !important; }
 }
 
-/* ── Nav items ─────────────────────────────────────────────── */
+/* ── Nav items — equal flex columns, icon+label centered ───── */
 .sbn-item {
+	flex: 1;
 	display: flex;
 	flex-direction: column;
 	align-items: center;
 	justify-content: center;
-	gap: 3px;
-	flex: 1;
+	gap: 4px;
 	background: none;
 	border: none;
 	cursor: pointer;
-	padding: 6px 4px;
+	padding: 0;
 	color: #6e6e73;
 	transition: color 0.15s;
 	-webkit-tap-highlight-color: transparent;
 	text-decoration: none;
+	min-width: 0;
+	height: 100%;
 }
-.sbn-item:active { opacity: 0.7; }
+.sbn-item:active { opacity: 0.65; }
 .sbn-item svg {
 	width: 22px;
 	height: 22px;
 	stroke: currentColor;
+	flex-shrink: 0;
 	display: block;
 }
 .sbn-label {
-	font-size: 9px;
+	font-size: 10px;
 	font-weight: 600;
-	letter-spacing: 0.02em;
+	letter-spacing: 0.01em;
 	line-height: 1;
+	white-space: nowrap;
 }
 [data-theme="dark"] .sbn-item { color: #8e8e93; }
 .sbn-item:hover,
@@ -128,53 +136,58 @@
 [data-theme="dark"] .sbn-item:hover,
 [data-theme="dark"] .sbn-item.active { color: #0FBF7F; }
 
-/* ── brAIn center button ───────────────────────────────────── */
+/* ── brAIn center — raised circle floating above the bar ───── */
 .sbn-brain {
-	flex: 1.2;
-	position: relative;
-	top: -10px;
+	flex: 1;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: flex-end;   /* anchor label to bar baseline */
+	padding-bottom: 8px;
+	min-width: 0;
+	height: 100%;
 }
 .sbn-brain-btn {
 	display: flex;
 	flex-direction: column;
 	align-items: center;
-	justify-content: center;
-	gap: 3px;
+	gap: 4px;
 	background: none;
 	border: none;
 	cursor: pointer;
 	padding: 0;
 	-webkit-tap-highlight-color: transparent;
+	transform: translateY(-16px); /* lift above the bar */
 }
 .sbn-brain-pill {
-	width: 52px;
-	height: 52px;
+	width: 54px;
+	height: 54px;
 	border-radius: 50%;
 	background: linear-gradient(135deg, #0FBF7F 0%, #0DA870 100%);
-	box-shadow: 0 4px 20px rgba(15, 191, 127, 0.45);
+	box-shadow: 0 6px 24px rgba(15, 191, 127, 0.50);
 	display: flex;
 	align-items: center;
 	justify-content: center;
 	transition: transform 0.15s, box-shadow 0.15s;
 }
 .sbn-brain-pill:active {
-	transform: scale(0.94);
-	box-shadow: 0 2px 10px rgba(15, 191, 127, 0.35);
+	transform: scale(0.92);
+	box-shadow: 0 3px 12px rgba(15, 191, 127, 0.35);
 }
 .sbn-brain-pill svg {
-	width: 24px;
-	height: 24px;
+	width: 26px;
+	height: 26px;
 	stroke: #fff;
 }
 .sbn-brain-btn .sbn-label {
 	color: #0FBF7F;
-	margin-top: 2px;
+	font-size: 10px;
 }
 /* Notification badge on bell */
 .sbn-badge {
 	position: absolute;
-	top: 2px;
-	right: calc(50% - 18px);
+	top: 10px;
+	right: calc(50% - 16px);
 	width: 8px;
 	height: 8px;
 	border-radius: 50%;
@@ -291,18 +304,9 @@
 			}, 50);
 		});
 
-		// Profile — open user dropdown or navigate to profile
+		// Profile — open the actual user profile form
 		document.getElementById("sbn-profile").addEventListener("click", () => {
-			const dropdown = document.querySelector(
-				".navbar .user-avatar, .navbar .navbar-user, #navbar-user .dropdown-toggle, .avatar.avatar-small"
-			);
-			if (dropdown) {
-				dropdown.closest("[data-toggle='dropdown'], .dropdown")
-					? dropdown.closest("[data-toggle='dropdown'], .dropdown").querySelector("[data-toggle='dropdown']")?.click()
-					: dropdown.click();
-			} else {
-				frappe.set_route("Form/User/" + frappe.session.user);
-			}
+			frappe.set_route("Form", "User", frappe.session.user);
 		});
 	}
 
