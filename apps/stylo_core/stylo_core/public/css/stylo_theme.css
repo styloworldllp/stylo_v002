@@ -1147,17 +1147,14 @@ h1, h2, h3 {
 }
 
 /* ── Mobile responsive desktop page ──────────────────────────────────────── */
-/* Behaves like a phone home screen: 4-column icon grid, vertical scroll      */
 @media screen and (max-width: 768px) {
-  /* Wallpaper stays fixed to viewport — no white gap when scrolling */
-  [data-theme="light"] .desktop-wrapper {
-    background-attachment: fixed !important;
-  }
-  [data-theme="dark"] .desktop-wrapper {
+  /* Wallpaper fixed so it doesn't gap on scroll */
+  [data-theme="light"] .desktop-wrapper,
+  [data-theme="dark"]  .desktop-wrapper {
     background-attachment: fixed !important;
   }
 
-  /* Page fills screen and scrolls */
+  /* Page fills screen height and scrolls */
   #page-desktop {
     height: auto !important;
     min-height: 100dvh !important;
@@ -1169,89 +1166,151 @@ h1, h2, h3 {
     overflow-y: auto !important;
   }
 
-  /* Compact navbar */
+  /* Compact navbar — tighter padding, smaller logo */
   .desktop-wrapper .navbar-container {
-    padding: 8px 14px !important;
-    height: 48px !important;
+    padding: 6px 12px !important;
+    height: 52px !important;
   }
   #brand-logo,
   #brand-logo-dark {
-    height: 24px !important;
+    height: 22px !important;
     width: auto !important;
   }
+  /* Search bar: pill style, shorter */
+  .desktop-wrapper .desktop-navbar-modal-search {
+    max-width: 180px !important;
+    font-size: 13px !important;
+  }
 
-  /* Stack icon groups vertically, top-aligned, scrollable */
+  /* Icon grid container: vertical stack, full width */
   .desktop-wrapper > .desktop-container {
     min-height: unset !important;
     align-items: flex-start !important;
     justify-content: flex-start !important;
     flex-direction: column !important;
-    padding: 12px 10px 40px !important;
+    padding: 10px 12px 60px !important;
     overflow: visible !important;
   }
 
-  /* Full-width frosted glass card per group, no height constraint */
+  /* Frosted glass card: full width, generous padding */
   #page-desktop .icons-container:not(.folder-icon .icons-container):not(.modal .icons-container) {
     width: 100% !important;
     height: auto !important;
     max-height: none !important;
     overflow: visible !important;
-    margin-top: 8px !important;
-    padding: 14px 10px !important;
-    border-radius: 20px !important;
+    margin-top: 10px !important;
+    padding: 18px 16px !important;
+    border-radius: 24px !important;
   }
 
-  /* 4-column grid, all rows shown (no row cap), auto height */
+  /* ── 3-column grid: bigger tiles, more breathing room ── */
   #page-desktop .icons {
-    grid-template-columns: repeat(4, 1fr) !important;
+    grid-template-columns: repeat(3, 1fr) !important;
     grid-template-rows: none !important;
     grid-auto-rows: auto !important;
     height: auto !important;
     overflow: visible !important;
-    gap: 8px 4px !important;
+    gap: 16px 10px !important;
     width: 100% !important;
   }
 
-  /* Show all icon grids (Frappe sets display:none on non-active pages) */
+  /* Show all icon pages (Frappe hides non-active) */
   #page-desktop .icons-container > .icons {
     display: grid !important;
   }
 
-  /* Compact icon tile */
+  /* Icon tile: tall enough for icon + label */
   #page-desktop .desktop-icon {
     width: 100% !important;
     height: auto !important;
-    min-height: 88px !important;
-    padding: 10px 6px 8px !important;
+    min-height: 100px !important;
+    padding: 14px 8px 10px !important;
+    border-radius: 20px !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    gap: 8px !important;
+  }
+
+  /* Icon image: bigger on 3-column */
+  #page-desktop .icon-container {
+    width: 58px !important;
+    height: 58px !important;
+    min-width: 58px !important;
+    min-height: 58px !important;
+    border-radius: 16px !important;
+  }
+  #page-desktop .icon-container:not(.folder-icon) img.app-icon {
+    width: 58px !important;
+    height: 58px !important;
+    border-radius: 16px !important;
+  }
+  /* Folder icon: internal thumbnail grid */
+  #page-desktop .icon-container.folder-icon {
+    width: 58px !important;
+    height: 58px !important;
+    padding: 6px !important;
     border-radius: 16px !important;
   }
 
-  /* Icon image size */
-  #page-desktop .icon-container {
-    width: 46px !important;
-    height: 46px !important;
-    min-width: 46px !important;
-    min-height: 46px !important;
-  }
-  #page-desktop .icon-container img {
-    width: 46px !important;
-    height: 46px !important;
-  }
-
-  /* Icon label: 2-line clamp, centered */
+  /* Icon label: 2-line max, centered, no awkward breaks */
   #page-desktop .icon-title {
-    font-size: 10px !important;
+    font-size: 11px !important;
+    font-weight: 600 !important;
     white-space: normal !important;
     text-align: center !important;
     word-break: break-word !important;
+    hyphens: auto !important;
     display: -webkit-box !important;
     -webkit-line-clamp: 2 !important;
     -webkit-box-orient: vertical !important;
     overflow: hidden !important;
+    line-height: 1.3 !important;
+    max-width: 100% !important;
   }
   #page-desktop .icon-subtitle { display: none !important; }
 
-  /* Hide pagination arrows — vertical scroll replaces pages */
+  /* ── brAIn edge tab → small FAB circle at bottom-right ── */
+  #brain-bubble {
+    width: 52px !important;
+    height: 52px !important;
+    border-radius: 50% !important;
+    right: 16px !important;
+    bottom: 24px !important;
+    top: auto !important;
+    transform: none !important;
+    box-shadow: 0 4px 20px rgba(15, 191, 127, 0.45) !important;
+    gap: 0 !important;
+  }
+  /* Hide text label — only show the icon */
+  #brain-bubble .brain-tab-label {
+    display: none !important;
+  }
+  #brain-bubble .brain-tab-icon {
+    width: 24px !important;
+    height: 24px !important;
+  }
+  /* Reposition the status pulse dot */
+  #brain-bubble .brain-pulse {
+    top: 4px !important;
+    right: 4px !important;
+    width: 10px !important;
+    height: 10px !important;
+  }
+  /* brAIn panel: full-screen slide-up on mobile */
+  #brain-panel {
+    width: 100vw !important;
+    right: -100vw !important;
+    top: 0 !important;
+    height: 100dvh !important;
+    border-radius: 0 !important;
+    border-left: none !important;
+  }
+  #brain-panel.brain-panel-open {
+    right: 0 !important;
+  }
+
+  /* Hide pagination arrows */
   .right-page-arrow,
   .left-page-arrow,
   .page-indicator-container {
