@@ -1259,3 +1259,251 @@ h1, h2, h3 {
   }
 }
 [data-theme-mode="dark"] img[src="/assets/frappe/icons/desktop_icons/stylo-light/workspaces.svg"] { content: url("/assets/frappe/icons/desktop_icons/stylo-dark/workspaces.svg"); }
+
+/* ============================================================
+   MOBILE & RESPONSIVE — Workspace / Form / List / Table
+   Applies to all inner pages (not the desktop home, which has
+   its own @media block above).
+   ============================================================ */
+
+/* ── Sidebar header icon: size & fit ──────────────────────── */
+.sidebar-header .sidebar-item-icon .header-logo img.sidebar-app-icon {
+  width: 32px !important;
+  height: 32px !important;
+  object-fit: contain !important;
+  border-radius: 8px !important;
+  display: block !important;
+}
+
+@media screen and (max-width: 768px) {
+
+  /* ── Layout: stack sidebar above content, hide by default ── */
+  .layout-side-section {
+    display: none !important;
+  }
+  .layout-main-section-wrapper {
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+  .layout-main {
+    padding: 0 8px !important;
+  }
+  /* Full-width main when sidebar is hidden */
+  .page-body .layout-main-section {
+    padding: 0 !important;
+    border-radius: 0 !important;
+  }
+
+  /* ── Page header / breadcrumbs ──────────────────────────── */
+  .page-head {
+    padding: 6px 10px !important;
+  }
+  .page-head .breadcrumb-container {
+    display: none !important;
+  }
+  .page-title .title-text {
+    font-size: 16px !important;
+  }
+  .page-actions .btn {
+    padding: 5px 10px !important;
+    font-size: 12px !important;
+  }
+  /* Stack action buttons that overflow */
+  .page-head .page-actions {
+    flex-wrap: wrap !important;
+    gap: 4px !important;
+  }
+  /* Collapse extra action buttons to dropdown on mobile */
+  .page-head .custom-btn-group {
+    flex-wrap: wrap !important;
+  }
+
+  /* ── Workspace home page ─────────────────────────────────── */
+  [data-page-route="Workspaces"] .layout-side-section {
+    display: block !important;
+    width: 100% !important;
+    border-right: none !important;
+    border-bottom: 1px solid var(--border-color) !important;
+    max-height: 56px !important;
+    overflow: hidden !important;
+    transition: max-height 0.3s ease !important;
+  }
+  [data-page-route="Workspaces"] .layout-side-section.expanded {
+    max-height: 80vh !important;
+    overflow-y: auto !important;
+  }
+  [data-page-route="Workspaces"] .layout-main-section-wrapper {
+    width: 100% !important;
+  }
+  [data-page-route="Workspaces"] .page-body {
+    flex-direction: column !important;
+  }
+
+  /* ── Forms ──────────────────────────────────────────────── */
+  /* Single-column form layout */
+  .form-layout .section-body .form-column {
+    width: 100% !important;
+    max-width: 100% !important;
+    flex: 0 0 100% !important;
+    padding: 0 !important;
+  }
+  .form-layout .section-body {
+    flex-wrap: wrap !important;
+  }
+  .form-layout .form-page {
+    padding: 8px !important;
+  }
+  /* Full-width controls */
+  .frappe-control {
+    width: 100% !important;
+  }
+  /* Reduce label size */
+  .frappe-control label.control-label {
+    font-size: 11px !important;
+  }
+  /* Form actions bar */
+  .form-footer {
+    padding: 8px !important;
+  }
+  .form-footer .after-save {
+    flex-wrap: wrap !important;
+    gap: 4px !important;
+  }
+  /* Sidebar inside form (attachments, connections etc.) */
+  .form-sidebar {
+    display: none !important;
+  }
+
+  /* ── Lists ──────────────────────────────────────────────── */
+  .list-row-container {
+    overflow-x: auto !important;
+  }
+  .frappe-list .list-row {
+    min-width: 320px !important;
+  }
+  /* Compact list header */
+  .list-header-bar {
+    flex-wrap: wrap !important;
+    gap: 4px !important;
+    padding: 6px 8px !important;
+  }
+  .list-header-bar .search-bar {
+    width: 100% !important;
+    order: -1 !important;
+  }
+  /* Hide non-essential list columns on mobile */
+  .list-row .list-subject-col {
+    min-width: 160px !important;
+  }
+  /* Filter bar wraps */
+  .filter-section .filter-tag {
+    max-width: 120px !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    white-space: nowrap !important;
+  }
+
+  /* ── Data tables (Grid / Report) ────────────────────────── */
+  .datatable-wrapper,
+  .frappe-datatable,
+  .dt-scrollable {
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+  }
+  /* Prevent the table from shrinking columns below readable width */
+  .datatable .dt-cell {
+    min-width: 80px !important;
+  }
+  /* Report builder tables */
+  .report-wrapper {
+    overflow-x: auto !important;
+  }
+  .report-wrapper table {
+    min-width: 600px !important;
+  }
+
+  /* ── Child tables in forms ──────────────────────────────── */
+  .form-grid {
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+  }
+  .form-grid .grid-heading-row,
+  .form-grid .grid-body {
+    min-width: 500px !important;
+  }
+
+  /* ── Dialog / Modal ─────────────────────────────────────── */
+  .modal-dialog {
+    margin: 8px !important;
+    max-width: calc(100vw - 16px) !important;
+  }
+  .modal-body {
+    padding: 12px !important;
+    max-height: 70vh !important;
+    overflow-y: auto !important;
+  }
+  /* Dialog form columns → single column */
+  .modal .form-column {
+    width: 100% !important;
+    flex: 0 0 100% !important;
+  }
+
+  /* ── Quick Entry / Slide-in forms ──────────────────────── */
+  .quick-entry-container {
+    width: 100vw !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    border-radius: 16px 16px 0 0 !important;
+  }
+
+  /* ── Navbar ─────────────────────────────────────────────── */
+  .navbar .navbar-nav.d-none.d-sm-flex {
+    display: none !important;
+  }
+  /* Ensure search is accessible */
+  .navbar .form-control.search-widget {
+    font-size: 14px !important;
+  }
+
+  /* ── Dashboard ──────────────────────────────────────────── */
+  .dashboard-container .dashboard-chart-wrapper {
+    width: 100% !important;
+    flex: 0 0 100% !important;
+  }
+
+  /* ── Prevent global horizontal scroll ──────────────────── */
+  body {
+    overflow-x: hidden !important;
+  }
+  .page-container,
+  .page-body,
+  .layout-main-section-wrapper {
+    overflow-x: hidden !important;
+    max-width: 100vw !important;
+  }
+}
+
+/* ── Tablet (769px – 1024px) ─────────────────────────────── */
+@media screen and (min-width: 769px) and (max-width: 1024px) {
+  /* Narrow sidebar */
+  .layout-side-section {
+    min-width: 200px !important;
+    max-width: 220px !important;
+  }
+  /* Two-column forms instead of three */
+  .form-layout .section-body .form-column.col-sm-4 {
+    flex: 0 0 50% !important;
+    max-width: 50% !important;
+  }
+  /* Tables scroll on tablet too */
+  .datatable-wrapper,
+  .form-grid {
+    overflow-x: auto !important;
+  }
+  /* Dashboard 2-up cards */
+  .dashboard-container .dashboard-chart-wrapper {
+    width: calc(50% - 12px) !important;
+    flex: 0 0 calc(50% - 12px) !important;
+  }
+}
