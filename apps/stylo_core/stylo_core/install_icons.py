@@ -291,14 +291,17 @@ def run():
         rows = frappe.db.get_all(
             "Desktop Icon",
             filters={"label": label},
-            fields=["name", "logo_url", "icon_image"],
+            fields=["name", "logo_url", "icon_image", "icon"],
         )
         for row in rows:
-            # Always force-set logo_url and clear icon_image (SVG data overrides PNG logo)
-            frappe.db.set_value("Desktop Icon", row.name, {
+            updates = {
                 "logo_url":   url,
                 "icon_image": "",
-            }, update_modified=False)
+            }
+            # If icon is NULL the desk won't render logo_url — set a fallback icon name
+            if not row.get("icon"):
+                updates["icon"] = icon_file.split("/")[-1]  # use filename as icon slug
+            frappe.db.set_value("Desktop Icon", row.name, updates, update_modified=False)
             updated += 1
 
     # ── Step 4: Fix icons that need explicit workspace link / visibility ──
