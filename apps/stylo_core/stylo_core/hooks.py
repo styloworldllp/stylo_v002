@@ -27,6 +27,7 @@ app_logo_url = "/assets/stylo_core/images/stylo-logo-light.png"
 app_include_js = [
     "/assets/stylo_core/js/stylo_overrides.js",
     "/assets/stylo_core/js/license_lock.js",
+    "/assets/stylo_core/js/stylo_mobile_nav.js",
 ]
 app_include_css = [
     "/assets/stylo_core/css/stylo_theme.css",

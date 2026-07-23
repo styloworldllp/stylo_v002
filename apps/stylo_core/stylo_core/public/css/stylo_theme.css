@@ -1270,34 +1270,9 @@ h1, h2, h3 {
   }
   #page-desktop .icon-subtitle { display: none !important; }
 
-  /* ── brAIn edge tab → small FAB circle at bottom-right ── */
-  #brain-bubble {
-    width: 52px !important;
-    height: 52px !important;
-    border-radius: 50% !important;
-    right: 16px !important;
-    bottom: 24px !important;
-    top: auto !important;
-    transform: none !important;
-    box-shadow: 0 4px 20px rgba(15, 191, 127, 0.45) !important;
-    gap: 0 !important;
-  }
-  /* Hide text label — only show the icon */
-  #brain-bubble .brain-tab-label {
-    display: none !important;
-  }
-  #brain-bubble .brain-tab-icon {
-    width: 24px !important;
-    height: 24px !important;
-  }
-  /* Reposition the status pulse dot */
-  #brain-bubble .brain-pulse {
-    top: 4px !important;
-    right: 4px !important;
-    width: 10px !important;
-    height: 10px !important;
-  }
-  /* brAIn panel: full-screen slide-up on mobile */
+  /* brAIn edge tab — hidden on mobile (bottom nav handles it) */
+  #brain-bubble { display: none !important; }
+  /* brAIn panel: full-screen on mobile */
   #brain-panel {
     width: 100vw !important;
     right: -100vw !important;
