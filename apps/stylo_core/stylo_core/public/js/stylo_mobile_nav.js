@@ -324,35 +324,45 @@
 		setInterval(checkBadge, 10000);
 	}
 
-	function init() {
-		// Only run on the desktop home page
-		if (!document.getElementById("page-desktop")) return;
-		injectStyles();
-		if (isMobile()) buildNav();
+	function isDesktopPage() {
+		const p = document.getElementById("page-desktop");
+		return p && p.style.display !== "none" && !p.classList.contains("hidden");
 	}
 
-	// Run on page load and when Frappe navigates
+	function updateActiveState() {
+		const homeBtn = document.getElementById("sbn-home");
+		if (!homeBtn) return;
+		homeBtn.classList.toggle("active", isDesktopPage());
+	}
+
+	function init() {
+		injectStyles();
+		if (!isMobile()) return;
+		buildNav();       // builds only if not already built
+		updateActiveState();
+	}
+
+	// Fire on every Frappe page navigation
 	$(document).on("page-change", function () {
-		// Remove old nav when leaving desktop page
-		if (!document.getElementById("page-desktop")) {
-			const nav = document.getElementById("stylo-bottom-nav");
-			if (nav) nav.remove();
-			return;
-		}
-		init();
-	});
-
-	// Also run on initial load
-	$(document).ready(function () {
-		setTimeout(init, 300);
-	});
-
-	// Re-check on resize
-	window.addEventListener("resize", () => {
-		if (!document.getElementById("page-desktop")) return;
-		if (isMobile() && !document.getElementById("stylo-bottom-nav")) {
+		if (!isMobile()) return;
+		// Ensure nav exists on all pages
+		if (!document.getElementById("stylo-bottom-nav")) {
 			injectStyles();
 			buildNav();
+		}
+		updateActiveState();
+	});
+
+	// Initial load
+	$(document).ready(function () {
+		// Frappe may not have rendered yet — wait a tick
+		setTimeout(init, 400);
+	});
+
+	// Handle browser resize (phone rotation etc.)
+	window.addEventListener("resize", () => {
+		if (isMobile() && !document.getElementById("stylo-bottom-nav")) {
+			init();
 		} else if (!isMobile()) {
 			const nav = document.getElementById("stylo-bottom-nav");
 			if (nav) nav.remove();
