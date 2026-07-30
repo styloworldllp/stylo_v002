@@ -1,0 +1,16 @@
+{
+ "creation": "2026-07-30 00:00:00.000000",
+ "doctype": "Page",
+ "modified": "2026-07-30 00:00:00.000000",
+ "module": "Stylo Core",
+ "name": "mobile-access",
+ "page_name": "mobile-access",
+ "restrict_to_domain": "",
+ "roles": [
+  {
+   "role": "System Manager"
+  }
+ ],
+ "standard": "Yes",
+ "title": "Mobile App Access"
+}

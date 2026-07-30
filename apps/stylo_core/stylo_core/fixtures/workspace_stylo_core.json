@@ -1,0 +1,26 @@
+[
+ {
+  "doctype": "Workspace",
+  "name": "Stylo Core",
+  "title": "Stylo Core",
+  "module": "Stylo Core",
+  "public": 1,
+  "for_user": "",
+  "icon": "setting",
+  "indicator_color": "green",
+  "sequence_id": 1,
+  "links": [
+   {
+    "type": "Page",
+    "label": "Mobile App Access",
+    "link_to": "mobile-access",
+    "description": "Manage which users can access the Stylo mobile app"
+   },
+   {
+    "type": "DocType",
+    "label": "User",
+    "link_to": "User"
+   }
+  ]
+ }
+]

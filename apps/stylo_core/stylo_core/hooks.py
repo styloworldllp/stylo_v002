@@ -47,6 +47,7 @@ after_migrate = ["stylo_core.install_icons.run"]
 # Fixtures — exported/imported with bench import-fixtures
 fixtures = [
     {"dt": "Role", "filters": [["role_name", "=", "Mobile App User"]]},
+    {"dt": "Workspace", "filters": [["name", "=", "Stylo Core"]]},
 ]
 
 # include js, css files in header of web template
