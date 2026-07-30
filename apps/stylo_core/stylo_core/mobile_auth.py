@@ -253,6 +253,32 @@ def get_home_stats():
     return stats
 
 
+# ─── WebView one-time token auth ──────────────────────────────────────────────
+
+@frappe.whitelist()
+def get_webview_token():
+    """Generate a 60-second one-time token so the WebView can auto-login."""
+    user = frappe.session.user
+    if not user or user == "Guest":
+        frappe.throw("Not logged in", frappe.AuthenticationError)
+    token = frappe.generate_hash(length=32)
+    frappe.cache().set_value(f"sty_wv_{token}", user, expires_in_sec=60)
+    return {"token": token}
+
+
+@frappe.whitelist(allow_guest=True)
+def webview_auth(token, redirect="/app/desk"):
+    """Consume a one-time token, log in the user, and redirect to the target page."""
+    user = frappe.cache().get_value(f"sty_wv_{token}")
+    if not user:
+        frappe.throw("Token invalid or expired. Please reopen from the Stylo app.",
+                     frappe.AuthenticationError)
+    frappe.cache().delete_key(f"sty_wv_{token}")
+    frappe.local.login_manager.login_as(user)
+    frappe.local.response["type"] = "redirect"
+    frappe.local.response["location"] = redirect
+
+
 # ─── Admin: list mobile users ──────────────────────────────────────────────────
 
 @frappe.whitelist()
