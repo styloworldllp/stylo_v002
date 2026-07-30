@@ -11,15 +11,19 @@
   "sequence_id": 1,
   "links": [
    {
+    "name": "stylo-core-link-mobile-access",
     "type": "Page",
     "label": "Mobile App Access",
     "link_to": "mobile-access",
-    "description": "Manage which users can access the Stylo mobile app"
+    "description": "Manage which users can access the Stylo mobile app",
+    "idx": 1
    },
    {
+    "name": "stylo-core-link-user",
     "type": "DocType",
     "label": "User",
-    "link_to": "User"
+    "link_to": "User",
+    "idx": 2
    }
   ]
  }
