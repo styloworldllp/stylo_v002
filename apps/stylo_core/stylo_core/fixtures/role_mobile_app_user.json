@@ -1,0 +1,11 @@
+[
+  {
+    "doctype": "Role",
+    "role_name": "Mobile App User",
+    "desk_access": 0,
+    "disabled": 0,
+    "home_page": "",
+    "two_factor_auth": 0,
+    "restrict_to_domain": ""
+  }
+]

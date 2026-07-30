@@ -44,6 +44,11 @@ on_login = ["stylo_core.user_license.check_user_license_on_login"]
 # Re-apply Stylo icons and white-label after every migrate
 after_migrate = ["stylo_core.install_icons.run"]
 
+# Fixtures — exported/imported with bench import-fixtures
+fixtures = [
+    {"dt": "Role", "filters": [["role_name", "=", "Mobile App User"]]},
+]
+
 # include js, css files in header of web template
 # web_include_css = "/assets/stylo_core/css/stylo_core.css"
 # web_include_js = "/assets/stylo_core/js/stylo_core.js"
