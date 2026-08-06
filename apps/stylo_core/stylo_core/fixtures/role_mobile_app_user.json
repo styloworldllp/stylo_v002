@@ -1,6 +1,7 @@
 [
   {
     "doctype": "Role",
+    "name": "Mobile App User",
     "role_name": "Mobile App User",
     "desk_access": 0,
     "disabled": 0,
