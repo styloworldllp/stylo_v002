@@ -45,9 +45,12 @@ on_login = ["stylo_core.user_license.check_user_license_on_login"]
 after_migrate = ["stylo_core.install_icons.run"]
 
 # Fixtures — exported/imported with bench import-fixtures
+# Note: Workspace must NOT be shipped as a fixture — Frappe's post-migrate orphan
+# cleanup only protects workspaces defined at <app>/<module>/workspace/<name>/<name>.json,
+# so a fixture-defined public workspace gets deleted again in the same migrate run.
+# See stylo_core/stylo_core/workspace/stylo_core/stylo_core.json instead.
 fixtures = [
     {"dt": "Role", "filters": [["role_name", "=", "Mobile App User"]]},
-    {"dt": "Workspace", "filters": [["name", "=", "Stylo Core"]]},
 ]
 
 # include js, css files in header of web template
