@@ -1,4 +1,0 @@
-stylo_migrator
-crm
-insights
-brain
