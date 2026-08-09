@@ -111,7 +111,7 @@ stylo.ui.form.on('${doctype}', {
 });
 
 const SAMPLE_HTML = `<h3>Client Script Help</h3>
-<p>Client Scripts are executed on the client-side (i.e. in Forms). Use <code>stylo</code> (or <code>frappe</code>) as the global namespace. Here are some examples:</p>
+<p>Client Scripts are executed on the client-side (i.e. in Forms). Use <code>stylo</code> as the global namespace. Here are some examples:</p>
 <pre><code class="language-javascript">
 // fetch local_tax_no on selection of customer
 // cur_frm.add_fetch(link_field, source_fieldname, target_fieldname);

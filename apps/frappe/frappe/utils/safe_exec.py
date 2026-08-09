@@ -301,6 +301,10 @@ def get_safe_globals():
 	if frappe.response:
 		out.frappe.response = frappe.response
 
+	# Stylo rebrand: alias `stylo` to the same namespace as `frappe` so Server Scripts
+	# never need to reference "frappe" directly.
+	out.stylo = out.frappe
+
 	out.update(safe_globals)
 
 	# default writer allows write access
