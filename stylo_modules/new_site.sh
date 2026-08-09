@@ -24,6 +24,14 @@
 
 set -e
 
+# Requires bash 4+ (associative arrays). macOS ships bash 3.2 by default —
+# run this with a modern bash (e.g. `brew install bash` and use /opt/homebrew/bin/bash).
+if [ "${BASH_VERSINFO:-0}" -lt 4 ]; then
+  echo "ERROR: this script needs bash 4+ (found ${BASH_VERSION:-unknown})." >&2
+  echo "  On macOS: brew install bash && /opt/homebrew/bin/bash $0 \"\$@\"" >&2
+  exit 1
+fi
+
 # ---------- Server config ----------
 declare -A SERVER_USER=( [demo]="stylo" [stangroup]="frappe" )
 declare -A SERVER_IP=( [demo]="57.155.90.17" [stangroup]="104.43.114.1" )
@@ -75,7 +83,7 @@ sshpass -p "$SSH_PASS" ssh -o StrictHostKeyChecking=no "$USER@$IP" \
     --db-root-username root \
     --db-root-password '$DB_ROOT_PASS' \
     --admin-password '$ADMIN_PASS' \
-    --mariadb-user-host-login-scope='%'"
+    --mariadb-user-host-login-scope='%'" < /dev/null
 
 # ---------- Step 2: Install modules ----------
 echo ""
@@ -98,7 +106,7 @@ for MODULE in "${MODULES[@]}"; do
     [ -z "$APP" ] && continue
     echo "  Installing app: $APP"
     sshpass -p "$SSH_PASS" ssh -o StrictHostKeyChecking=no "$USER@$IP" \
-      "cd $BENCH && bench --site '$SITE' install-app '$APP'"
+      "cd $BENCH && bench --site '$SITE' install-app '$APP'" < /dev/null
   done < "$MODULE_DIR/apps.txt"
 
   # Run post_install on the server by copying and executing
@@ -108,14 +116,14 @@ for MODULE in "${MODULES[@]}"; do
   sshpass -p "$SSH_PASS" ssh -o StrictHostKeyChecking=no "$USER@$IP" \
     "chmod +x /tmp/stylo_post_install_$MODULE.sh && \
      /tmp/stylo_post_install_$MODULE.sh '$SITE' '$BENCH' && \
-     rm /tmp/stylo_post_install_$MODULE.sh"
+     rm /tmp/stylo_post_install_$MODULE.sh" < /dev/null
 done
 
 # ---------- Step 3: Restart service ----------
 echo ""
 echo ">>> [3/3] Restarting web service: $SERVICE ..."
 sshpass -p "$SSH_PASS" ssh -o StrictHostKeyChecking=no "$USER@$IP" \
-  "sudo systemctl restart $SERVICE"
+  "sudo systemctl restart $SERVICE" < /dev/null
 
 echo ""
 echo "============================================================"

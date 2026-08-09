@@ -13,6 +13,14 @@
 
 set -e
 
+# Requires bash 4+ (associative arrays). macOS ships bash 3.2 by default —
+# run this with a modern bash (e.g. `brew install bash` and use /opt/homebrew/bin/bash).
+if [ "${BASH_VERSINFO:-0}" -lt 4 ]; then
+  echo "ERROR: this script needs bash 4+ (found ${BASH_VERSION:-unknown})." >&2
+  echo "  On macOS: brew install bash && /opt/homebrew/bin/bash $0 \"\$@\"" >&2
+  exit 1
+fi
+
 # ---------- Server config ----------
 declare -A SERVER_USER=( [demo]="stylo" [stangroup]="frappe" )
 declare -A SERVER_IP=( [demo]="57.155.90.17" [stangroup]="104.43.114.1" )
@@ -63,7 +71,7 @@ while IFS= read -r APP || [ -n "$APP" ]; do
   [ -z "$APP" ] && continue
   echo "  Installing: $APP"
   sshpass -p "$SSH_PASS" ssh -o StrictHostKeyChecking=no "$USER@$IP" \
-    "cd $BENCH && bench --site '$SITE' install-app '$APP'"
+    "cd $BENCH && bench --site '$SITE' install-app '$APP'" < /dev/null
 done < "$MODULE_DIR/apps.txt"
 
 # ---------- Post-install ----------
@@ -74,13 +82,13 @@ sshpass -p "$SSH_PASS" scp -o StrictHostKeyChecking=no \
 sshpass -p "$SSH_PASS" ssh -o StrictHostKeyChecking=no "$USER@$IP" \
   "chmod +x /tmp/stylo_post_install_$MODULE.sh && \
    /tmp/stylo_post_install_$MODULE.sh '$SITE' '$BENCH' && \
-   rm /tmp/stylo_post_install_$MODULE.sh"
+   rm /tmp/stylo_post_install_$MODULE.sh" < /dev/null
 
 # ---------- Restart ----------
 echo ""
 echo ">>> Restarting $SERVICE ..."
 sshpass -p "$SSH_PASS" ssh -o StrictHostKeyChecking=no "$USER@$IP" \
-  "sudo systemctl restart $SERVICE"
+  "sudo systemctl restart $SERVICE" < /dev/null
 
 echo ""
 echo "============================================================"
