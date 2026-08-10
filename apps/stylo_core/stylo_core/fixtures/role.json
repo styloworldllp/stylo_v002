@@ -1,0 +1,32 @@
+[
+  {
+    "doctype": "Role",
+    "name": "Mobile App User",
+    "role_name": "Mobile App User",
+    "desk_access": 0,
+    "disabled": 0,
+    "home_page": "",
+    "two_factor_auth": 0,
+    "restrict_to_domain": ""
+  },
+  {
+    "doctype": "Role",
+    "name": "Stylo Consultant",
+    "role_name": "Stylo Consultant",
+    "desk_access": 1,
+    "disabled": 0,
+    "home_page": "",
+    "two_factor_auth": 0,
+    "restrict_to_domain": ""
+  },
+  {
+    "doctype": "Role",
+    "name": "Stylo License Administrator",
+    "role_name": "Stylo License Administrator",
+    "desk_access": 1,
+    "disabled": 0,
+    "home_page": "",
+    "two_factor_auth": 0,
+    "restrict_to_domain": ""
+  }
+]

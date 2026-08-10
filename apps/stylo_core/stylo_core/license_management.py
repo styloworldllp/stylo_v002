@@ -30,12 +30,12 @@ def release_license(license_request_name: str):
 	start = today()
 	end = add_months(start, int(req.duration_months or 12))
 
-	# Build licensed_modules from base + all addons (store keys only, not display names)
-	all_modules = [req.base_module] if req.base_module else []
+	# Entitled modules from base + all addons (base_module is retained on the Request for
+	# the commercial quoting flow, even though it no longer exists on Stylo License itself)
+	module_keys = [req.base_module] if req.base_module else []
 	for addon in req.addon_modules or []:
-		if addon.module_key and addon.module_key not in all_modules:
-			all_modules.append(addon.module_key)
-	licensed_modules_str = ",".join(all_modules)
+		if addon.module_key and addon.module_key not in module_keys:
+			module_keys.append(addon.module_key)
 
 	lic = frappe.new_doc("Stylo License")
 	lic.license_key = str(uuid.uuid4())
@@ -44,8 +44,7 @@ def release_license(license_request_name: str):
 	lic.client_contact_email = req.client_contact_email or ""
 	lic.consultant = req.consultant
 	lic.license_request = req.name
-	lic.base_module = req.base_module or ""
-	lic.licensed_modules = licensed_modules_str
+	lic.entitled_modules = [{"module_key": k} for k in module_keys]
 	lic.user_limit = int(req.num_users or 0)
 	lic.start_date = start
 	lic.end_date = end
@@ -60,6 +59,51 @@ def release_license(license_request_name: str):
 	_send_license_confirmation(lic, req)
 
 	return {"license": lic.name, "key": lic.license_key}
+
+
+@frappe.whitelist()
+def release_demo_license(site_request: str):
+	"""Command Center action: declare a site Demo/POC — unlimited access, no payment, no
+	Stylo License Request involved. Demo → Active later is purely a status flip by a human
+	(see Stylo License Architecture V1.0 — demo lifecycle), never a new record."""
+	if not any(
+		r in frappe.get_roles() for r in ("Command Center Super Admin", "Command Center Admin")
+	):
+		frappe.throw("Not permitted", frappe.PermissionError)
+
+	# Stylo module install keys (stylo_modules/) -> commercial license keys (license_map.py).
+	# stylo_core/stylo_brain/stylo_command_center are never commercial entitlements (core is
+	# mandatory infra, brAIn is complimentary, command center is internal-only); stylo_reco
+	# has no separate license key (bundled free into bms — see license_map.py).
+	INSTALL_TO_LICENSE_KEY = {
+		"stylo_bms": "bms",
+		"stylo_hr": "hr",
+		"stylo_crm": "crm",
+		"stylo_analytics": "insights",
+		"stylo_lms": "lms",
+		"stylo_lending": "lending",
+		"stylo_desk": "desk",
+	}
+
+	sr = frappe.get_doc("Site Request", site_request)
+	module_keys = [
+		INSTALL_TO_LICENSE_KEY[m.module_key]
+		for m in (sr.requested_modules or [])
+		if m.module_key in INSTALL_TO_LICENSE_KEY
+	]
+
+	lic = frappe.new_doc("Stylo License")
+	lic.license_key = str(uuid.uuid4())
+	lic.site = sr.sitename
+	lic.client_name = sr.client_name
+	lic.client_contact_email = sr.client_contact_email or ""
+	lic.entitled_modules = [{"module_key": k} for k in module_keys if k]
+	lic.user_limit = 9999
+	lic.status = "Demo"
+	lic.insert(ignore_permissions=True)
+	frappe.db.commit()
+
+	return {"license": lic.name}
 
 
 # ── Add module to existing site ────────────────────────────────────────────
@@ -78,18 +122,12 @@ def release_addon(addon_request_name: str):
 
 	lic = frappe.get_doc("Stylo License", req.license)
 
-	# 1. Add module to licensed_modules
-	existing = [m.strip() for m in (lic.licensed_modules or "").split(",") if m.strip()]
+	# 1. Add module to entitled_modules (no-op if already entitled)
+	existing = [m.module_key for m in (lic.entitled_modules or [])]
 	if req.module_to_add not in existing:
-		existing.append(req.module_to_add)
-	lic.licensed_modules = ",".join(existing)
+		lic.append("entitled_modules", {"module_key": req.module_to_add})
 
-	# 2. Handle brAIn sub-limit if adding brain
-	if req.module_to_add == "brain":
-		brain_users = int(lic.user_limit or 0) + int(req.user_count_change or 0)
-		lic.brain_user_limit = brain_users
-
-	# 3. Increase user limit if requested
+	# 2. Increase user limit if requested
 	if int(req.user_count_change or 0) > 0:
 		lic.user_limit = int(lic.user_limit or 0) + int(req.user_count_change)
 
@@ -103,10 +141,17 @@ def release_addon(addon_request_name: str):
 
 	return {
 		"success": True,
-		"licensed_modules": lic.licensed_modules,
+		"entitled_modules": [m.module_key for m in (lic.entitled_modules or [])],
 		"user_limit": lic.user_limit,
-		"brain_user_limit": lic.brain_user_limit,
 	}
+
+
+def _entitled_modules_display(lic) -> str:
+	from stylo_core.license_map import MODULE_DISPLAY_NAMES
+
+	return ", ".join(
+		MODULE_DISPLAY_NAMES.get(m.module_key, m.module_key) for m in (lic.entitled_modules or [])
+	) or "—"
 
 
 def _send_addon_confirmation(lic, req):
@@ -123,7 +168,7 @@ def _send_addon_confirmation(lic, req):
 <p>The module <b>{module_name}</b> has been added to your Stylo license.</p>
 <table>
 <tr><td><b>Site:</b></td><td>{lic.site}</td></tr>
-<tr><td><b>All Licensed Modules:</b></td><td>{lic.licensed_modules}</td></tr>
+<tr><td><b>All Licensed Modules:</b></td><td>{_entitled_modules_display(lic)}</td></tr>
 <tr><td><b>User Limit:</b></td><td>{lic.user_limit}</td></tr>
 </table>
 <p>Users on {lic.site} will have access to {module_name} on their next login.</p>
@@ -145,7 +190,7 @@ def _send_license_confirmation(lic, req):
 <table>
 <tr><td><b>Client:</b></td><td>{lic.client_name}</td></tr>
 <tr><td><b>Site:</b></td><td>{lic.site or 'TBD'}</td></tr>
-<tr><td><b>Modules:</b></td><td>{lic.licensed_modules}</td></tr>
+<tr><td><b>Modules:</b></td><td>{_entitled_modules_display(lic)}</td></tr>
 <tr><td><b>Users:</b></td><td>{lic.user_limit} (total slots)</td></tr>
 <tr><td><b>Valid until:</b></td><td>{lic.end_date}</td></tr>
 <tr><td><b>License key:</b></td><td><code>{lic.license_key}</code></td></tr>
@@ -202,7 +247,7 @@ def _send_renewal_reminders():
 		"Stylo License",
 		filters={"status": ["in", ["Active", "Grace Period"]]},
 		fields=["name", "client_name", "site", "consultant", "client_contact_email",
-		        "end_date", "grace_end_date", "module_pack", "user_limit", "status"],
+		        "end_date", "grace_end_date", "user_limit", "status"],
 	)
 
 	for lic in licenses:

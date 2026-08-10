@@ -6,12 +6,12 @@ Client sites call:
 
 Returns:
   {
-    "status": "active" | "grace_period" | "expired" | "suspended" | "not_found",
+    "status": "demo" | "active" | "grace_period" | "expired" | "suspended" | "terminated" | "not_found",
     "user_limit": N,
-    "end_date": "YYYY-MM-DD",
-    "grace_end_date": "YYYY-MM-DD",
-    "days_remaining": N,
-    "modules": "StyloBMS, StyloHR"
+    "end_date": "YYYY-MM-DD" | None,
+    "grace_end_date": "YYYY-MM-DD" | None,
+    "days_remaining": N | None,
+    "modules": ["bms", "hr"]
   }
 """
 
@@ -35,10 +35,10 @@ def check(site: str = ""):
 	return {
 		"status": computed_status,
 		"user_limit": doc.user_limit or 0,
-		"end_date": str(doc.end_date),
-		"grace_end_date": str(doc.grace_end_date),
-		"days_remaining": max(0, date_diff(doc.end_date, today())),
-		"modules": doc.modules or "",
+		"end_date": str(doc.end_date) if doc.end_date else None,
+		"grace_end_date": str(doc.grace_end_date) if doc.grace_end_date else None,
+		"days_remaining": max(0, date_diff(doc.end_date, today())) if doc.end_date else None,
+		"modules": [m.module_key for m in (doc.entitled_modules or [])],
 	}
 
 
@@ -46,7 +46,7 @@ def _get_active_license(site: str):
 	"""Return the most recent non-expired license for the site, or None."""
 	licenses = frappe.get_all(
 		"Stylo License",
-		filters={"site": site, "status": ["in", ["Active", "Grace Period", "Suspended"]]},
+		filters={"site": site, "status": ["in", ["Demo", "Active", "Grace Period", "Suspended"]]},
 		fields=["name", "status", "end_date"],
 		order_by="end_date desc",
 		limit=1,

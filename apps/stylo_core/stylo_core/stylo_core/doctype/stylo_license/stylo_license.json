@@ -8,7 +8,7 @@
   "column_break_1",
   "consultant", "license_request",
   "section_break_modules",
-  "base_module", "licensed_modules", "user_limit", "brain_user_limit",
+  "entitled_modules", "user_limit",
   "section_break_dates",
   "start_date", "end_date", "grace_end_date",
   "column_break_2",
@@ -64,33 +64,18 @@
    "label": "Licensed Modules"
   },
   {
-   "fieldname": "base_module",
-   "fieldtype": "Select",
-   "in_list_view": 1,
-   "label": "Base Module",
-   "options": "bms\nhr\ncrm\nlms\ndesk\nbrain\ninsights"
-  },
-  {
-   "fieldname": "licensed_modules",
-   "fieldtype": "Small Text",
-   "in_list_view": 1,
-   "label": "Licensed Modules (keys)",
-   "description": "Comma-separated module keys e.g. bms,hr,crm — written to site_config.json on release",
-   "read_only": 1
+   "fieldname": "entitled_modules",
+   "fieldtype": "Table",
+   "label": "Entitled Modules",
+   "options": "Stylo License Module",
+   "description": "Commercially licensed modules for this site. Installing an app does not grant entitlement — this table is the source of truth."
   },
   {
    "fieldname": "user_limit",
    "fieldtype": "Int",
    "in_list_view": 1,
    "label": "User Limit",
-   "description": "Total users (active + inactive both count)"
-  },
-  {
-   "fieldname": "brain_user_limit",
-   "fieldtype": "Int",
-   "label": "brAIn User Limit",
-   "default": "0",
-   "description": "How many users can access brAIn (0 = brAIn not licensed). Must be ≤ user_limit."
+   "description": "Total licensed seats (active + inactive both count). @stylo.io internal users are excluded."
   },
   {
    "fieldname": "section_break_dates",
@@ -124,7 +109,7 @@
    "fieldtype": "Select",
    "in_list_view": 1,
    "label": "Status",
-   "options": "Active\nGrace Period\nExpired\nSuspended",
+   "options": "Demo\nActive\nGrace Period\nSuspended\nExpired\nTerminated",
    "default": "Active",
    "reqd": 1
   }
@@ -154,6 +139,11 @@
    "read": 1,
    "role": "Stylo Consultant",
    "if_owner": 1
+  },
+  {
+   "read": 1,
+   "report": 1,
+   "role": "Stylo License Administrator"
   },
   {
    "create": 1,

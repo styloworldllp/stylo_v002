@@ -10,7 +10,7 @@
    "fieldtype": "Select",
    "in_list_view": 1,
    "label": "Module Key",
-   "options": "bms\nmanufacturing\nprojects\ngst\nhr\ncrm\nlms\ndesk\nbrain\ninsights",
+   "options": "bms\nhr\ncrm\nlms\ndesk\ninsights\nlending",
    "reqd": 1
   },
   {
