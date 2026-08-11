@@ -11,6 +11,27 @@ import uuid
 
 import frappe
 from frappe.utils import add_days, add_months, date_diff, nowdate, today
+from frappe.utils.password import get_decrypted_password
+
+# Stylo module install keys (stylo_modules/) -> commercial license keys (license_map.py).
+# stylo_core/stylo_brain/stylo_command_center are never commercial entitlements (core is
+# mandatory infra, brAIn is complimentary, command center is internal-only); stylo_reco has
+# no separate license key (bundled free into bms — see license_map.py).
+INSTALL_TO_LICENSE_KEY = {
+	"stylo_bms": "bms",
+	"stylo_hr": "hr",
+	"stylo_crm": "crm",
+	"stylo_analytics": "insights",
+	"stylo_lms": "lms",
+	"stylo_lending": "lending",
+	"stylo_desk": "desk",
+}
+
+
+def _site_api_key(lic_name: str) -> str:
+	"""Decrypted site_api_key right after insert — always re-fetch rather than trust the
+	in-memory Document value, since Frappe may mask Password fields post-save."""
+	return get_decrypted_password("Stylo License", lic_name, "site_api_key", raise_exception=False)
 
 
 # ── Release license after payment confirmed ────────────────────────────────
@@ -58,7 +79,7 @@ def release_license(license_request_name: str):
 
 	_send_license_confirmation(lic, req)
 
-	return {"license": lic.name, "key": lic.license_key}
+	return {"license": lic.name, "key": lic.license_key, "site_api_key": _site_api_key(lic.name)}
 
 
 @frappe.whitelist()
@@ -70,20 +91,6 @@ def release_demo_license(site_request: str):
 		r in frappe.get_roles() for r in ("Command Center Super Admin", "Command Center Admin")
 	):
 		frappe.throw("Not permitted", frappe.PermissionError)
-
-	# Stylo module install keys (stylo_modules/) -> commercial license keys (license_map.py).
-	# stylo_core/stylo_brain/stylo_command_center are never commercial entitlements (core is
-	# mandatory infra, brAIn is complimentary, command center is internal-only); stylo_reco
-	# has no separate license key (bundled free into bms — see license_map.py).
-	INSTALL_TO_LICENSE_KEY = {
-		"stylo_bms": "bms",
-		"stylo_hr": "hr",
-		"stylo_crm": "crm",
-		"stylo_analytics": "insights",
-		"stylo_lms": "lms",
-		"stylo_lending": "lending",
-		"stylo_desk": "desk",
-	}
 
 	sr = frappe.get_doc("Site Request", site_request)
 	module_keys = [
@@ -103,7 +110,40 @@ def release_demo_license(site_request: str):
 	lic.insert(ignore_permissions=True)
 	frappe.db.commit()
 
-	return {"license": lic.name}
+	return {"license": lic.name, "site_api_key": _site_api_key(lic.name)}
+
+
+@frappe.whitelist()
+def import_existing_license(site: str, client_name: str, entitled_modules: list):
+	"""Command Center action: back-fill a Stylo License for a site that already existed
+	before Command Center could track it (e.g. demo.stylo.io, nhs.stylo.io). status=Active
+	with a generous default user_limit — a human tunes it down later; this just establishes
+	the record and the site_api_key needed to activate real login-time enforcement."""
+	if not any(
+		r in frappe.get_roles() for r in ("Command Center Super Admin", "Command Center Admin")
+	):
+		frappe.throw("Not permitted", frappe.PermissionError)
+
+	if frappe.db.exists("Stylo License", {"site": site, "status": ["!=", "Terminated"]}):
+		frappe.throw(f"An active Stylo License already exists for {site}")
+
+	start = today()
+	end = add_months(start, 12)
+
+	lic = frappe.new_doc("Stylo License")
+	lic.license_key = str(uuid.uuid4())
+	lic.site = site
+	lic.client_name = client_name
+	lic.entitled_modules = [{"module_key": k} for k in entitled_modules]
+	lic.user_limit = 9999
+	lic.start_date = start
+	lic.end_date = end
+	lic.grace_end_date = add_days(end, 30)
+	lic.status = "Active"
+	lic.insert(ignore_permissions=True)
+	frappe.db.commit()
+
+	return {"license": lic.name, "site_api_key": _site_api_key(lic.name)}
 
 
 # ── Add module to existing site ────────────────────────────────────────────

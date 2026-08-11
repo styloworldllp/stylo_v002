@@ -1,3 +1,5 @@
+import secrets
+
 import frappe
 from frappe.model.document import Document
 from frappe.utils import add_days, today, date_diff
@@ -7,6 +9,10 @@ class StyloLicense(Document):
 	def before_insert(self):
 		if not self.grace_end_date and self.end_date:
 			self.grace_end_date = add_days(self.end_date, 30)
+		if not self.site_api_key:
+			# Mirrors Server.agent_api_key's generation — the licensed site presents this
+			# when calling license_api.check() (see stylo_core/license_api.py).
+			self.site_api_key = secrets.token_hex(32)
 
 	def get_status(self):
 		"""Return current computed status. Demo and Terminated short-circuit the date-based

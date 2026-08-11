@@ -18,6 +18,11 @@ import requests
 
 # ── Environment ───────────────────────────────────────────────────────────────
 
+# STYLO_CLOUD_URL env var is a fallback only — env vars are process-wide on a shared bench
+# (every site on that box would get the same value, which happens to be fine since they all
+# point at the same Command Center), but per-site AUTH cannot be an env var, so the real
+# per-deployment config is site_config.json (`stylo_cloud_url`/`stylo_site_api_key`, pushed by
+# Command Center's deploy/import flows via `bench set-config`). See _get_cloud_url() below.
 STYLO_CLOUD_URL = os.environ.get("STYLO_CLOUD_URL", "")
 LICENSE_CACHE_KEY = "stylo:site_license_status"
 LICENSE_CACHE_TTL = 86400  # 24 hours
@@ -29,12 +34,20 @@ CACHE_KEY = "stylo:user_licenses"
 CACHE_TTL = 900  # 15 minutes
 
 
+def _get_cloud_url() -> str:
+	return frappe.conf.get("stylo_cloud_url") or STYLO_CLOUD_URL
+
+
+def _get_site_api_key() -> str:
+	return frappe.conf.get("stylo_site_api_key", "")
+
+
 # ── Helper: is this a demo / unconfigured site? ───────────────────────────────
 
 def _is_demo_or_unconfigured() -> bool:
 	try:
 		return bool(
-			not STYLO_CLOUD_URL
+			not _get_cloud_url()
 			or frappe.conf.get("is_demo")
 			or frappe.conf.get("skip_license_check")
 		)
@@ -74,8 +87,9 @@ def get_site_license_status() -> dict:
 
 	try:
 		resp = requests.get(
-			f"{STYLO_CLOUD_URL}/api/method/stylo_core.license_api.check",
+			f"{_get_cloud_url()}/api/method/stylo_core.license_api.check",
 			params={"site": frappe.local.site},
+			headers={"X-Site-Api-Key": _get_site_api_key()},
 			timeout=5,
 		)
 		if resp.ok:

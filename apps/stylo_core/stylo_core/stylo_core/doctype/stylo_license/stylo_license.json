@@ -4,7 +4,7 @@
  "doctype": "DocType",
  "engine": "InnoDB",
  "field_order": [
-  "license_key", "site", "client_name", "client_contact_email",
+  "license_key", "site_api_key", "site", "client_name", "client_contact_email",
   "column_break_1",
   "consultant", "license_request",
   "section_break_modules",
@@ -21,6 +21,13 @@
    "in_list_view": 1,
    "label": "License Key",
    "read_only": 1
+  },
+  {
+   "fieldname": "site_api_key",
+   "fieldtype": "Password",
+   "label": "Site API Key",
+   "read_only": 1,
+   "description": "Auto-generated. The licensed site presents this (X-Site-Api-Key header) when calling license_api.check — never shown/editable, only pushed to the site's own site_config.json at provisioning/import time."
   },
   {
    "fieldname": "site",
