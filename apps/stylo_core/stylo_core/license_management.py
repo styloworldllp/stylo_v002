@@ -65,7 +65,10 @@ def release_license(license_request_name: str):
 	lic.client_contact_email = req.client_contact_email or ""
 	lic.consultant = req.consultant
 	lic.license_request = req.name
-	lic.entitled_modules = [{"module_key": k} for k in module_keys]
+	# See import_existing_license's comment below: direct assignment to a Table field
+	# bypasses Document's dict-to-child-Document conversion (no __setattr__ override) and
+	# crashes on insert() the moment module_keys is non-empty.
+	lic.set("entitled_modules", [{"module_key": k} for k in module_keys])
 	lic.user_limit = int(req.num_users or 0)
 	lic.start_date = start
 	lic.end_date = end
@@ -104,7 +107,7 @@ def release_demo_license(site_request: str):
 	lic.site = sr.sitename
 	lic.client_name = sr.client_name
 	lic.client_contact_email = sr.client_contact_email or ""
-	lic.entitled_modules = [{"module_key": k} for k in module_keys if k]
+	lic.set("entitled_modules", [{"module_key": k} for k in module_keys if k])
 	lic.user_limit = 9999
 	lic.status = "Demo"
 	lic.insert(ignore_permissions=True)
@@ -134,7 +137,12 @@ def import_existing_license(site: str, client_name: str, entitled_modules: list)
 	lic.license_key = str(uuid.uuid4())
 	lic.site = site
 	lic.client_name = client_name
-	lic.entitled_modules = [{"module_key": k} for k in entitled_modules]
+	# Document has no __setattr__ override, so a plain `lic.entitled_modules = [...]`
+	# assignment bypasses the dict-to-child-Document conversion that `.set()`/`.append()`
+	# normally do — it stores raw dicts, and insert() later crashes on the first one with
+	# `'dict' object has no attribute 'is_new'`. Only ever worked before because every prior
+	# caller happened to pass an empty list.
+	lic.set("entitled_modules", [{"module_key": k} for k in entitled_modules])
 	lic.user_limit = 9999
 	lic.start_date = start
 	lic.end_date = end
