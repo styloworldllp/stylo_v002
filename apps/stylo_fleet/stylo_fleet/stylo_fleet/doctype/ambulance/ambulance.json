@@ -1,0 +1,348 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "autoname": "field:ambulance_id",
+ "creation": "2026-08-08 01:31:10.800788",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "identity_section",
+  "ambulance_id",
+  "vehicle_number",
+  "vehicle_type",
+  "column_break_amb_1",
+  "base_station",
+  "active",
+  "assignment_section",
+  "current_paramedic",
+  "column_break_amb_2",
+  "assignment_start",
+  "operational_section",
+  "operational_status",
+  "availability_status",
+  "availability_reason",
+  "column_break_amb_3",
+  "last_activity_at",
+  "kits_section",
+  "kit_capacity",
+  "available_kits",
+  "column_break_amb_4",
+  "minimum_operational_kits",
+  "refill_threshold",
+  "kit_status",
+  "readiness_section",
+  "cleanliness_status",
+  "column_break_amb_5",
+  "mechanical_status",
+  "location_section",
+  "latitude",
+  "longitude",
+  "column_break_amb_6",
+  "location_label",
+  "last_location_at",
+  "gps_status",
+  "current_shift",
+  "current_call_activity"
+ ],
+ "fields": [
+  {
+   "fieldname": "identity_section",
+   "fieldtype": "Section Break",
+   "label": "Identity"
+  },
+  {
+   "fieldname": "ambulance_id",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Ambulance ID",
+   "reqd": 1,
+   "unique": 1
+  },
+  {
+   "fieldname": "vehicle_number",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Vehicle Number",
+   "reqd": 1
+  },
+  {
+   "fieldname": "vehicle_type",
+   "fieldtype": "Data",
+   "label": "Vehicle Type"
+  },
+  {
+   "fieldname": "column_break_amb_1",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "base_station",
+   "fieldtype": "Link",
+   "label": "Base Station",
+   "options": "Ambulance Station"
+  },
+  {
+   "default": "1",
+   "fieldname": "active",
+   "fieldtype": "Check",
+   "label": "Active"
+  },
+  {
+   "fieldname": "assignment_section",
+   "fieldtype": "Section Break",
+   "label": "Assignment"
+  },
+  {
+   "fieldname": "current_paramedic",
+   "fieldtype": "Link",
+   "label": "Current Paramedic",
+   "options": "Paramedic",
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_amb_2",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "assignment_start",
+   "fieldtype": "Datetime",
+   "label": "Assignment Start",
+   "read_only": 1
+  },
+  {
+   "fieldname": "operational_section",
+   "fieldtype": "Section Break",
+   "label": "Operational"
+  },
+  {
+   "default": "Inactive",
+   "fieldname": "operational_status",
+   "fieldtype": "Select",
+   "label": "Operational Status",
+   "options": "Available\nOn Call\nReturning / Transit\nGoing for Refill\nAt Refill Station\nUnder Cleaning\nUnder Maintenance\nBreakdown\nUnavailable\nInactive",
+   "read_only": 1
+  },
+  {
+   "default": "Unavailable",
+   "fieldname": "availability_status",
+   "fieldtype": "Select",
+   "label": "Availability Status",
+   "options": "Available\nWarning\nUnavailable",
+   "read_only": 1
+  },
+  {
+   "fieldname": "availability_reason",
+   "fieldtype": "Data",
+   "label": "Availability Reason",
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_amb_3",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "last_activity_at",
+   "fieldtype": "Datetime",
+   "label": "Last Activity At",
+   "read_only": 1
+  },
+  {
+   "fieldname": "kits_section",
+   "fieldtype": "Section Break",
+   "label": "Kits"
+  },
+  {
+   "fieldname": "kit_capacity",
+   "fieldtype": "Int",
+   "in_list_view": 1,
+   "label": "Kit Capacity",
+   "reqd": 1
+  },
+  {
+   "fieldname": "available_kits",
+   "fieldtype": "Int",
+   "label": "Available Kits",
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_amb_4",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "minimum_operational_kits",
+   "fieldtype": "Int",
+   "in_list_view": 1,
+   "label": "Minimum Operational Kits",
+   "reqd": 1
+  },
+  {
+   "fieldname": "refill_threshold",
+   "fieldtype": "Int",
+   "label": "Refill Threshold",
+   "reqd": 1
+  },
+  {
+   "default": "Ready",
+   "fieldname": "kit_status",
+   "fieldtype": "Select",
+   "label": "Kit Status",
+   "options": "Ready\nRefill Due\nInsufficient\nNo Kits",
+   "read_only": 1
+  },
+  {
+   "fieldname": "readiness_section",
+   "fieldtype": "Section Break",
+   "label": "Readiness"
+  },
+  {
+   "default": "Clean",
+   "fieldname": "cleanliness_status",
+   "fieldtype": "Select",
+   "label": "Cleanliness Status",
+   "options": "Clean\nCleaning Required\nUnder Cleaning"
+  },
+  {
+   "fieldname": "column_break_amb_5",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "Fit",
+   "fieldname": "mechanical_status",
+   "fieldtype": "Select",
+   "label": "Mechanical Status",
+   "options": "Fit\nObservation\nMaintenance Required\nBreakdown"
+  },
+  {
+   "fieldname": "location_section",
+   "fieldtype": "Section Break",
+   "label": "Location"
+  },
+  {
+   "fieldname": "latitude",
+   "fieldtype": "Float",
+   "label": "Latitude",
+   "precision": "8",
+   "read_only": 1
+  },
+  {
+   "fieldname": "longitude",
+   "fieldtype": "Float",
+   "label": "Longitude",
+   "precision": "8",
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_amb_6",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "location_label",
+   "fieldtype": "Data",
+   "label": "Location Label",
+   "read_only": 1
+  },
+  {
+   "fieldname": "last_location_at",
+   "fieldtype": "Datetime",
+   "label": "Last Location At",
+   "read_only": 1
+  },
+  {
+   "default": "Offline",
+   "fieldname": "gps_status",
+   "fieldtype": "Select",
+   "label": "GPS Status",
+   "options": "Online\nStale\nOffline\nManual",
+   "read_only": 1
+  },
+  {
+   "fieldname": "current_shift",
+   "fieldtype": "Link",
+   "label": "Current Shift",
+   "options": "Ambulance Shift",
+   "read_only": 1
+  },
+  {
+   "fieldname": "current_call_activity",
+   "fieldtype": "Link",
+   "label": "Current Call Activity",
+   "options": "Ambulance Activity",
+   "read_only": 1
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2026-08-08 02:18:43.405884",
+ "modified_by": "Administrator",
+ "module": "Stylo Fleet",
+ "name": "Ambulance",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Fleet Admin",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Fleet Operations",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Fleet Station",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Fleet Paramedic",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "row_format": "Dynamic",
+ "rows_threshold_for_grid_search": 20,
+ "sort_field": "creation",
+ "sort_order": "DESC",
+ "states": []
+}

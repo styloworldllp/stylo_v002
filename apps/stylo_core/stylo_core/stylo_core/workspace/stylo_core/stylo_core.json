@@ -1,0 +1,63 @@
+{
+ "app": "stylo_core",
+ "charts": [],
+ "content": "[{\"id\":\"stylocoreheader\",\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h4\\\"><b>Stylo Core</b></span>\",\"col\":12}},{\"id\":\"stylocorecard\",\"type\":\"card\",\"data\":{\"card_name\":\"Stylo Core\",\"col\":4}}]",
+ "creation": "2026-08-08 00:00:00.000000",
+ "custom_blocks": [],
+ "docstatus": 0,
+ "doctype": "Workspace",
+ "for_user": "",
+ "hide_custom": 0,
+ "icon": "setting",
+ "idx": 0,
+ "indicator_color": "green",
+ "is_hidden": 0,
+ "label": "Stylo Core",
+ "links": [
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Stylo Core",
+   "link_count": 0,
+   "onboard": 0,
+   "type": "Card Break"
+  },
+  {
+   "dependencies": "",
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Mobile App Access",
+   "link_count": 0,
+   "link_to": "mobile-access",
+   "link_type": "Page",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "dependencies": "",
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "User",
+   "link_count": 0,
+   "link_to": "User",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  }
+ ],
+ "modified": "2026-08-08 00:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "Stylo Core",
+ "name": "Stylo Core",
+ "number_cards": [],
+ "owner": "Administrator",
+ "parent_page": "",
+ "public": 1,
+ "quick_lists": [],
+ "restrict_to_domain": "",
+ "roles": [],
+ "sequence_id": 1.0,
+ "shortcuts": [],
+ "title": "Stylo Core",
+ "type": "Workspace"
+}

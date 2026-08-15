@@ -1,0 +1,102 @@
+{
+ "actions": [],
+ "allow_rename": 0,
+ "autoname": "field:user",
+ "creation": "2026-08-10 00:00:00.000000",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "user", "tier", "status",
+  "section_break_modules",
+  "assigned_modules"
+ ],
+ "fields": [
+  {
+   "fieldname": "user",
+   "fieldtype": "Link",
+   "label": "User",
+   "options": "User",
+   "reqd": 1,
+   "unique": 1,
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "tier",
+   "fieldtype": "Select",
+   "label": "Tier",
+   "options": "Stylo User\nStylo Manager\nStylo Pro",
+   "reqd": 1,
+   "in_list_view": 1,
+   "description": "User = 1 module, Manager = up to 2, Pro = all company-entitled modules"
+  },
+  {
+   "fieldname": "status",
+   "fieldtype": "Select",
+   "label": "Status",
+   "options": "Active\nDisabled",
+   "default": "Active",
+   "reqd": 1,
+   "in_list_view": 1,
+   "description": "Disable to revoke license access without deleting the assignment (audit-friendly, reversible)"
+  },
+  {
+   "fieldname": "section_break_modules",
+   "fieldtype": "Section Break",
+   "label": "Assigned Modules"
+  },
+  {
+   "fieldname": "assigned_modules",
+   "fieldtype": "Table",
+   "options": "Stylo User License Module",
+   "description": "Core and brAIn are automatic for every Active license and never listed here. Must be a subset of the site's entitled modules; Stylo Pro auto-syncs to all of them."
+  }
+ ],
+ "links": [],
+ "modified": "2026-08-10 00:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "Stylo Core",
+ "name": "Stylo User License",
+ "naming_rule": "By fieldname",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Stylo License Administrator",
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Command Center Super Admin",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "read": 1,
+   "report": 1,
+   "role": "Command Center Admin"
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "track_changes": 1
+}

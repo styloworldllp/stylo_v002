@@ -1106,7 +1106,14 @@
 	}
 
 	function renderWelcome() {
-		const suggestions = [
+		const isFleetApp = !!(frappe.boot && frappe.boot.versions && frappe.boot.versions.stylo_fleet);
+		const suggestions = isFleetApp ? [
+			{ icon: "🚑", text: "What is our fleet status right now?" },
+			{ icon: "⛽", text: "Which ambulances need a refill?" },
+			{ icon: "🛠️", text: "Show me all open Ambulance Issues" },
+			{ icon: "🧭", text: "Guide me through starting a shift" },
+			{ icon: "➕", text: "Create a new Paramedic" },
+		] : [
 			{ icon: "🧭", text: "Guide me through creating a Sales Invoice" },
 			{ icon: "🧭", text: "How do I add a new employee?" },
 			{ icon: "🔍", text: "Show me all overdue invoices" },

@@ -1,0 +1,199 @@
+{
+ "actions": [],
+ "allow_rename": 0,
+ "autoname": "format:SR-{YYYY}-{#####}",
+ "creation": "2026-08-10 00:00:00.000000",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "requested_by", "client_name", "client_contact_email", "sitename", "status",
+  "column_break_1",
+  "base_module", "requested_modules",
+  "section_break_wizard",
+  "country", "currency", "timezone",
+  "section_break_server",
+  "server", "server_auto_selected",
+  "section_break_approval",
+  "approved_by", "license_request",
+  "column_break_2",
+  "failure_reason"
+ ],
+ "fields": [
+  {
+   "fieldname": "requested_by",
+   "fieldtype": "Link",
+   "label": "Requested By",
+   "options": "User",
+   "reqd": 1,
+   "in_list_view": 1,
+   "default": "__user"
+  },
+  {
+   "fieldname": "client_name",
+   "fieldtype": "Data",
+   "label": "Client Name",
+   "reqd": 1,
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "client_contact_email",
+   "fieldtype": "Data",
+   "label": "Client Contact Email",
+   "options": "Email"
+  },
+  {
+   "fieldname": "sitename",
+   "fieldtype": "Data",
+   "label": "Proposed Site Name",
+   "reqd": 1,
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "status",
+   "fieldtype": "Select",
+   "label": "Status",
+   "options": "Draft\nPending Approval\nApproved\nRejected\nDeployed\nFailed",
+   "default": "Draft",
+   "reqd": 1,
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "column_break_1",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "base_module",
+   "fieldtype": "Select",
+   "label": "Base Module",
+   "options": "bms\nhr\ncrm\nlms\ndesk\nbrain\ninsights"
+  },
+  {
+   "fieldname": "requested_modules",
+   "fieldtype": "Table",
+   "label": "Requested Modules",
+   "options": "Site Request Module"
+  },
+  {
+   "fieldname": "section_break_wizard",
+   "fieldtype": "Section Break",
+   "label": "Setup Wizard"
+  },
+  {
+   "fieldname": "country",
+   "fieldtype": "Data",
+   "label": "Country",
+   "reqd": 1,
+   "description": "Must match a Country doctype name exactly, e.g. India, United States"
+  },
+  {
+   "fieldname": "currency",
+   "fieldtype": "Data",
+   "label": "Currency",
+   "reqd": 1,
+   "description": "3-letter code, e.g. INR, USD"
+  },
+  {
+   "fieldname": "timezone",
+   "fieldtype": "Data",
+   "label": "Timezone",
+   "reqd": 1,
+   "description": "e.g. Asia/Kolkata, America/New_York"
+  },
+  {
+   "fieldname": "section_break_server",
+   "fieldtype": "Section Break",
+   "label": "Server"
+  },
+  {
+   "fieldname": "server",
+   "fieldtype": "Link",
+   "label": "Server",
+   "options": "Server",
+   "description": "Leave blank to auto-select the best server by live load at approval time"
+  },
+  {
+   "fieldname": "server_auto_selected",
+   "fieldtype": "Check",
+   "label": "Server Auto-Selected",
+   "read_only": 1
+  },
+  {
+   "fieldname": "section_break_approval",
+   "fieldtype": "Section Break",
+   "label": "Approval"
+  },
+  {
+   "fieldname": "approved_by",
+   "fieldtype": "Link",
+   "label": "Approved By",
+   "options": "User",
+   "read_only": 1
+  },
+  {
+   "fieldname": "license_request",
+   "fieldtype": "Link",
+   "label": "License Request",
+   "options": "Stylo License Request",
+   "description": "Commercial/pricing approval — linked, not merged with this infrastructure approval"
+  },
+  {
+   "fieldname": "column_break_2",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "failure_reason",
+   "fieldtype": "Small Text",
+   "label": "Failure Reason",
+   "read_only": 1
+  }
+ ],
+ "links": [],
+ "modified": "2026-08-10 00:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "Command Center",
+ "name": "Site Request",
+ "naming_rule": "Expression",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Command Center Super Admin",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 0,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Command Center Admin",
+   "share": 0,
+   "write": 1,
+   "if_owner": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "track_changes": 1
+}

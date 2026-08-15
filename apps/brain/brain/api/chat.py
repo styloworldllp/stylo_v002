@@ -236,6 +236,37 @@ def send_stream(message: str, history: str = "[]", context: str = "{}", session_
             yield f"data: {json.dumps({'type': 'error', 'message': setup_error})}\n\n"
             return
 
+        # Fast-path: instant, non-AI answers for a known set of common data
+        # questions on apps that register one (see brain_fast_answers docstring
+        # for why this exists -- an LLM round trip has a multi-second floor that
+        # no prompt tuning removes; this bypasses it for the high-frequency cases).
+        fast_answer = None
+        try:
+            from stylo_fleet.api.brain_fast_answers import try_fast_answer
+            fast_answer = try_fast_answer(message)
+        except ImportError:
+            pass
+        except Exception:
+            frappe.log_error(frappe.get_traceback(), "Brain fast-path error")
+
+        if fast_answer:
+            yield f"data: {json.dumps({'type': 'chunk', 'text': fast_answer})}\n\n"
+            try:
+                _save_message(sid, "assistant", fast_answer, seq_base + 2,
+                              tools_called=[], provider=provider, model=model)
+                _increment_session_count(sid, messages=2, tools=0)
+                if write_audit_log:
+                    write_audit_log(
+                        event_type="assistant_response",
+                        session=sid,
+                        detail={"sequence": seq_base + 2, "tool_count": 0, "fast_path": True},
+                    )
+                frappe.db.commit()
+            except Exception:
+                pass
+            yield f"data: {json.dumps({'type': 'done', 'message': fast_answer, 'actions': []})}\n\n"
+            return
+
         collected_text = []
         tool_events = []
         try:

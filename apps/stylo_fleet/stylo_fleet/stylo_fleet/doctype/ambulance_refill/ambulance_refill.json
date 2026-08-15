@@ -1,0 +1,222 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "autoname": "format:REFILL-{YYYY}-{#####}",
+ "creation": "2026-08-08 01:47:25.989197",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "ambulance",
+  "station",
+  "status",
+  "column_break_refill_1",
+  "requested_at",
+  "balance_before_refill",
+  "required_to_full",
+  "expected_load_quantity",
+  "section_break_refill_confirm",
+  "actual_loaded_quantity",
+  "balance_after_refill",
+  "exception_reason",
+  "column_break_refill_2",
+  "completed_by",
+  "completed_at",
+  "amended_from"
+ ],
+ "fields": [
+  {
+   "fieldname": "ambulance",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Ambulance",
+   "options": "Ambulance",
+   "read_only": 1,
+   "reqd": 1
+  },
+  {
+   "allow_on_submit": 1,
+   "fieldname": "station",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Station",
+   "options": "Ambulance Station"
+  },
+  {
+   "allow_on_submit": 1,
+   "default": "Pending",
+   "fieldname": "status",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "Status",
+   "options": "Pending\nCompleted",
+   "read_only": 1,
+   "reqd": 1
+  },
+  {
+   "fieldname": "column_break_refill_1",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "requested_at",
+   "fieldtype": "Datetime",
+   "label": "Requested At",
+   "read_only": 1,
+   "reqd": 1
+  },
+  {
+   "fieldname": "balance_before_refill",
+   "fieldtype": "Int",
+   "label": "Balance Before Refill",
+   "read_only": 1
+  },
+  {
+   "fieldname": "required_to_full",
+   "fieldtype": "Int",
+   "label": "Required To Full",
+   "read_only": 1
+  },
+  {
+   "fieldname": "expected_load_quantity",
+   "fieldtype": "Int",
+   "label": "Expected Load Quantity",
+   "read_only": 1
+  },
+  {
+   "fieldname": "section_break_refill_confirm",
+   "fieldtype": "Section Break",
+   "label": "Confirmation"
+  },
+  {
+   "allow_on_submit": 1,
+   "fieldname": "actual_loaded_quantity",
+   "fieldtype": "Int",
+   "label": "Actual Loaded Quantity",
+   "read_only": 1
+  },
+  {
+   "allow_on_submit": 1,
+   "fieldname": "balance_after_refill",
+   "fieldtype": "Int",
+   "label": "Balance After Refill",
+   "read_only": 1
+  },
+  {
+   "allow_on_submit": 1,
+   "fieldname": "exception_reason",
+   "fieldtype": "Small Text",
+   "label": "Exception Reason",
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_refill_2",
+   "fieldtype": "Column Break"
+  },
+  {
+   "allow_on_submit": 1,
+   "fieldname": "completed_by",
+   "fieldtype": "Link",
+   "label": "Completed By",
+   "options": "User",
+   "read_only": 1
+  },
+  {
+   "allow_on_submit": 1,
+   "fieldname": "completed_at",
+   "fieldtype": "Datetime",
+   "label": "Completed At",
+   "read_only": 1
+  },
+  {
+   "fieldname": "amended_from",
+   "fieldtype": "Link",
+   "label": "Amended From",
+   "no_copy": 1,
+   "options": "Ambulance Refill",
+   "print_hide": 1,
+   "read_only": 1,
+   "search_index": 1
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "is_submittable": 1,
+ "links": [],
+ "modified": "2026-08-08 02:19:24.114631",
+ "modified_by": "Administrator",
+ "module": "Stylo Fleet",
+ "name": "Ambulance Refill",
+ "naming_rule": "Expression (old style)",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "cancel": 1,
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "submit": 1,
+   "write": 1
+  },
+  {
+   "cancel": 1,
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Fleet Admin",
+   "share": 1,
+   "submit": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Fleet Operations",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Fleet Station",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Fleet Paramedic",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "row_format": "Dynamic",
+ "rows_threshold_for_grid_search": 20,
+ "sort_field": "creation",
+ "sort_order": "DESC",
+ "states": []
+}

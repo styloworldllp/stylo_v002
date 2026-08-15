@@ -1,0 +1,106 @@
+{
+ "actions": [],
+ "creation": "2026-08-10 00:00:00.000000",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "section_break_weights",
+  "w_cpu", "w_ram",
+  "column_break_1",
+  "w_disk", "w_capacity",
+  "section_break_thresholds",
+  "metric_staleness_minutes",
+  "section_break_notify",
+  "default_notification_recipients"
+ ],
+ "fields": [
+  {
+   "fieldname": "section_break_weights",
+   "fieldtype": "Section Break",
+   "label": "Server Selection Score Weights"
+  },
+  {
+   "fieldname": "w_cpu",
+   "fieldtype": "Float",
+   "label": "CPU Weight",
+   "default": "0.35"
+  },
+  {
+   "fieldname": "w_ram",
+   "fieldtype": "Float",
+   "label": "RAM Weight",
+   "default": "0.35"
+  },
+  {
+   "fieldname": "column_break_1",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "w_disk",
+   "fieldtype": "Float",
+   "label": "Disk Weight",
+   "default": "0.15"
+  },
+  {
+   "fieldname": "w_capacity",
+   "fieldtype": "Float",
+   "label": "Capacity Weight",
+   "default": "0.15"
+  },
+  {
+   "fieldname": "section_break_thresholds",
+   "fieldtype": "Section Break",
+   "label": "Thresholds"
+  },
+  {
+   "fieldname": "metric_staleness_minutes",
+   "fieldtype": "Int",
+   "label": "Metric Staleness Threshold (minutes)",
+   "default": "15",
+   "description": "Servers with no metric push newer than this are excluded from auto-selection"
+  },
+  {
+   "fieldname": "section_break_notify",
+   "fieldtype": "Section Break",
+   "label": "Notifications"
+  },
+  {
+   "fieldname": "default_notification_recipients",
+   "fieldtype": "Small Text",
+   "label": "Default Notification Recipients",
+   "description": "Comma-separated user emails notified on deployment success/failure in addition to the requester"
+  }
+ ],
+ "issingle": 1,
+ "links": [],
+ "modified": "2026-08-10 00:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "Command Center",
+ "name": "Command Center Settings",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 0,
+   "email": 0,
+   "print": 0,
+   "read": 1,
+   "role": "System Manager",
+   "share": 0,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 0,
+   "email": 0,
+   "print": 0,
+   "read": 1,
+   "role": "Command Center Super Admin",
+   "share": 0,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "track_changes": 0
+}

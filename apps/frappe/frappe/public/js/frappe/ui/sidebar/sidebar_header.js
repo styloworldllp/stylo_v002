@@ -272,24 +272,27 @@ frappe.ui.SidebarHeader = class SidebarHeader {
 	}
 	set_header_icon() {
 		let desktop_icon = this.get_desktop_icon_by_label(this.sidebar.sidebar_title);
-		let desktop_icon_url =
-			desktop_icon && frappe.utils.get_desktop_icon(desktop_icon.label, "solid");
-		if (desktop_icon_url) {
-			this.header_icon = desktop_icon_url;
-			this.header_icon = `<img class="sidebar-app-icon" src=${this.header_icon}></img>`;
-		} else if (desktop_icon && desktop_icon.logo_url) {
+		// Prefer logo_url (Stylo PNG) over the solid SVG path which may not exist
+		if (desktop_icon && desktop_icon.logo_url) {
 			let icon_url = desktop_icon.logo_url;
 			const is_dark = document.documentElement.getAttribute("data-theme") === "dark";
 			if (is_dark && icon_url.includes("/stylobms/light/")) {
 				icon_url = icon_url.replace("/stylobms/light/", "/stylobms/dark/");
 			}
 			this.header_icon = `<img class="sidebar-app-icon" src=${icon_url}></img>`;
-		} else if (this.sidebar.sidebar_data) {
-			this.header_icon = this.sidebar.sidebar_data.header_icon;
-			this.header_icon = frappe.utils.desktop_icon(this.sidebar.sidebar_title, "gray", "sm");
 		} else {
-			this.header_icon = this.get_default_icon();
-			this.header_icon = `<img src=${this.header_icon}></img>`;
+			let desktop_icon_url =
+				desktop_icon && frappe.utils.get_desktop_icon(desktop_icon.label, "solid");
+			if (desktop_icon_url) {
+				this.header_icon = desktop_icon_url;
+				this.header_icon = `<img class="sidebar-app-icon" src=${this.header_icon}></img>`;
+			} else if (this.sidebar.sidebar_data) {
+				this.header_icon = this.sidebar.sidebar_data.header_icon;
+				this.header_icon = frappe.utils.desktop_icon(this.sidebar.sidebar_title, "gray", "sm");
+			} else {
+				this.header_icon = this.get_default_icon();
+				this.header_icon = `<img src=${this.header_icon}></img>`;
+			}
 		}
 	}
 	get_default_icon() {

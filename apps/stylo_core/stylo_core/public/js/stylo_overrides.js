@@ -160,11 +160,20 @@
 	function patch_links(root) {
 		(root || document).querySelectorAll("a[href]").forEach((a) => {
 			if (is_external_frappe_url(a.href)) {
-				a.href = redirect_link(a.href);
-				a.textContent = a.textContent
+				// Only write when the value actually changes — an unconditional
+				// a.textContent = ... re-creates the text node every call (even
+				// when the replace() is a no-op), which the brand-sanitize
+				// MutationObserver below picks up as a new mutation and re-runs
+				// patch_links() on, causing an infinite self-triggering loop
+				// that pegs the main thread (seen as a "frozen" desk page).
+				const newHref = redirect_link(a.href);
+				if (a.href !== newHref) a.href = newHref;
+
+				const newText = a.textContent
 					.replace(/https?:\/\/(www\.)?(docs\.)?(erpnext|frappe)\.[a-z.]+\/?[^\s]*/gi, "stylo.io")
 					.replace(/\bFrappe\b/g, "Stylo")
 					.replace(/\bERPNext\b/g, "StyloBMS");
+				if (a.textContent !== newText) a.textContent = newText;
 			}
 		});
 	}
@@ -300,12 +309,34 @@
 		if (!t) return;
 		if (t.includes("frappe") || t.includes("Frappe") ||
 		    t.includes("ERPNext") || t.includes("erpnext")) {
-			node.textContent = sanitize(t);
+			// sanitize()'s replacements use \b word boundaries, so substrings
+			// like "erpnext_user" (underscore is a word char — no boundary)
+			// pass the .includes() check above but come back unchanged. Only
+			// write when the result actually differs — an unconditional write
+			// re-creates the text node every time, which the MutationObserver
+			// below sees as a new mutation and reprocesses forever, pegging
+			// the main thread (this is what causes the desk page to "freeze").
+			const newText = sanitize(t);
+			if (newText !== t) node.textContent = newText;
 		}
 	}
 
 	function patch_subtree(root) {
 		if (!root || !root.querySelectorAll) return;
+		// Cheap bail-out: skip the expensive TreeWalker + should_patch()/closest()
+		// scan entirely when this subtree has no trigger substring at all. Forms
+		// with many fields (e.g. Employee's ~150+ fields in Customize Form) fire
+		// large bursts of childList mutations on load; without this check every
+		// added node/subtree pays for a full text-node walk with up to ~19
+		// closest() DOM-tree climbs per node, which can block the main thread
+		// for a very long time and make the page look frozen.
+		const text = root.textContent;
+		if (!text ||
+			(!text.includes("frappe") && !text.includes("Frappe") &&
+			 !text.includes("ERPNext") && !text.includes("erpnext"))) {
+			patch_links(root);
+			return;
+		}
 		const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
 		while (walker.nextNode()) {
 			const node = walker.currentNode;

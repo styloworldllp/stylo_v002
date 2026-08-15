@@ -1,0 +1,126 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2026-08-08 01:31:10.309807",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "default_kit_capacity",
+  "default_minimum_operational_kits",
+  "default_refill_threshold",
+  "column_break_settings_1",
+  "location_stale_after_minutes",
+  "allow_emergency_override"
+ ],
+ "fields": [
+  {
+   "default": "10",
+   "fieldname": "default_kit_capacity",
+   "fieldtype": "Int",
+   "in_list_view": 1,
+   "label": "Default Kit Capacity",
+   "reqd": 1
+  },
+  {
+   "default": "3",
+   "fieldname": "default_minimum_operational_kits",
+   "fieldtype": "Int",
+   "in_list_view": 1,
+   "label": "Default Minimum Operational Kits",
+   "reqd": 1
+  },
+  {
+   "default": "5",
+   "fieldname": "default_refill_threshold",
+   "fieldtype": "Int",
+   "in_list_view": 1,
+   "label": "Default Refill Threshold",
+   "reqd": 1
+  },
+  {
+   "fieldname": "column_break_settings_1",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "15",
+   "fieldname": "location_stale_after_minutes",
+   "fieldtype": "Int",
+   "in_list_view": 1,
+   "label": "Location Stale After (minutes)",
+   "reqd": 1
+  },
+  {
+   "default": "0",
+   "fieldname": "allow_emergency_override",
+   "fieldtype": "Check",
+   "label": "Allow Emergency Override"
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "issingle": 1,
+ "links": [],
+ "modified": "2026-08-08 02:19:24.510544",
+ "modified_by": "Administrator",
+ "module": "Stylo Fleet",
+ "name": "Ambulance Settings",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "print": 1,
+   "read": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "print": 1,
+   "read": 1,
+   "role": "Fleet Admin",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "print": 1,
+   "read": 1,
+   "role": "Fleet Operations",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "print": 1,
+   "read": 1,
+   "role": "Fleet Station",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "print": 1,
+   "read": 1,
+   "role": "Fleet Paramedic",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "row_format": "Dynamic",
+ "rows_threshold_for_grid_search": 20,
+ "sort_field": "creation",
+ "sort_order": "DESC",
+ "states": []
+}

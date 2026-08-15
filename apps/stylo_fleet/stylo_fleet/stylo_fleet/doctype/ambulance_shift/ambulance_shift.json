@@ -1,0 +1,216 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "autoname": "format:SHIFT-{YYYY}-{#####}",
+ "creation": "2026-08-08 01:34:17.399271",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "ambulance",
+  "paramedic",
+  "status",
+  "column_break_shift_1",
+  "start_datetime",
+  "start_latitude",
+  "start_longitude",
+  "start_check_result",
+  "section_break_shift_end",
+  "end_datetime",
+  "end_latitude",
+  "end_longitude",
+  "column_break_shift_2",
+  "end_check_result",
+  "amended_from"
+ ],
+ "fields": [
+  {
+   "fieldname": "ambulance",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Ambulance",
+   "options": "Ambulance",
+   "reqd": 1
+  },
+  {
+   "fieldname": "paramedic",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Paramedic",
+   "options": "Paramedic",
+   "reqd": 1
+  },
+  {
+   "allow_on_submit": 1,
+   "default": "Open",
+   "fieldname": "status",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "Status",
+   "options": "Open\nClosed\nException",
+   "reqd": 1
+  },
+  {
+   "fieldname": "column_break_shift_1",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "start_datetime",
+   "fieldtype": "Datetime",
+   "in_list_view": 1,
+   "label": "Start Date-Time",
+   "read_only": 1,
+   "reqd": 1
+  },
+  {
+   "fieldname": "start_latitude",
+   "fieldtype": "Float",
+   "label": "Start Latitude",
+   "precision": "8",
+   "read_only": 1
+  },
+  {
+   "fieldname": "start_longitude",
+   "fieldtype": "Float",
+   "label": "Start Longitude",
+   "precision": "8",
+   "read_only": 1
+  },
+  {
+   "fieldname": "start_check_result",
+   "fieldtype": "Small Text",
+   "label": "Start Check Result",
+   "read_only": 1
+  },
+  {
+   "fieldname": "section_break_shift_end",
+   "fieldtype": "Section Break",
+   "label": "End of Shift"
+  },
+  {
+   "allow_on_submit": 1,
+   "fieldname": "end_datetime",
+   "fieldtype": "Datetime",
+   "label": "End Date-Time",
+   "read_only": 1
+  },
+  {
+   "allow_on_submit": 1,
+   "fieldname": "end_latitude",
+   "fieldtype": "Float",
+   "label": "End Latitude",
+   "precision": "8",
+   "read_only": 1
+  },
+  {
+   "allow_on_submit": 1,
+   "fieldname": "end_longitude",
+   "fieldtype": "Float",
+   "label": "End Longitude",
+   "precision": "8",
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_shift_2",
+   "fieldtype": "Column Break"
+  },
+  {
+   "allow_on_submit": 1,
+   "fieldname": "end_check_result",
+   "fieldtype": "Small Text",
+   "label": "End Check Result",
+   "read_only": 1
+  },
+  {
+   "fieldname": "amended_from",
+   "fieldtype": "Link",
+   "label": "Amended From",
+   "no_copy": 1,
+   "options": "Ambulance Shift",
+   "print_hide": 1,
+   "read_only": 1,
+   "search_index": 1
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "is_submittable": 1,
+ "links": [],
+ "modified": "2026-08-08 02:19:23.823303",
+ "modified_by": "Administrator",
+ "module": "Stylo Fleet",
+ "name": "Ambulance Shift",
+ "naming_rule": "Expression (old style)",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "cancel": 1,
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "submit": 1,
+   "write": 1
+  },
+  {
+   "cancel": 1,
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Fleet Admin",
+   "share": 1,
+   "submit": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Fleet Operations",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Fleet Station",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Fleet Paramedic",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "row_format": "Dynamic",
+ "rows_threshold_for_grid_search": 20,
+ "sort_field": "creation",
+ "sort_order": "DESC",
+ "states": []
+}

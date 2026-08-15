@@ -6,9 +6,32 @@ Run with:
   bench --site <site> execute stylo_core.install_icons.run
 """
 
+import glob
+import os
+import stat
+
 import frappe
 
 BASE = "/assets/stylo_core/images/workspace_icons"
+
+_ICONS_DIR = os.path.join(os.path.dirname(__file__), "public", "images", "workspace_icons")
+
+
+def _icon_url(icon_file):
+    """Build a logo_url with a cache-busting ?v=<mtime> query string.
+
+    nginx serves /assets/ with Cache-Control: public, immutable + 30d expiry
+    (see /etc/nginx/sites-available/stylo), so browsers never re-check a
+    previously-fetched icon URL even on hard refresh. Appending the file's
+    mtime as a query string changes the URL whenever the PNG changes,
+    forcing a fresh fetch without needing any nginx/cache config changes.
+    """
+    path = os.path.join(_ICONS_DIR, f"{icon_file}.png")
+    try:
+        version = int(os.path.getmtime(path))
+    except OSError:
+        version = 0
+    return f"{BASE}/{icon_file}.png?v={version}"
 
 # Old Frappe/ERPNext name → new Stylo brand name
 RENAME = {
@@ -18,6 +41,13 @@ RENAME = {
     "Frappe CRM":       "CRM",
     "ERPNext":          "BMS",
     "ERPNext Settings": "BMS Settings",
+    "Stylo Core":       "Core",
+}
+
+# Icons that should be nested inside another top-level icon rather than
+# shown as their own top-level tile — name (after RENAME) -> parent name.
+NEST_UNDER = {
+    "Core": "Stylo",
 }
 
 # Child icons that may still reference old parent names → fix to new names
@@ -96,12 +126,28 @@ LINK_FIX = {
         "hidden":      0,
         "parent_icon": "",
     },
+    "India Compliance": {
+        "link":        "/desk/gst-india",
+        "link_to":     "",
+        "icon_type":   "Link",
+        "link_type":   "External",
+        "hidden":      0,
+        "parent_icon": "",
+        "bg_color":    "",
+    },
 }
 
 # Label (after renaming) → PNG filename in workspace_icons/
 ICON_MAP = {
     # ── Top-level folders ─────────────────────────────────────────────────
     "Stylo":             "stylo-logo",    # Framework → Stylo ring logo
+    "Core":              "settings",       # Stylo Core → nested under Stylo, gear icon
+    "Stylo Fleet":       "stylo-fleet",
+    "Ambulance":         "ambulance",
+    "Fleet Analytics":   "fleet-analytics",
+    "Admin":             "erp-settings",
+    "Station":           "support",
+    "Operations":        "system",
     "HRMS":              "hrms",
     "LMS":               "documents",
     "CRM":               "crm",
@@ -221,6 +267,42 @@ DESKTOP_CREATE = {
         "logo_file":   "integrations",
         "app":         "stylo_core",
     },
+    "Stylo Fleet": {
+        "label":       "Stylo Fleet",
+        "link":        "/app/stylo-fleet",
+        "logo_file":   "stylo-fleet",
+        "app":         "stylo_fleet",
+    },
+    "Ambulance": {
+        "label":       "Ambulance",
+        "link":        "/app/ambulance-console",
+        "logo_file":   "ambulance",
+        "app":         "stylo_fleet",
+    },
+    "Fleet Analytics": {
+        "label":       "Fleet Analytics",
+        "link":        "/app/fleet-dashboard",
+        "logo_file":   "fleet-analytics",
+        "app":         "stylo_fleet",
+    },
+    "Admin": {
+        "label":       "Admin",
+        "link":        "/app/admin-console",
+        "logo_file":   "erp-settings",  # placeholder — swap once a custom icon is supplied
+        "app":         "stylo_fleet",
+    },
+    "Station": {
+        "label":       "Station",
+        "link":        "/app/station-console",
+        "logo_file":   "support",  # placeholder — swap once a custom icon is supplied
+        "app":         "stylo_fleet",
+    },
+    "Operations": {
+        "label":       "Operations",
+        "link":        "/app/operations-console",
+        "logo_file":   "system",  # placeholder — swap once a custom icon is supplied
+        "app":         "stylo_fleet",
+    },
 }
 
 
@@ -240,7 +322,7 @@ def run():
                 continue
         if frappe.db.exists("Desktop Icon", icon_name):
             continue
-        logo_url = f"{BASE}/{cfg['logo_file']}.png"
+        logo_url = _icon_url(cfg["logo_file"])
         doc = frappe.get_doc({
             "doctype":    "Desktop Icon",
             "name":       icon_name,
@@ -285,20 +367,37 @@ def run():
             fixed += 1
     frappe.db.commit()
 
+    # ── Step 2b: Nest icons that should live inside another top-level icon ─
+    nested = 0
+    for child_name, parent_name in NEST_UNDER.items():
+        if frappe.db.exists("Desktop Icon", child_name) and frappe.db.exists("Desktop Icon", parent_name):
+            current_parent = frappe.db.get_value("Desktop Icon", child_name, "parent_icon")
+            if current_parent != parent_name:
+                frappe.db.set_value(
+                    "Desktop Icon", child_name,
+                    {"parent_icon": parent_name, "standard": 1},
+                    update_modified=False,
+                )
+                nested += 1
+    frappe.db.commit()
+
     # ── Step 3: Apply Stylo PNG logo_url ──────────────────────────────────
     for label, icon_file in ICON_MAP.items():
-        url = f"{BASE}/{icon_file}.png"
+        url = _icon_url(icon_file)
         rows = frappe.db.get_all(
             "Desktop Icon",
             filters={"label": label},
-            fields=["name", "logo_url", "icon_image"],
+            fields=["name", "logo_url", "icon_image", "icon"],
         )
         for row in rows:
-            # Always force-set logo_url and clear icon_image (SVG data overrides PNG logo)
-            frappe.db.set_value("Desktop Icon", row.name, {
+            updates = {
                 "logo_url":   url,
                 "icon_image": "",
-            }, update_modified=False)
+            }
+            # If icon is NULL the desk won't render logo_url — set a fallback icon name
+            if not row.get("icon"):
+                updates["icon"] = icon_file.split("/")[-1]  # use filename as icon slug
+            frappe.db.set_value("Desktop Icon", row.name, updates, update_modified=False)
             updated += 1
 
     # ── Step 4: Fix icons that need explicit workspace link / visibility ──
@@ -336,7 +435,7 @@ def run():
     # Re-apply logos for the renamed entries
     for label, icon_file in ICON_MAP.items():
         if label in (LABEL_RENAME.values()):
-            url = f"{BASE}/{icon_file}.png"
+            url = _icon_url(icon_file)
             rows = frappe.db.get_all("Desktop Icon", filters={"label": label}, fields=["name", "logo_url"])
             for row in rows:
                 if row.logo_url != url:
@@ -398,6 +497,21 @@ def run():
     frappe.db.commit()
     frappe.cache.delete_key("desktop_icons")
     frappe.cache.delete_value("desktop_icons")
-    print(f"Stylo icons: {created} created, {renamed} renamed, {fixed} parent_icon fixed, "
+
+    # ── Step 9: Fix world-readable permissions on stylo_core public assets ──
+    # Prevents nginx 403 when rsync accidentally copies 0600 source perms.
+    perms_fixed = 0
+    try:
+        bench_path = frappe.utils.get_bench_path()
+        asset_css_dir = os.path.join(bench_path, "sites", "assets", "stylo_core", "css")
+        for f in glob.glob(os.path.join(asset_css_dir, "*.css")):
+            current = stat.S_IMODE(os.stat(f).st_mode)
+            if not (current & stat.S_IROTH):
+                os.chmod(f, current | stat.S_IRGRP | stat.S_IROTH)
+                perms_fixed += 1
+    except Exception:
+        pass
+
+    print(f"Stylo icons: {created} created, {renamed} renamed, {nested} nested, {fixed} parent_icon fixed, "
           f"{link_fixed} links fixed, {updated} logos updated, {brand_fixed} app brands fixed, "
-          f"{sidebar_fixed} sidebars/settings cleaned.")
+          f"{sidebar_fixed} sidebars/settings cleaned, {perms_fixed} asset perms fixed.")

@@ -1,0 +1,226 @@
+{
+ "actions": [],
+ "allow_rename": 0,
+ "autoname": "field:server_name",
+ "creation": "2026-08-10 00:00:00.000000",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "server_name", "label", "hosting_type", "status",
+  "column_break_1",
+  "host", "ssh_port", "ssh_user",
+  "section_break_auth",
+  "auth_method", "ssh_key", "ssh_key_passphrase", "ssh_password",
+  "section_break_bench",
+  "bench_path", "web_service_name", "db_root_password",
+  "column_break_2",
+  "max_sites",
+  "section_break_agent",
+  "agent_api_key", "last_seen",
+  "column_break_3",
+  "last_cpu_percent", "last_ram_percent", "last_disk_percent", "last_metric_at"
+ ],
+ "fields": [
+  {
+   "fieldname": "server_name",
+   "fieldtype": "Data",
+   "label": "Server Name",
+   "reqd": 1,
+   "unique": 1,
+   "in_list_view": 1,
+   "description": "Short unique key, e.g. demo, stangroup"
+  },
+  {
+   "fieldname": "label",
+   "fieldtype": "Data",
+   "label": "Display Label",
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "hosting_type",
+   "fieldtype": "Select",
+   "label": "Hosting Type",
+   "options": "Stylo-Managed\nClient-Premise",
+   "default": "Stylo-Managed",
+   "reqd": 1,
+   "in_list_view": 1,
+   "description": "Client-Premise means the client's own IT holds root on this box — automated SSH deployment does not apply, see build-and-handoff flow"
+  },
+  {
+   "fieldname": "status",
+   "fieldtype": "Select",
+   "label": "Status",
+   "options": "Active\nMaintenance\nDisabled",
+   "default": "Active",
+   "reqd": 1,
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "column_break_1",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "host",
+   "fieldtype": "Data",
+   "label": "Host / IP"
+  },
+  {
+   "fieldname": "ssh_port",
+   "fieldtype": "Int",
+   "label": "SSH Port",
+   "default": "22"
+  },
+  {
+   "fieldname": "ssh_user",
+   "fieldtype": "Data",
+   "label": "SSH User"
+  },
+  {
+   "fieldname": "section_break_auth",
+   "fieldtype": "Section Break",
+   "label": "SSH Credentials"
+  },
+  {
+   "fieldname": "auth_method",
+   "fieldtype": "Select",
+   "label": "Auth Method",
+   "options": "SSH Key\nPassword",
+   "default": "SSH Key"
+  },
+  {
+   "fieldname": "ssh_key",
+   "fieldtype": "Password",
+   "label": "SSH Private Key",
+   "depends_on": "eval: doc.auth_method == 'SSH Key'"
+  },
+  {
+   "fieldname": "ssh_key_passphrase",
+   "fieldtype": "Password",
+   "label": "SSH Key Passphrase",
+   "depends_on": "eval: doc.auth_method == 'SSH Key'",
+   "description": "Optional, only if the private key itself is passphrase-protected"
+  },
+  {
+   "fieldname": "ssh_password",
+   "fieldtype": "Password",
+   "label": "SSH Password",
+   "depends_on": "eval: doc.auth_method == 'Password'",
+   "description": "Fallback only — prefer SSH Key auth"
+  },
+  {
+   "fieldname": "section_break_bench",
+   "fieldtype": "Section Break",
+   "label": "Bench Details"
+  },
+  {
+   "fieldname": "bench_path",
+   "fieldtype": "Data",
+   "label": "Bench Path",
+   "description": "e.g. /home/stylo/stylo"
+  },
+  {
+   "fieldname": "web_service_name",
+   "fieldtype": "Data",
+   "label": "Web Service Name",
+   "description": "e.g. stylo-web.service"
+  },
+  {
+   "fieldname": "db_root_password",
+   "fieldtype": "Password",
+   "label": "DB Root Password",
+   "description": "Used for bench new-site on this server"
+  },
+  {
+   "fieldname": "column_break_2",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "max_sites",
+   "fieldtype": "Int",
+   "label": "Max Sites (Capacity)",
+   "default": "10"
+  },
+  {
+   "fieldname": "section_break_agent",
+   "fieldtype": "Section Break",
+   "label": "Monitoring Agent"
+  },
+  {
+   "fieldname": "agent_api_key",
+   "fieldtype": "Password",
+   "label": "Agent API Key",
+   "description": "Generated per server; the monitoring agent authenticates metric pushes with this key"
+  },
+  {
+   "fieldname": "last_seen",
+   "fieldtype": "Datetime",
+   "label": "Last Seen",
+   "read_only": 1,
+   "description": "Updated on every metric push, used for staleness detection"
+  },
+  {
+   "fieldname": "column_break_3",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "last_cpu_percent",
+   "fieldtype": "Float",
+   "label": "Last CPU %",
+   "read_only": 1
+  },
+  {
+   "fieldname": "last_ram_percent",
+   "fieldtype": "Float",
+   "label": "Last RAM %",
+   "read_only": 1
+  },
+  {
+   "fieldname": "last_disk_percent",
+   "fieldtype": "Float",
+   "label": "Last Disk %",
+   "read_only": 1
+  },
+  {
+   "fieldname": "last_metric_at",
+   "fieldtype": "Datetime",
+   "label": "Last Metric At",
+   "read_only": 1
+  }
+ ],
+ "links": [],
+ "modified": "2026-08-10 00:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "Command Center",
+ "name": "Server",
+ "naming_rule": "By fieldname",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Command Center Super Admin",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "track_changes": 1
+}

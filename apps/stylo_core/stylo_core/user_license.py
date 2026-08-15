@@ -1,10 +1,14 @@
 """
 user_license.py — runs on CLIENT sites (not on cloud.stylo.io).
 
-Enforces:
-1. Site-level license validity (expiry, grace period, suspension)
-2. Total user count against licensed user limit
-3. Module access based on stylo_licensed_modules in site_config
+Enforces (Stylo Licensing Architecture V1.0, Phase 1):
+1. Site-level license validity (expiry, grace period, suspension, demo bypass)
+2. Total user count against licensed user limit (@stylo.io internal users excluded)
+3. Per-user module access based on that user's Stylo User License tier + assigned modules
+   (module access is per-user, not site-wide — a Manager might have BMS+HR while another
+   Manager on the same site has CRM+Desk; both are capped/validated against the site's
+   Stylo License.entitled_modules)
+4. brAIn is complimentary with every Active Stylo User License — never separately counted
 """
 
 import os
@@ -14,6 +18,11 @@ import requests
 
 # ── Environment ───────────────────────────────────────────────────────────────
 
+# STYLO_CLOUD_URL env var is a fallback only — env vars are process-wide on a shared bench
+# (every site on that box would get the same value, which happens to be fine since they all
+# point at the same Command Center), but per-site AUTH cannot be an env var, so the real
+# per-deployment config is site_config.json (`stylo_cloud_url`/`stylo_site_api_key`, pushed by
+# Command Center's deploy/import flows via `bench set-config`). See _get_cloud_url() below.
 STYLO_CLOUD_URL = os.environ.get("STYLO_CLOUD_URL", "")
 LICENSE_CACHE_KEY = "stylo:site_license_status"
 LICENSE_CACHE_TTL = 86400  # 24 hours
@@ -25,17 +34,41 @@ CACHE_KEY = "stylo:user_licenses"
 CACHE_TTL = 900  # 15 minutes
 
 
+def _get_cloud_url() -> str:
+	return frappe.conf.get("stylo_cloud_url") or STYLO_CLOUD_URL
+
+
+def _get_site_api_key() -> str:
+	return frappe.conf.get("stylo_site_api_key", "")
+
+
 # ── Helper: is this a demo / unconfigured site? ───────────────────────────────
 
 def _is_demo_or_unconfigured() -> bool:
 	try:
 		return bool(
-			not STYLO_CLOUD_URL
+			not _get_cloud_url()
 			or frappe.conf.get("is_demo")
 			or frappe.conf.get("skip_license_check")
 		)
 	except Exception:
 		return True
+
+
+def is_unlimited_access() -> bool:
+	"""Combined bypass check: config-based demo/unconfigured OR the site's actual
+	Stylo License record is in Demo status. Config check runs first (cheap, no DB/network)."""
+	if _is_demo_or_unconfigured():
+		return True
+	return get_site_license_status().get("status") == "demo"
+
+
+def _is_internal_user(email: str) -> bool:
+	"""Verified @stylo.io accounts are Stylo Internal Users — consume zero customer
+	licenses, but must still appear in audit logs (see check_user_license_on_login)."""
+	if not email or not email.endswith("@stylo.io"):
+		return False
+	return bool(frappe.db.get_value("User", email, "enabled"))
 
 
 # ── Site-level license status ─────────────────────────────────────────────────
@@ -54,8 +87,9 @@ def get_site_license_status() -> dict:
 
 	try:
 		resp = requests.get(
-			f"{STYLO_CLOUD_URL}/api/method/stylo_core.license_api.check",
+			f"{_get_cloud_url()}/api/method/stylo_core.license_api.check",
 			params={"site": frappe.local.site},
+			headers={"X-Site-Api-Key": _get_site_api_key()},
 			timeout=5,
 		)
 		if resp.ok:
@@ -83,45 +117,11 @@ def get_user_limit_from_config() -> int:
 		return 9999
 
 
-def get_brain_user_limit_from_config() -> int:
-	"""Read brAIn-specific user limit from site_config."""
-	try:
-		limit = frappe.conf.get("brain_user_limit")
-		return int(limit) if limit else 0
-	except Exception:
-		return 0
-
-
-def check_brain_user_limit():
-	"""
-	Block assigning the brAIn User role when the brain_user_limit is reached.
-	Call this from the Has Role before_insert hook for the brAIn User role.
-	"""
-	brain_limit = get_brain_user_limit_from_config()
-	if brain_limit == 0:
-		frappe.throw(
-			"brAIn is not licensed for this site. "
-			"Contact your Stylo consultant to add the brAIn module.",
-			frappe.PermissionError,
-		)
-
-	brain_users = frappe.db.count(
-		"Has Role",
-		{"role": "brAIn User", "parenttype": "User"},
-	)
-	if brain_users >= brain_limit:
-		frappe.throw(
-			f"brAIn user limit reached ({brain_users}/{brain_limit}). "
-			"Contact your consultant to add more brAIn user slots.",
-			frappe.PermissionError,
-		)
-
-
 def check_user_count_against_license():
 	"""
 	Block if TOTAL System Users (active + inactive) >= license limit.
 	Every user slot is consumed whether the user is active or not.
-	Administrator and Guest are excluded from the count.
+	Administrator, Guest, and @stylo.io internal users are excluded from the count.
 	"""
 	limit = get_user_limit_from_config()
 	if limit >= 9999:
@@ -130,6 +130,7 @@ def check_user_count_against_license():
 	total_users = frappe.db.count("User", {
 		"user_type": "System User",
 		"name": ["not in", ["Administrator", "Guest"]],
+		"email": ["not like", "%@stylo.io"],
 	})
 
 	if total_users >= limit:
@@ -141,15 +142,6 @@ def check_user_count_against_license():
 		)
 
 
-def check_brain_role_limit(doc, method=None):
-	"""Hook on Has Role before_insert — blocks brAIn User role when limit reached."""
-	if getattr(doc, "role", "") != "brAIn User":
-		return
-	if _is_demo_or_unconfigured():
-		return
-	check_brain_user_limit()
-
-
 def check_user_count_on_user_create(doc, method=None):
 	"""
 	Blocks creating a new System User when the license limit is reached.
@@ -159,29 +151,34 @@ def check_user_count_on_user_create(doc, method=None):
 		return
 	if getattr(doc, "name", "") in ("Administrator", "Guest"):
 		return
-	if _is_demo_or_unconfigured():
+	if _is_internal_user(getattr(doc, "email", "") or getattr(doc, "name", "")):
+		return
+	if is_unlimited_access():
 		return
 	check_user_count_against_license()
 
 
-# ── Module access (site-level) ────────────────────────────────────────────────
+# ── Module access (per-user) ──────────────────────────────────────────────────
+
+def _get_local_license_doc():
+	"""The site's current Stylo License, queried locally (this doctype lives on the same
+	site as this code runs — no remote call needed for entitlement data, unlike the
+	site-level status check above which is designed for a future multi-site master)."""
+	from stylo_core.license_api import _get_active_license
+
+	license_row = _get_active_license(frappe.local.site)
+	return frappe.get_doc("Stylo License", license_row.name) if license_row else None
+
 
 def get_licensed_modules() -> list[str]:
-	"""
-	Returns the list of module keys licensed for this site.
-	Source priority:
-	  1. site_config.stylo_licensed_modules  (set during provisioning)
-	  2. Control Center per-user data        (legacy fallback)
+	"""Module keys commercially entitled to this site (Stylo License.entitled_modules).
+	This is the company-wide entitlement ceiling — individual users are further capped by
+	their own Stylo User License tier/assignment, see get_user_licenses()."""
+	license_doc = _get_local_license_doc()
+	if license_doc:
+		return [m.module_key for m in (license_doc.entitled_modules or [])]
 
-	All users on the site share the same module access — licensing is
-	site-level, not per-user.
-	"""
-	# Priority 1: site_config (primary — set by Stylo Cloud when creating the site)
-	site_modules = frappe.conf.get("stylo_licensed_modules", "")
-	if site_modules:
-		return [m.strip() for m in site_modules.split(",") if m.strip()]
-
-	# Priority 2: Control Center per-user data (legacy / development)
+	# Legacy fallback for sites without a local Stylo License record yet.
 	if CONTROL_CENTER_URL:
 		return _get_cc_licenses().get(frappe.session.user, [])
 
@@ -190,15 +187,31 @@ def get_licensed_modules() -> list[str]:
 
 def get_user_licenses(email: str) -> list[str]:
 	"""
-	Returns module keys this user can access.
-	Administrator always gets everything.
-	All other users get the site-level licensed modules.
+	Returns module keys this user can access, always including "core" and "brain"
+	(both automatic — Core is mandatory infra, brAIn is complimentary with every Active
+	license, neither is ever gated or counted).
+
+	Administrator always gets everything. A user with an Active Stylo User License gets
+	exactly their assigned_modules. A user with NO Stylo User License record yet gets the
+	site's full entitled_modules as a temporary rollout safety net (equivalent to implicit
+	Pro) — this is deliberate short-term technical debt so existing users aren't locked out
+	on deploy day; explicit per-user assignment should close this gap over time.
 	"""
 	from stylo_core.license_map import ALL_MODULE_KEYS
+
 	if email in ("Administrator", "administrator"):
 		return ALL_MODULE_KEYS + ["pro"]
 
-	return get_licensed_modules()
+	always_on = ["core", "brain"]
+
+	user_license_name = frappe.db.get_value(
+		"Stylo User License", {"user": email, "status": "Active"}, "name"
+	)
+	if user_license_name:
+		doc = frappe.get_cached_doc("Stylo User License", user_license_name)
+		return always_on + [m.module_key for m in (doc.assigned_modules or [])]
+
+	return always_on + get_licensed_modules()
 
 
 def has_license(email: str, license_key: str) -> bool:
@@ -219,7 +232,12 @@ def check_user_license_on_login(login_manager=None):
 	if user in ("Administrator", "Guest"):
 		return
 
-	if _is_demo_or_unconfigured():
+	if _is_internal_user(user):
+		# Zero license consumption, but must still appear in audit logs.
+		frappe.logger("stylo_licensing").info(f"Internal user login (unenforced): {user}")
+		return
+
+	if is_unlimited_access():
 		return
 
 	# 1. Site-level license status
@@ -235,7 +253,7 @@ def check_user_license_on_login(login_manager=None):
 			frappe.AuthenticationError,
 		)
 
-	if status == "suspended":
+	if status in ("suspended", "terminated"):
 		if login_manager:
 			login_manager.logout()
 		frappe.throw(
@@ -259,7 +277,7 @@ def check_user_license_on_login(login_manager=None):
 		)
 
 	# 4. Must have at least one licensed module
-	if not _is_demo_or_unconfigured() and not get_licensed_modules():
+	if not get_licensed_modules():
 		if login_manager:
 			login_manager.logout()
 		frappe.throw(

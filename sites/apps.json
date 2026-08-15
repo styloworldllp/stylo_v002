@@ -97,24 +97,14 @@
         "idx": 11,
         "version": "0.0.1"
     },
-    "lending": {
+    "stylo_fleet": {
         "is_repo": true,
         "resolution": {
-            "commit_hash": "e36bda1d73f9e844f517e71fc1069dda201a5053",
-            "branch": "develop"
+            "commit_hash": "5c5a6697fb117fa43c6ef5ee5f116b1c9b9517ae",
+            "branch": "main"
         },
         "required": [],
         "idx": 12,
         "version": "0.0.1"
-    },
-    "drive": {
-        "is_repo": true,
-        "resolution": {
-            "commit_hash": "ebfb284d391388255727a3ea5790baef7fa1f87c",
-            "branch": "main"
-        },
-        "required": [],
-        "idx": 13,
-        "version": "0.3.0"
     }
 }

@@ -1,0 +1,23 @@
+{
+ "content": null,
+ "creation": "2026-07-30 16:42:09.591558",
+ "docstatus": 0,
+ "doctype": "Page",
+ "idx": 0,
+ "modified": "2026-07-30 16:42:09.591558",
+ "modified_by": "Administrator",
+ "module": "Stylo Core",
+ "name": "mobile-access",
+ "owner": "Administrator",
+ "page_name": "mobile-access",
+ "roles": [
+  {
+   "role": "System Manager"
+  }
+ ],
+ "script": null,
+ "standard": "Yes",
+ "style": null,
+ "system_page": 0,
+ "title": "Mobile App Access"
+}

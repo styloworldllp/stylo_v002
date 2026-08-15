@@ -1,7 +1,7 @@
 [project]
 name = "stylo_core"
 authors = [
-    { name = "Stylo Core branding and customizations", email = "hello@styloworld.io"}
+    { name = "Stylo Core branding and customizations", email = "hello@stylo.io"}
 ]
 description = "Styloworld"
 requires-python = ">=3.14"

@@ -27,6 +27,7 @@ app_logo_url = "/assets/stylo_core/images/stylo-logo-light.png"
 app_include_js = [
     "/assets/stylo_core/js/stylo_overrides.js",
     "/assets/stylo_core/js/license_lock.js",
+    "/assets/stylo_core/js/stylo_mobile_nav.js",
 ]
 app_include_css = [
     "/assets/stylo_core/css/stylo_theme.css",
@@ -41,7 +42,25 @@ before_request = ["stylo_core.license.validate_license"]
 on_login = ["stylo_core.user_license.check_user_license_on_login"]
 
 # Re-apply Stylo icons and white-label after every migrate
-after_migrate = ["stylo_core.install_icons.run"]
+after_migrate = ["stylo_core.install_icons.run", "stylo_core.license_permissions.run"]
+
+# Fixtures — exported/imported with bench import-fixtures
+# Note: Workspace must NOT be shipped as a fixture — Frappe's post-migrate orphan
+# cleanup only protects workspaces defined at <app>/<module>/workspace/<name>/<name>.json,
+# so a fixture-defined public workspace gets deleted again in the same migrate run.
+# See stylo_core/stylo_core/workspace/stylo_core/stylo_core.json instead.
+fixtures = [
+    {
+        "dt": "Role",
+        "filters": [
+            [
+                "role_name",
+                "in",
+                ["Mobile App User", "Stylo Consultant", "Stylo License Administrator"],
+            ]
+        ],
+    },
+]
 
 # include js, css files in header of web template
 # web_include_css = "/assets/stylo_core/css/stylo_core.css"
@@ -159,9 +178,9 @@ doc_events = {
         "before_insert": "stylo_core.user_license.check_user_count_on_user_create",
         "validate": "stylo_core.user_license.check_user_count_on_user_create",
     },
-    "Has Role": {
-        # Block assigning brAIn User role when brain_user_limit is reached.
-        "before_insert": "stylo_core.user_license.check_brain_role_limit",
+    "Workflow Action": {
+        # Send Expo push notification to the approver's mobile device.
+        "after_insert": "stylo_core.notifications.push_workflow_notification",
     },
 }
 

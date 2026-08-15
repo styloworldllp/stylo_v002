@@ -1,0 +1,38 @@
+{
+ "actions": [],
+ "allow_rename": 0,
+ "creation": "2026-08-10 00:00:00.000000",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "module_key", "installed_on"
+ ],
+ "fields": [
+  {
+   "fieldname": "module_key",
+   "fieldtype": "Select",
+   "label": "Module",
+   "options": "stylo_core\nstylo_bms\nstylo_hr\nstylo_crm\nstylo_brain\nstylo_analytics\nstylo_lms\nstylo_lending\nstylo_desk\nstylo_reco\nstylo_command_center",
+   "reqd": 1,
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "installed_on",
+   "fieldtype": "Date",
+   "label": "Installed On",
+   "in_list_view": 1
+  }
+ ],
+ "istable": 1,
+ "links": [],
+ "modified": "2026-08-10 00:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "Command Center",
+ "name": "Site Module",
+ "owner": "Administrator",
+ "permissions": [],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "track_changes": 0
+}

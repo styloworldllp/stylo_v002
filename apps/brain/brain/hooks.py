@@ -7,7 +7,7 @@ app_license = "mit"
 app_logo_url = "/assets/brain/images/brain-logo.png"
 
 # Inject brAIn UI into every Frappe desk page
-app_include_js = ["/assets/brain/js/brain.js"]
+app_include_js = ["/assets/brain/js/brain.js?v=2"]
 app_include_css = ["/assets/brain/css/brain.css"]
 
 # DocType classes

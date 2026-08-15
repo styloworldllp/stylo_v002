@@ -1,0 +1,238 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "autoname": "hash",
+ "creation": "2026-08-08 01:37:36.666824",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "activity_type",
+  "ambulance",
+  "shift",
+  "paramedic",
+  "column_break_activity_1",
+  "event_datetime",
+  "latitude",
+  "longitude",
+  "section_break_activity_status",
+  "previous_status",
+  "new_status",
+  "column_break_activity_2",
+  "kit_balance_before",
+  "kit_balance_after",
+  "section_break_activity_ref",
+  "remarks",
+  "reference_doctype",
+  "reference_transaction",
+  "amended_from"
+ ],
+ "fields": [
+  {
+   "fieldname": "activity_type",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "Activity Type",
+   "options": "Shift Started\nShift Ended\nCall Started\nCall Completed\nRefill Requested\nRefill Completed\nCleaning Required\nCleaning Completed\nMechanical Issue\nMaintenance Completed\nManual Correction",
+   "read_only": 1,
+   "reqd": 1
+  },
+  {
+   "fieldname": "ambulance",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Ambulance",
+   "options": "Ambulance",
+   "read_only": 1,
+   "reqd": 1
+  },
+  {
+   "fieldname": "shift",
+   "fieldtype": "Link",
+   "label": "Shift",
+   "options": "Ambulance Shift",
+   "read_only": 1
+  },
+  {
+   "fieldname": "paramedic",
+   "fieldtype": "Link",
+   "label": "Paramedic",
+   "options": "Paramedic",
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_activity_1",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "event_datetime",
+   "fieldtype": "Datetime",
+   "in_list_view": 1,
+   "label": "Event Date-Time",
+   "read_only": 1,
+   "reqd": 1
+  },
+  {
+   "fieldname": "latitude",
+   "fieldtype": "Float",
+   "label": "Latitude",
+   "precision": "8",
+   "read_only": 1
+  },
+  {
+   "fieldname": "longitude",
+   "fieldtype": "Float",
+   "label": "Longitude",
+   "precision": "8",
+   "read_only": 1
+  },
+  {
+   "fieldname": "section_break_activity_status",
+   "fieldtype": "Section Break",
+   "label": "Status Change"
+  },
+  {
+   "fieldname": "previous_status",
+   "fieldtype": "Data",
+   "label": "Previous Status",
+   "read_only": 1
+  },
+  {
+   "fieldname": "new_status",
+   "fieldtype": "Data",
+   "label": "New Status",
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_activity_2",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "kit_balance_before",
+   "fieldtype": "Int",
+   "label": "Kit Balance Before",
+   "read_only": 1
+  },
+  {
+   "fieldname": "kit_balance_after",
+   "fieldtype": "Int",
+   "label": "Kit Balance After",
+   "read_only": 1
+  },
+  {
+   "fieldname": "section_break_activity_ref",
+   "fieldtype": "Section Break",
+   "label": "Details"
+  },
+  {
+   "fieldname": "remarks",
+   "fieldtype": "Small Text",
+   "label": "Remarks",
+   "read_only": 1
+  },
+  {
+   "fieldname": "reference_doctype",
+   "fieldtype": "Select",
+   "label": "Reference Document Type",
+   "options": "\nAmbulance Refill\nAmbulance Issue",
+   "read_only": 1
+  },
+  {
+   "fieldname": "reference_transaction",
+   "fieldtype": "Dynamic Link",
+   "label": "Reference Transaction",
+   "options": "reference_doctype",
+   "read_only": 1
+  },
+  {
+   "fieldname": "amended_from",
+   "fieldtype": "Link",
+   "label": "Amended From",
+   "no_copy": 1,
+   "options": "Ambulance Activity",
+   "print_hide": 1,
+   "read_only": 1,
+   "search_index": 1
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "is_submittable": 1,
+ "links": [],
+ "modified": "2026-08-08 02:19:24.006770",
+ "modified_by": "Administrator",
+ "module": "Stylo Fleet",
+ "name": "Ambulance Activity",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "cancel": 1,
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "submit": 1,
+   "write": 1
+  },
+  {
+   "cancel": 1,
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Fleet Admin",
+   "share": 1,
+   "submit": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Fleet Operations",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Fleet Station",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Fleet Paramedic",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "row_format": "Dynamic",
+ "rows_threshold_for_grid_search": 20,
+ "sort_field": "event_datetime",
+ "sort_order": "DESC",
+ "states": []
+}

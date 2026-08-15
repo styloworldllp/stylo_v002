@@ -80,3 +80,9 @@ control_center/frontend/dist/
 .idea/
 *.swp
 *.swo
+
+# ── Bench-root secrets & local-only artifacts (added 2026-08-15) ───────────
+.env
+config.json
+chromium/
+*.bak
