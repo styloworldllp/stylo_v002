@@ -1,0 +1,24 @@
+[project]
+name = "mint"
+authors = [
+    { name = "The Commit Company (Algocode Technologies Pvt. Ltd.)", email = "support@thecommit.company"}
+]
+description = "Bank reconciliation made simple for ERPNext"
+requires-python = ">=3.10"
+readme = "README.md"
+dynamic = ["version"]
+dependencies = [
+    # "frappe~=15.0.0" # Installed and managed by bench.
+    "google-cloud-documentai"
+]
+
+[build-system]
+requires = ["flit_core >=3.4,<4"]
+build-backend = "flit_core.buildapi"
+
+# These dependencies are only installed when developer mode is enabled
+[tool.bench.dev-dependencies]
+# package_name = "~=1.1.0"
+
+[tool.bench.frappe-dependencies]
+frappe = ">=15.0.0,<=17.0.0-dev"

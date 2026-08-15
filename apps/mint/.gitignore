@@ -1,0 +1,11 @@
+.DS_Store
+*.pyc
+*.egg-info
+*.swp
+tags
+node_modules
+__pycache__
+
+mint/public/mint
+mint/public/node_modules
+mint/www/mint.html

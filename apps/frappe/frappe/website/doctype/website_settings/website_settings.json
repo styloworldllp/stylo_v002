@@ -390,7 +390,7 @@
    "label": "Navbar Template"
   },
   {
-   "default": "Frappe",
+   "default": "Stylo",
    "fieldname": "app_name",
    "fieldtype": "Data",
    "label": "App Name"
