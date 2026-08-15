@@ -3,7 +3,7 @@
  * If the site license has expired (past grace period), replaces the page
  * body with a lock screen. Administrator is exempt.
  */
-frappe.ready(function () {
+frappe.after_ajax(function () {
 	if (frappe.session.user === "Administrator") return;
 
 	frappe

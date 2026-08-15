@@ -269,7 +269,60 @@ cd apps/frappe && node esbuild --production  # builds all apps
 bench --site <sitename> clear-cache
 
 # 9. Setup nginx + SSL + systemd (see stangroup config above as template)
+#    IMPORTANT: web systemd unit alone is NOT enough — you MUST also create a
+#    socketio systemd unit and an nginx /socket.io proxy block, or desk pages
+#    will randomly freeze/hang (browser's socket.io client retries in a tight
+#    loop against a dead port, saturating the ~6-connections-per-host limit
+#    and starving real API calls). See "Socket.io Service — Required on Every
+#    Site" below.
 ```
+
+### Socket.io Service — Required on Every Site
+
+Every production site needs a running socket.io process on `socketio_port`
+(default `9000`, set in `sites/common_site_config.json`). Without it, the
+browser's socket.io client fast-retries against a dead port forever, which
+starves the browser's connection pool and makes desk pages (Customize Form,
+DocType list, etc.) appear permanently stuck/frozen — this looks exactly like
+a doctype-specific bug but isn't; it happens on every page equally.
+
+Create `/etc/systemd/system/<sitename>-socketio.service` (adjust user/paths to
+match the site's web service):
+
+```ini
+[Unit]
+Description=<Site Name> Socket.IO Server
+After=network.target
+
+[Service]
+User=frappe
+WorkingDirectory=/home/frappe/stylo
+ExecStart=/usr/bin/node apps/frappe/socketio.js
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
+```
+
+```bash
+sudo systemctl daemon-reload
+sudo systemctl enable --now <sitename>-socketio.service
+```
+
+And add this nginx block alongside the site's other `location` blocks:
+
+```nginx
+location /socket.io {
+    proxy_pass http://127.0.0.1:9000;
+    proxy_http_version 1.1;
+    proxy_set_header Upgrade $http_upgrade;
+    proxy_set_header Connection "upgrade";
+    proxy_set_header Host $host;
+}
+```
+
+Verify with `sudo ss -tlnp | grep 9000` — must show the node process listening.
 
 ### Known issue: *.bundle.js files are gitignored
 
