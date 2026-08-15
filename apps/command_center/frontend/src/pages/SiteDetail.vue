@@ -7,6 +7,11 @@
       <div><span class="text-ink-gray-5">Status:</span> {{ site.doc.status }}</div>
       <div><span class="text-ink-gray-5">License:</span> {{ site.doc.license || '—' }}</div>
     </div>
+    <div v-if="session.isSuperAdmin" class="flex justify-end">
+      <Button variant="outline" theme="red" size="sm" @click="openDeleteDialog">
+        Delete Site
+      </Button>
+    </div>
     <div>
       <div class="mb-2 flex items-center justify-between">
         <div class="text-sm font-medium text-ink-gray-5">Installed Modules</div>
@@ -42,12 +47,43 @@
       </template>
     </Dialog>
 
+    <Dialog v-model="showDeleteDialog" :options="{ title: 'Delete Site — Irreversible' }">
+      <template #body-content>
+        <div class="space-y-3">
+          <p class="text-sm text-ink-red-4">
+            This drops the site's database and files on {{ site.doc.server }}. There is no
+            undo. Type the site name to confirm.
+          </p>
+          <FormControl label="Site name" v-model="deleteConfirmText" :placeholder="props.siteName" />
+          <FormControl
+            type="checkbox"
+            label="Take a backup first and store it in Command Center (recommended)"
+            v-model="deleteTakeBackup"
+          />
+          <Button
+            variant="solid"
+            theme="red"
+            :disabled="deleteConfirmText !== props.siteName"
+            @click="deleteSite"
+          >
+            Delete {{ props.siteName }}
+          </Button>
+        </div>
+      </template>
+    </Dialog>
+
     <DeployProgress
       v-model="showProgress"
-      title="Installing Module"
+      :title="progressTitle"
       :site="props.siteName"
       :since="progressSince"
-      @update:model-value="(open) => !open && site.reload()"
+      @update:model-value="
+        (open) => {
+          if (open) return
+          if (deleted) router.push('/command-center/sites')
+          else site.reload()
+        }
+      "
     />
   </div>
 </template>
@@ -55,11 +91,13 @@
 <script setup>
 import { ref, computed } from 'vue'
 import { createDocumentResource, createResource, call } from 'frappe-ui'
+import { useRouter } from 'vue-router'
 import { sessionStore } from '@/stores/session'
 import DeployProgress from '@/components/DeployProgress.vue'
 
 const props = defineProps({ siteName: String })
 const session = sessionStore()
+const router = useRouter()
 
 const site = createDocumentResource({
   doctype: 'Site',
@@ -76,6 +114,31 @@ const showInstallDialog = ref(false)
 const moduleToInstall = ref('')
 const showProgress = ref(false)
 const progressSince = ref(null)
+const progressTitle = ref('Installing Module')
+
+const showDeleteDialog = ref(false)
+const deleteConfirmText = ref('')
+const deleteTakeBackup = ref(true)
+const deleted = ref(false)
+
+function openDeleteDialog() {
+  deleteConfirmText.value = ''
+  deleteTakeBackup.value = true
+  showDeleteDialog.value = true
+}
+
+async function deleteSite() {
+  if (deleteConfirmText.value !== props.siteName) return
+  progressSince.value = await call('command_center.api.deploy.get_server_time')
+  progressTitle.value = 'Deleting Site'
+  await call('command_center.api.sites.request_delete_site', {
+    site: props.siteName,
+    take_backup: deleteTakeBackup.value,
+  })
+  showDeleteDialog.value = false
+  deleted.value = true
+  showProgress.value = true
+}
 
 const availableModules = computed(() => {
   const installed = new Set((site.doc?.modules || []).map((m) => m.module_key))
@@ -92,6 +155,7 @@ async function installModule() {
   // Captured before enqueueing so get_deploy_progress can exclude this site's Deploy Log
   // history from any module installed before now.
   progressSince.value = await call('command_center.api.deploy.get_server_time')
+  progressTitle.value = 'Installing Module'
   await call('command_center.api.deploy.request_add_module', {
     site: props.siteName,
     module_key: moduleToInstall.value,
