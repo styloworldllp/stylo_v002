@@ -140,7 +140,18 @@ def _ensure_app_source_ready(client, bench_path, app, site_request_name, site_na
 	then — after fixing that by hand — with `App X not in apps.txt`. Every check here is
 	idempotent (`pip show` / `grep -qx` first) so this is a fast no-op on a server that
 	already has the app ready, and self-heals a server that doesn't — this must work
-	"any time on any site" without needing a manual SSH pass first."""
+	"any time on any site" without needing a manual SSH pass first.
+
+	Deeper gap also hit live: `lending`'s app folder didn't exist on demo's bench at all —
+	it had never been pushed to styloworldllp/stylo_v002 in the first place (fixed
+	separately by committing it), but even once it's in the shared repo, a server only gets
+	it on its next `git pull`. The check below covers that — if the app folder is missing
+	outright, pull first (the bench's own `origin` remote already carries stored
+	credentials from its initial clone, so no token needs to live in this source file)."""
+	_run_step(
+		client, site_request_name, site_name, f"ensure_app_cloned:{app}",
+		f"[ -d '{bench_path}/apps/{app}' ] || (cd {bench_path} && git pull origin main)",
+	)
 	_run_step(
 		client, site_request_name, site_name, f"ensure_pip:{app}",
 		f"{bench_path}/env/bin/pip show {app} >/dev/null 2>&1 || "
@@ -180,6 +191,110 @@ def _ensure_app_assets_ready(client, bench_path, app, site_request_name, site_na
 			f"[ ! -f '{src}/package.json' ] || [ -f '{marker}' ] || "
 			f"(cd '{src}' && yarn install && yarn build)",
 		)
+
+
+def _setup_nginx_ssl(client, site_name, bench_path, site_request_name):
+	"""Provisions a real public vhost for a newly created site. `bench new-site` only creates
+	the Frappe-level site (DB + site folder) — without this, a request to the new domain has
+	no matching nginx server block. Confirmed live: on a shared server (demo/nhs/console all
+	behind one nginx, one shared `/etc/nginx/sites-available/stylo` file), an unmatched
+	HTTPS SNI falls through to whichever server block nginx treats as the implicit default
+	for that listen socket — here, demo.stylo.io's block, which has a *hardcoded*
+	`location = / { return 302 https://demo.stylo.io/desk; }`. So a freshly "created" site
+	just silently redirected to demo.stylo.io — nothing was actually serving it.
+
+	Written to its own file under conf.d/ rather than appended into the shared
+	sites-available/stylo file every other site lives in, so a bad render here can only ever
+	break this one site's own file — never the already-working shared config. `nginx -t`
+	gates every reload; if a render is ever wrong, this fails loudly as a Deploy Log step
+	instead of silently corrupting nginx for demo/nhs/console too.
+
+	Two-phase because the SSL cert doesn't exist yet when we need an HTTP vhost for certbot's
+	nginx authenticator to attach the ACME challenge to."""
+	conf_path = f"/etc/nginx/conf.d/{site_name}.conf"
+	tmp_path = f"/tmp/nginx_{site_name}.conf"
+
+	http_only = f"""server {{
+    listen 80;
+    server_name {site_name};
+    location / {{
+        return 301 https://$host$request_uri;
+    }}
+}}
+"""
+	sftp = client.open_sftp()
+	try:
+		with sftp.open(tmp_path, "w") as f:
+			f.write(http_only)
+	finally:
+		sftp.close()
+
+	_run_step(
+		client, site_request_name, site_name, "nginx_http_only",
+		f"sudo mv {tmp_path} {conf_path} && sudo nginx -t && sudo systemctl reload nginx",
+	)
+
+	_run_step(
+		client, site_request_name, site_name, "issue_ssl_cert",
+		f"sudo certbot certonly --nginx -d {site_name} --non-interactive --agree-tos "
+		f"-m support@stylo.io",
+	)
+
+	full_conf = f"""server {{
+    listen 80;
+    server_name {site_name};
+    return 301 https://$host$request_uri;
+}}
+server {{
+    listen 443 ssl;
+    server_name {site_name};
+    ssl_certificate /etc/letsencrypt/live/{site_name}/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/{site_name}/privkey.pem;
+    client_max_body_size 100m;
+
+    location = / {{
+        return 302 https://{site_name}/desk;
+    }}
+
+    location /assets {{
+        alias {bench_path}/sites/assets;
+        expires 30d;
+        add_header Cache-Control "public, immutable";
+        try_files $uri $uri/ =404;
+    }}
+
+    location /files {{
+        alias {bench_path}/sites/{site_name}/public/files;
+        expires 7d;
+        try_files $uri =404;
+    }}
+
+    location /private/files {{
+        internal;
+        alias {bench_path}/sites/{site_name}/private/files;
+    }}
+
+    location / {{
+        proxy_pass http://127.0.0.1:8000;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto https;
+        proxy_read_timeout 120s;
+    }}
+}}
+"""
+	sftp = client.open_sftp()
+	try:
+		with sftp.open(tmp_path, "w") as f:
+			f.write(full_conf)
+	finally:
+		sftp.close()
+
+	_run_step(
+		client, site_request_name, site_name, "nginx_full_ssl",
+		f"sudo mv {tmp_path} {conf_path} && sudo nginx -t && sudo systemctl reload nginx",
+	)
 
 
 def _notify_site_updated(client, site_request_name, site_name, bench_path):
@@ -390,6 +505,11 @@ def run_deployment(site_request: str):
 				"restart_service",
 				f"sudo systemctl restart {server_doc.web_service_name}",
 			)
+
+		# Step 5: nginx vhost + SSL — without this the site is only reachable on the
+		# backend, never at its own public URL (see _setup_nginx_ssl's docstring).
+		if "nginx_full_ssl" not in done:
+			_setup_nginx_ssl(client, site_name, bench_path, site_request)
 
 		site_doc.status = "Active"
 		site_doc.save(ignore_permissions=True)
