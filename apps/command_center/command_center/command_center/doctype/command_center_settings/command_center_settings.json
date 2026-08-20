@@ -11,7 +11,9 @@
   "section_break_thresholds",
   "metric_staleness_minutes",
   "section_break_notify",
-  "default_notification_recipients"
+  "default_notification_recipients",
+  "section_break_dns",
+  "godaddy_domain", "godaddy_api_key", "godaddy_api_secret"
  ],
  "fields": [
   {
@@ -69,6 +71,28 @@
    "fieldtype": "Small Text",
    "label": "Default Notification Recipients",
    "description": "Comma-separated user emails notified on deployment success/failure in addition to the requester"
+  },
+  {
+   "fieldname": "section_break_dns",
+   "fieldtype": "Section Break",
+   "label": "DNS (GoDaddy)"
+  },
+  {
+   "fieldname": "godaddy_domain",
+   "fieldtype": "Data",
+   "label": "Domain",
+   "default": "stylo.io",
+   "description": "Every new site's A record is created under this domain, pointed at its Server's host IP — without this, a freshly deployed site's DNS never points at the server it was actually deployed to (confirmed live: DNS pointed at demo's IP for a site deployed to stangroup, so nothing — including Let's Encrypt's own validator — could ever reach it)."
+  },
+  {
+   "fieldname": "godaddy_api_key",
+   "fieldtype": "Password",
+   "label": "API Key"
+  },
+  {
+   "fieldname": "godaddy_api_secret",
+   "fieldtype": "Password",
+   "label": "API Secret"
   }
  ],
  "issingle": 1,

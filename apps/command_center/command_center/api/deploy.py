@@ -193,6 +193,64 @@ def _ensure_app_assets_ready(client, bench_path, app, site_request_name, site_na
 		)
 
 
+def _ensure_dns_record(site_name, host_ip, site_request_name):
+	"""Points <site_name>'s DNS A record at the server it was actually deployed to. Confirmed
+	live as a real gap: a site created on `stangroup` had its DNS still resolving to `demo`'s
+	IP (from an old/manual record, or never set at all) — the nginx vhost and SSL cert were
+	provisioned correctly ON stangroup, but nothing on the public internet, including Let's
+	Encrypt's own HTTP-01 validator, could ever reach it there, so cert issuance failed with
+	a confusing "Invalid response" pointing at demo.stylo.io (demo's own fallback vhost is
+	what the validator actually hit). Must run — and be given time to propagate — before
+	_setup_nginx_ssl's certbot step.
+
+	Credentials come from Command Center Settings (Password fields), not this source file —
+	command_center is git-tracked now, so anything hardcoded here would leak into git
+	history."""
+	import time
+
+	import requests
+
+	settings = frappe.get_cached_doc("Command Center Settings")
+	domain = settings.godaddy_domain or "stylo.io"
+	api_key = get_decrypted_password(
+		"Command Center Settings", "Command Center Settings", "godaddy_api_key", raise_exception=False
+	)
+	api_secret = get_decrypted_password(
+		"Command Center Settings", "Command Center Settings", "godaddy_api_secret", raise_exception=False
+	)
+	if not api_key or not api_secret:
+		raise DeploymentError(
+			"GoDaddy API key/secret not configured in Command Center Settings — cannot "
+			"point this site's DNS at its server."
+		)
+
+	if not site_name.endswith(f".{domain}"):
+		raise DeploymentError(
+			f"Site {site_name} is not under the configured DNS domain ({domain}) — "
+			f"set up its DNS manually."
+		)
+	subdomain = site_name[: -(len(domain) + 1)]
+
+	resp = requests.put(
+		f"https://api.godaddy.com/v1/domains/{domain}/records/A/{subdomain}",
+		headers={
+			"Authorization": f"sso-key {api_key}:{api_secret}",
+			"Content-Type": "application/json",
+		},
+		json=[{"data": host_ip, "ttl": 600}],
+		timeout=30,
+	)
+	output = f"PUT A record {subdomain}.{domain} -> {host_ip}\nstatus: {resp.status_code}\n{resp.text}"
+	success = resp.status_code < 300
+	_log(site_request_name, site_name, "dns_record", output, success)
+	if not success:
+		raise DeploymentError(f"Step 'dns_record' failed: {resp.status_code} {resp.text[:500]}")
+
+	# Give GoDaddy's own nameservers a moment to actually start answering the new value —
+	# without this, certbot's very next step can still race a stale/absent answer.
+	time.sleep(30)
+
+
 def _setup_nginx_ssl(client, site_name, bench_path, site_request_name):
 	"""Provisions a real public vhost for a newly created site. `bench new-site` only creates
 	the Frappe-level site (DB + site folder) — without this, a request to the new domain has
@@ -505,6 +563,11 @@ def run_deployment(site_request: str):
 				"restart_service",
 				f"sudo systemctl restart {server_doc.web_service_name}",
 			)
+
+		# Step 4b: DNS — must point at this server BEFORE certbot tries to validate against
+		# it (see _ensure_dns_record's docstring for the exact failure this prevents).
+		if "dns_record" not in done:
+			_ensure_dns_record(site_name, server_doc.host, site_request)
 
 		# Step 5: nginx vhost + SSL — without this the site is only reachable on the
 		# backend, never at its own public URL (see _setup_nginx_ssl's docstring).
