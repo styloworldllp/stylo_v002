@@ -22,7 +22,15 @@
           <td>{{ r.client_name }}</td>
           <td>{{ r.sitename }}</td>
           <td>{{ r.server || '(auto)' }}</td>
-          <td><Badge :theme="statusTheme(r.status)">{{ r.status }}</Badge></td>
+          <td>
+            <Badge
+              :theme="statusTheme(r.status)"
+              :class="hasLog(r.status) ? 'cursor-pointer' : ''"
+              @click="hasLog(r.status) && viewLog(r.name)"
+            >
+              {{ r.status }}
+            </Badge>
+          </td>
           <td v-if="session.isSuperAdmin" class="space-x-2">
             <Button
               v-if="r.status === 'Pending Approval'"
@@ -137,6 +145,15 @@ const requests = createListResource({
   pageLength: 50,
   auto: true,
 })
+
+function hasLog(status) {
+  return status !== 'Draft' && status !== 'Pending Approval'
+}
+
+function viewLog(name) {
+  progressRequestName.value = name
+  showProgress.value = true
+}
 
 function statusTheme(status) {
   return {

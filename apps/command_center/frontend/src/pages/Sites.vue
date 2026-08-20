@@ -28,7 +28,13 @@
           <td>{{ site.server }}</td>
           <td>{{ site.module_count }} installed</td>
           <td>
-            <Badge :theme="statusTheme(site.status)">{{ site.status }}</Badge>
+            <Badge
+              :theme="statusTheme(site.status)"
+              :class="site.status === 'Failed' ? 'cursor-pointer' : ''"
+              @click.stop="site.status === 'Failed' && viewLog(site.name)"
+            >
+              {{ site.status }}
+            </Badge>
           </td>
         </tr>
       </tbody>
@@ -53,7 +59,7 @@
 
     <DeployProgress
       v-model="showProgress"
-      title="Importing Site"
+      :title="progressTitle"
       :site="progressSitename"
       :since="progressSince"
       @update:model-value="(open) => !open && sites.reload()"
@@ -89,6 +95,7 @@ const importError = ref('')
 const showProgress = ref(false)
 const progressSitename = ref('')
 const progressSince = ref(null)
+const progressTitle = ref('Importing Site')
 
 function openImportDialog() {
   importForm.value = { server: serverOptions.value[0] || '', sitename: '', client_name: '' }
@@ -102,6 +109,7 @@ async function importSite() {
   importError.value = ''
   try {
     progressSince.value = await call('command_center.api.deploy.get_server_time')
+    progressTitle.value = 'Importing Site'
     await call('command_center.api.sites.request_import_site', { ...importForm.value })
     progressSitename.value = importForm.value.sitename
     showImportDialog.value = false
@@ -111,6 +119,13 @@ async function importSite() {
   } finally {
     importing.value = false
   }
+}
+
+function viewLog(sitename) {
+  progressTitle.value = 'Deploy Log'
+  progressSitename.value = sitename
+  progressSince.value = null
+  showProgress.value = true
 }
 
 function statusTheme(status) {
