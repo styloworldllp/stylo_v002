@@ -363,20 +363,33 @@ def _notify_site_updated(client, site_request_name, site_name, bench_path):
 	stock "The application has been updated... Refresh" dialog with a Refresh button that
 	does `location.reload(true)`. Same mechanism `bench migrate` itself uses
 	(frappe/migrate.py). No custom popup needed — we're just triggering the one Frappe
-	already ships."""
-	_run_step(
-		client, site_request_name, site_name, "refresh_icons",
-		f"{_bench_prefix(bench_path)} bench --site '{site_name}' execute stylo_core.install_icons.run",
-	)
-	_run_step(
-		client, site_request_name, site_name, "clear_cache",
-		f"{_bench_prefix(bench_path)} bench --site '{site_name}' clear-cache",
-	)
-	_run_step(
-		client, site_request_name, site_name, "notify_update",
-		f"{_bench_prefix(bench_path)} bench --site '{site_name}' execute frappe.publish_realtime "
-		f"--args \"['version-update']\"",
-	)
+	already ships.
+
+	Each step below is best-effort (caught, not re-raised) — confirmed live: refresh_icons
+	failing (site genuinely had no stylo_core due to a separate now-fixed bug) propagated
+	all the way up and flipped an otherwise fully-successful deployment (site created, DNS
+	set, SSL issued) to "Failed", the same failure class already fixed once for the
+	post-deploy email. None of these three are load-bearing for "is the site actually up."
+	"""
+	for step_name, cmd in (
+		(
+			"refresh_icons",
+			f"{_bench_prefix(bench_path)} bench --site '{site_name}' execute stylo_core.install_icons.run",
+		),
+		(
+			"clear_cache",
+			f"{_bench_prefix(bench_path)} bench --site '{site_name}' clear-cache",
+		),
+		(
+			"notify_update",
+			f"{_bench_prefix(bench_path)} bench --site '{site_name}' execute frappe.publish_realtime "
+			f"--args \"['version-update']\"",
+		),
+	):
+		try:
+			_run_step(client, site_request_name, site_name, step_name, cmd)
+		except DeploymentError:
+			pass
 
 
 @frappe.whitelist()
