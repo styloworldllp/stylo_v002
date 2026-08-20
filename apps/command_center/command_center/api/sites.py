@@ -281,3 +281,33 @@ def delete_site(site: str, take_backup: bool = True, deleted_by: str | None = No
 		frappe.db.commit()
 	finally:
 		client.close()
+
+
+@frappe.whitelist()
+def change_admin_password(site: str, new_password: str):
+	"""Lets a Super Admin change a site's actual Administrator login password from Command
+	Center itself, rather than needing SSH — sites created here default to the standard
+	Administrator/stylo123Admin (see deploy.py::run_deployment), and this is how that gets
+	changed later for a specific site without touching every other site on the server."""
+	if SUPER_ADMIN_ROLE not in frappe.get_roles():
+		frappe.throw("Not permitted", frappe.PermissionError)
+
+	if not new_password or len(new_password) < 8:
+		frappe.throw("Password must be at least 8 characters")
+
+	site_doc = frappe.get_doc("Site", site)
+	server_doc = frappe.get_doc("Server", site_doc.server)
+	client = _get_ssh_client(server_doc)
+	try:
+		_run_step(
+			client, None, site, "change_admin_password",
+			f"{_bench_prefix(server_doc.bench_path)} bench --site '{site}' "
+			f"set-admin-password '{new_password}'",
+		)
+	finally:
+		client.close()
+
+	site_doc.admin_password = new_password
+	site_doc.save(ignore_permissions=True)
+	frappe.db.commit()
+	return {"status": "ok"}

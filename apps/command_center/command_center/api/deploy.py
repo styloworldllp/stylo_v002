@@ -14,7 +14,7 @@ import os
 import shlex
 
 import frappe
-from frappe.utils import get_bench_path, now_datetime, random_string
+from frappe.utils import get_bench_path, now_datetime
 from frappe.utils.password import get_decrypted_password
 
 from command_center.module_map import resolve_apps
@@ -486,7 +486,17 @@ def run_deployment(site_request: str):
 	try:
 		# Step 1: create_site
 		if "create_site" not in done:
-			admin_password = random_string(16)
+			# Default is the standard Administrator/stylo123Admin used across every
+			# Stylo-managed server (see CLAUDE.md) — a random per-site password was the
+			# old behavior but doesn't match how Bhanu actually wants to log into a new
+			# site's Administrator account day to day. A requester can still override it
+			# per-request via Site Request.admin_password.
+			admin_password = (
+				get_decrypted_password(
+					"Site Request", sr.name, "admin_password", raise_exception=False
+				)
+				or "stylo123Admin"
+			)
 			db_root_password = get_decrypted_password(
 				"Server", server_doc.name, "db_root_password", raise_exception=False
 			)

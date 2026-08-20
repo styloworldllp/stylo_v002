@@ -96,6 +96,12 @@
             v-model="newRequest.timezone"
             :options="[{ label: 'Select...', value: '' }, ...timezoneOptions]"
           />
+          <FormControl
+            label="Admin Password"
+            type="password"
+            v-model="newRequest.admin_password"
+            placeholder="Leave blank for the default (Administrator / stylo123Admin)"
+          />
           <Button variant="solid" @click="createRequest">Create</Button>
         </div>
       </template>
@@ -136,6 +142,7 @@ const newRequest = ref({
   country: '',
   currency: '',
   timezone: '',
+  admin_password: '',
 })
 
 const requests = createListResource({
@@ -181,6 +188,7 @@ async function createRequest() {
     country: '',
     currency: '',
     timezone: '',
+    admin_password: '',
   }
   requests.reload()
 }

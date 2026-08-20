@@ -10,7 +10,7 @@
   "column_break_1",
   "base_module", "requested_modules",
   "section_break_wizard",
-  "country", "currency", "timezone",
+  "country", "currency", "timezone", "admin_password",
   "section_break_server",
   "server", "server_auto_selected",
   "section_break_approval",
@@ -98,6 +98,12 @@
    "label": "Timezone",
    "reqd": 1,
    "description": "e.g. Asia/Kolkata, America/New_York"
+  },
+  {
+   "fieldname": "admin_password",
+   "fieldtype": "Password",
+   "label": "Admin Password",
+   "description": "Leave blank to use the standard default (Administrator / stylo123Admin). Can be changed later from the site's own page."
   },
   {
    "fieldname": "section_break_server",

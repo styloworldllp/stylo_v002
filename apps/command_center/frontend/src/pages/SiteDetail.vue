@@ -7,7 +7,10 @@
       <div><span class="text-ink-gray-5">Status:</span> {{ site.doc.status }}</div>
       <div><span class="text-ink-gray-5">License:</span> {{ site.doc.license || '—' }}</div>
     </div>
-    <div v-if="session.isSuperAdmin" class="flex justify-end">
+    <div v-if="session.isSuperAdmin" class="flex justify-end gap-2">
+      <Button variant="outline" size="sm" @click="openPasswordDialog">
+        Change Admin Password
+      </Button>
       <Button variant="outline" theme="red" size="sm" @click="openDeleteDialog">
         Delete Site
       </Button>
@@ -43,6 +46,22 @@
             restarts the site's web service. Check the Dashboard for failures.
           </p>
           <Button variant="solid" @click="installModule">Start Install</Button>
+        </div>
+      </template>
+    </Dialog>
+
+    <Dialog v-model="showPasswordDialog" :options="{ title: 'Change Admin Password' }">
+      <template #body-content>
+        <div class="space-y-3">
+          <p class="text-xs text-ink-gray-5">
+            Changes the Administrator login on {{ props.siteName }} itself (over SSH via
+            `bench set-admin-password`) — takes effect immediately.
+          </p>
+          <FormControl label="New Password" type="password" v-model="newAdminPassword" />
+          <p v-if="passwordError" class="text-xs text-ink-red-4">{{ passwordError }}</p>
+          <Button variant="solid" :loading="changingPassword" @click="changeAdminPassword">
+            Change Password
+          </Button>
         </div>
       </template>
     </Dialog>
@@ -120,6 +139,33 @@ const showDeleteDialog = ref(false)
 const deleteConfirmText = ref('')
 const deleteTakeBackup = ref(true)
 const deleted = ref(false)
+
+const showPasswordDialog = ref(false)
+const newAdminPassword = ref('')
+const changingPassword = ref(false)
+const passwordError = ref('')
+
+function openPasswordDialog() {
+  newAdminPassword.value = ''
+  passwordError.value = ''
+  showPasswordDialog.value = true
+}
+
+async function changeAdminPassword() {
+  changingPassword.value = true
+  passwordError.value = ''
+  try {
+    await call('command_center.api.sites.change_admin_password', {
+      site: props.siteName,
+      new_password: newAdminPassword.value,
+    })
+    showPasswordDialog.value = false
+  } catch (e) {
+    passwordError.value = e.messages?.join(', ') || e.message || 'Failed to change password'
+  } finally {
+    changingPassword.value = false
+  }
+}
 
 function openDeleteDialog() {
   deleteConfirmText.value = ''
