@@ -75,8 +75,20 @@
           <FormControl label="Client Name" v-model="newRequest.client_name" />
           <FormControl label="Client Contact Email" v-model="newRequest.client_contact_email" />
           <FormControl label="Proposed Site Name" v-model="newRequest.sitename" />
-          <FormControl label="Base Module" type="select" v-model="newRequest.base_module"
-            :options="['crm', 'bms', 'hr', 'lms', 'desk', 'brain', 'insights']" />
+          <div>
+            <label class="mb-1 block text-sm text-ink-gray-5">Modules</label>
+            <p class="mb-2 text-xs text-ink-gray-5">Stylo Core is always included. Pick any others this client needs — you're not limited to one.</p>
+            <div class="grid grid-cols-2 gap-1.5">
+              <label
+                v-for="m in moduleChoices"
+                :key="m"
+                class="flex items-center gap-2 text-sm"
+              >
+                <input type="checkbox" :value="m" v-model="newRequest.modules" />
+                {{ moduleLabel(m) }}
+              </label>
+            </div>
+          </div>
           <div class="border-t pt-3 text-sm font-medium text-ink-gray-5">Setup Wizard</div>
           <FormControl
             label="Country"
@@ -130,20 +142,38 @@ const countryOptions = computed(() => (formChoices.data?.countries || []).map((c
 const currencyOptions = computed(() => (formChoices.data?.currencies || []).map((c) => ({ label: c, value: c })))
 const timezoneOptions = computed(() => (formChoices.data?.timezones || []).map((t) => ({ label: t, value: t })))
 
+const moduleChoicesResource = createResource({
+  url: 'command_center.module_map.get_module_choices',
+  auto: true,
+})
+// stylo_core is always included automatically; stylo_command_center is this app itself,
+// not something a client site installs — both are excluded from the picker.
+const moduleChoices = computed(() =>
+  (moduleChoicesResource.data || []).filter((m) => !['stylo_core', 'stylo_command_center'].includes(m)),
+)
+function moduleLabel(key) {
+  return key
+    .replace(/^stylo_/, '')
+    .split('_')
+    .map((w) => w[0].toUpperCase() + w.slice(1))
+    .join(' ')
+}
+
 const session = sessionStore()
 const showNewDialog = ref(false)
 const showProgress = ref(false)
 const progressRequestName = ref('')
-const newRequest = ref({
+const emptyRequest = () => ({
   client_name: '',
   client_contact_email: '',
   sitename: '',
-  base_module: 'crm',
+  modules: [],
   country: '',
   currency: '',
   timezone: '',
   admin_password: '',
 })
+const newRequest = ref(emptyRequest())
 
 const requests = createListResource({
   doctype: 'Site Request',
@@ -174,22 +204,18 @@ function statusTheme(status) {
 }
 
 async function createRequest() {
+  const { modules, ...rest } = newRequest.value
+  // stylo_core first (deploy.py installs in requested_modules order), then whatever was
+  // checked — sent directly as the child table so any number of modules can be requested
+  // in one go, not just the single "base_module" the old single-select allowed.
+  const requested_modules = ['stylo_core', ...modules].map((module_key) => ({ module_key }))
   await call('frappe.client.insert', {
-    doc: { doctype: 'Site Request', ...newRequest.value },
+    doc: { doctype: 'Site Request', ...rest, requested_modules },
   }).then((doc) =>
     call('command_center.api.site_request.submit_for_approval', { site_request: doc.name }),
   )
   showNewDialog.value = false
-  newRequest.value = {
-    client_name: '',
-    client_contact_email: '',
-    sitename: '',
-    base_module: 'crm',
-    country: '',
-    currency: '',
-    timezone: '',
-    admin_password: '',
-  }
+  newRequest.value = emptyRequest()
   requests.reload()
 }
 
