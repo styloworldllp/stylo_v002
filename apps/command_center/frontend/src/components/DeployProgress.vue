@@ -20,7 +20,7 @@
             <span v-if="s.success" class="mt-0.5 text-ink-green-3">✓</span>
             <span v-else class="mt-0.5 text-ink-red-4">✗</span>
             <div class="flex-1">
-              <div :class="s.success ? '' : 'font-medium text-ink-red-4'">{{ s.step }}</div>
+              <div :class="s.success ? '' : 'font-medium text-ink-red-4'">{{ formatStep(s.step) }}</div>
               <pre
                 v-if="!s.success"
                 class="mt-1 max-h-40 overflow-auto rounded bg-surface-gray-2 p-2 text-xs"
@@ -61,6 +61,20 @@ const show = computed({
 const steps = ref([])
 const overall = ref('in_progress')
 let pollTimer = null
+
+// Step names are built server-side from internal app-folder slugs (e.g.
+// "ensure_app_cloned:frappe") — "frappe" there is the real directory/package name
+// and can't change, but it must never render as the literal word to the user.
+// Only the display label is remapped; the underlying step/app identifiers are untouched.
+const APP_LABELS = { frappe: 'Stylo' }
+
+function formatStep(step) {
+  const [action, app] = step.split(':')
+  if (app && APP_LABELS[app]) {
+    return [action, APP_LABELS[app], ...step.split(':').slice(2)].join(':')
+  }
+  return step
+}
 
 async function poll() {
   const result = await call('command_center.api.deploy.get_deploy_progress', {
