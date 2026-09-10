@@ -1,0 +1,50 @@
+{
+ "actions": [],
+ "creation": "2026-09-11 00:00:00.000000",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "hrms_enabled",
+  "crm_enabled"
+ ],
+ "fields": [
+  {
+   "fieldname": "hrms_enabled",
+   "fieldtype": "Check",
+   "label": "Show HRMS in Mobile App",
+   "default": "1",
+   "description": "Only takes effect if the hrms app is actually installed on this site."
+  },
+  {
+   "fieldname": "crm_enabled",
+   "fieldtype": "Check",
+   "label": "Show CRM in Mobile App",
+   "default": "1",
+   "description": "Only takes effect if the crm app is actually installed on this site."
+  }
+ ],
+ "issingle": 1,
+ "links": [],
+ "modified": "2026-09-11 00:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "Stylo Core",
+ "name": "Stylo Mobile Settings",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 0,
+   "email": 0,
+   "export": 0,
+   "print": 0,
+   "read": 1,
+   "report": 0,
+   "role": "System Manager",
+   "share": 0,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "track_changes": 1
+}

@@ -2,21 +2,47 @@
 Mobile API — authentication and data helpers for the Stylo mobile app.
 
 Auth flow:
-  1. POST /api/method/login  (standard Frappe, sets session)
-  2. GET  stylo_core.mobile_auth.check_mobile_access  — confirm permission
-  3. GET  stylo_core.mobile_auth.get_api_keys          — get token pair
-  4. From then on: Authorization: token {api_key}:{api_secret}
+  1. POST stylo_core.mobile_auth.mobile_login (usr, pwd) — one shot: verifies the
+     password, opens a session, and returns { api_key, api_secret, ...profile } in a
+     single JSON body. Deliberately NOT a two-step "POST /api/method/login then read the
+     Set-Cookie header" flow — React Native's fetch does not expose Set-Cookie to JS
+     (same restriction browsers have), so that flow silently produces an empty session id
+     on-device even though it works fine in a browser or curl. Doing the whole thing
+     server-side in one request sidesteps the problem entirely.
+  2. From then on: Authorization: token {api_key}:{api_secret}
 
 All subsequent data calls use standard Frappe REST or the helpers below.
 """
 
 import frappe
 import secrets
+from frappe.utils.password import check_password
 
 
 # ─── Permission ────────────────────────────────────────────────────────────────
 
 MOBILE_ROLE = "Mobile App User"
+
+
+# ─── Login ─────────────────────────────────────────────────────────────────────
+
+@frappe.whitelist(allow_guest=True)
+def mobile_login(usr: str, pwd: str):
+    """Authenticate + return API credentials and profile in one response.
+    See module docstring for why this replaces the old cookie-relay flow."""
+    if not usr or not pwd:
+        frappe.throw("Username and password are required", frappe.AuthenticationError)
+
+    # Raises frappe.AuthenticationError on a bad password — propagates as a normal
+    # error response the client already knows how to surface.
+    check_password(usr, pwd)
+
+    frappe.local.login_manager.login_as(usr)
+
+    keys = get_api_keys()
+    profile = get_user_profile()
+
+    return {**keys, **profile}
 
 
 @frappe.whitelist()
@@ -192,6 +218,30 @@ def _get_workspace_icon(workspace_name: str) -> str:
     # Fallback: use the Frappe icon name (mobile app maps these to bundled images)
     ws = frappe.db.get_value("Workspace", workspace_name, ["icon"], as_dict=True)
     return ws.icon if ws else ""
+
+
+# module_key -> (installed app to check for, Stylo Mobile Settings field that can turn it
+# off even when installed). Extend this dict when a new module gets real mobile screens —
+# add a matching Check field to the Stylo Mobile Settings doctype at the same time.
+MOBILE_MODULES = {
+	"hrms": {"app": "hrms", "settings_field": "hrms_enabled"},
+	"crm": {"app": "crm", "settings_field": "crm_enabled"},
+}
+
+
+@frappe.whitelist()
+def get_enabled_modules():
+	"""Which of the mobile app's optional module tabs (HRMS, CRM, ...) should this site's
+	users actually see — a module only shows when it's BOTH installed on the site AND not
+	explicitly turned off in Stylo Mobile Settings. Lets each client site show exactly the
+	modules it actually has, instead of a fixed set baked into the app build."""
+	installed = set(frappe.get_installed_apps())
+	settings = frappe.get_single("Stylo Mobile Settings")
+
+	return {
+		key: (cfg["app"] in installed) and bool(settings.get(cfg["settings_field"], 1))
+		for key, cfg in MOBILE_MODULES.items()
+	}
 
 
 # ─── Home Stats ────────────────────────────────────────────────────────────────
